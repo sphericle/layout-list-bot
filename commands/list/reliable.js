@@ -1,4 +1,10 @@
-const { SlashCommandBuilder, EmbedBuilder, ButtonBuilder, ActionRowBuilder, ButtonStyle } = require("discord.js");
+const {
+    SlashCommandBuilder,
+    EmbedBuilder,
+    ButtonBuilder,
+    ActionRowBuilder,
+    ButtonStyle,
+} = require("discord.js");
 const logger = require("log4js").getLogger();
 const { submissionResultsID, guildId } = require("../../config.json");
 
@@ -298,11 +304,13 @@ module.exports = {
                 content: "Updating thread name...",
                 ephemeral: true,
             });
-            
+
             const message = await interaction.channel.send(
-                `This level has been ${command === "accept" ? "accepted" : "rejected"}.`
+                `This level has been ${
+                    command === "accept" ? "accepted" : "rejected"
+                }.`
             );
-            
+
             await interaction.channel.setName(
                 `${matchLevelName[1]} (${
                     command === "accept" ? "ACCEPTED" : "REJECTED"
@@ -316,7 +324,7 @@ module.exports = {
                 .setCustomId("deleteThread")
                 .setLabel("Delete Thread")
                 .setStyle(ButtonStyle.Danger);
-    
+
             const row = new ActionRowBuilder().addComponents(deleteThread);
 
             await interaction.editReply({
