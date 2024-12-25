@@ -442,6 +442,18 @@ module.exports = {
                             { name: "No", value: 0 }
                         )
                 )
+        )
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName("voteinsert")
+                .setDescription("debug")
+                .addStringOption((option) =>
+                    option
+                        .setName("submitteruser")
+                        .setDescription("The name of the user to insert")
+                        .setRequired(true)
+                        .setAutocomplete(true)
+                )
         ),
     async autocomplete(interaction) {
         const focused = interaction.options.getFocused(true);
@@ -2003,7 +2015,7 @@ module.exports = {
             });
             if (!submitter) {
                 // create submitter
-                db.submitters.create({
+                await db.submitters.create({
                     discordid: user,
                     submissions: 0,
                     dmFlag: false,
@@ -2011,7 +2023,7 @@ module.exports = {
                 });
             }
 
-            db.levelsInVoting.create({
+            await db.levelsInVoting.create({
                 levelname: matchLevelName[1],
                 submitter: user,
                 discordid: interaction.channel.id,
