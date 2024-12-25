@@ -127,14 +127,6 @@ module.exports = {
     // Sequelize sync init
     async sequelizeInit(db, cache) {
         logger.info("Syncing database data...");
-        // bro
-        try {
-            await db.staffSettings.destroy(
-                { where: {} }
-            )
-        } catch (e) {
-            logger.error(`Error updating staff settings: ${e}`);
-        }
         for (const table of Object.keys(db))
             await db[table].sync({ alter: true });
         for (const table of Object.keys(cache)) {
