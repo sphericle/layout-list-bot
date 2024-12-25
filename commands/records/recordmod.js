@@ -1110,7 +1110,7 @@ module.exports = {
                         inline: true,
                     },
                     { name: "Device", value: `${newDevice} (${newFPS} FPS)`, inline: true },
-                    { name: "Link", value: `${newDevice}`, inline: true },
+                    { name: "Link", value: `${oldRecord.completionlink}`, inline: true },
                     {
                         name: "Enjoyment",
                         value: newEnjoyment ? `${newEnjoyment}/10` : "None",
