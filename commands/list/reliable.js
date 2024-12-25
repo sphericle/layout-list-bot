@@ -309,7 +309,7 @@ module.exports = {
                 })`
             ); // Set the channel name to the same thing but with the added yes
 
-            awair message.delete();
+            await message.delete();
 
             // Create button to remove the message
             const deleteThread = new ButtonBuilder()
