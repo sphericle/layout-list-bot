@@ -505,7 +505,8 @@ module.exports = {
             );
         } else if (
             subcommand === "submitban" ||
-            subcommand === "setsubmissions"
+            subcommand === "setsubmissions" ||
+            subcommand === "voteinsert"
         ) {
             const members = interaction.guild.members.cache;
             const filtered = members
