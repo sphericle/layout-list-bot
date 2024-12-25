@@ -100,6 +100,16 @@ async function start() {
     } catch (e) {
         logger.error(`Error setting presence: ${e}`);
     }
+    
+    // bro
+    try {
+        await db.staffSettings.destroy(
+            { where: {} }
+        )
+    } catch (e) {
+        logger.error(`Error updating votes: ${e}`);
+    }
+    
 }
 
 start();
