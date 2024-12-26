@@ -4,3 +4,4 @@ logs
 .env
 .env.debug
 .env.real
+.DS_Store

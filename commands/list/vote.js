@@ -11,11 +11,11 @@ module.exports = {
     enabled: true,
     data: new SlashCommandBuilder()
         .setName("vote")
-        .setDescription("Bot ping measurements")
+        .setDescription("Commands to manage your levels submitted to the Layout List.")
         .addSubcommand((subcommand) =>
             subcommand
                 .setName("submit")
-                .setDescription("Submit a level to be voted on")
+                .setDescription("Submit a level to be voted on by the reliable team")
                 .addStringOption((option) =>
                     option
                         .setName("levelname")
@@ -104,7 +104,7 @@ module.exports = {
             subcommand
                 .setName("dm")
                 .setDescription(
-                    "Toggle D/* M */s when someone votes for your level"
+                    "Toggle DMs when someone votes for your level"
                 )
                 .addIntegerOption((option) =>
                     option
