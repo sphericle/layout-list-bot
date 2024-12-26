@@ -332,7 +332,10 @@ module.exports = {
                 components: command === "reject" ? [row] : [],
                 ephemeral: true,
             });
-            if (command === "reject") interaction.channel.setArchived(true);
+            if (command === "reject") {
+                interaction.channel.setArchived(true);
+                interaction.channel.setLocked(true)
+            }
 
             await db.levelsInVoting.destroy({
                 where: { discordid: interaction.channel.id },
