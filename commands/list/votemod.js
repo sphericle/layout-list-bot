@@ -1,9 +1,6 @@
 const { SlashCommandBuilder } = require("discord.js");
 const {
-    guildId,
-    reliableThreadID,
-    staffRole,
-    submissionsChannelID,
+    guildId
 } = require("../../config.json");
 const logger = require("log4js").getLogger();
 
@@ -77,7 +74,6 @@ module.exports = {
         ),
     async autocomplete(interaction) {
         const focused = interaction.options.getFocused(true);
-        const { db } = require("../../index.js");
         const subcommand = interaction.options.getSubcommand();
         if (
             subcommand === "submitban" ||
@@ -243,7 +239,6 @@ module.exports = {
             });
 
             levels.forEach(async (level) => {
-                // get discord thread associated with level.discordid
                 const channel = await guild.channels.cache.get(level.discordid);
 
                 await channel.send(
