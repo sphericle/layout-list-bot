@@ -1,6 +1,6 @@
 name: Bug Report
-description: Report a Geode bug (not mods themselves) where something is not working as expected in Geode Loader (not mods created by others), which does not crash the game.
-labels: [ "unverified", "bug" ]
+description: Report a bug in a command or elsewhere from the bot.
+labels: [ "bug" ]
 body:
   - type: textarea
     id: command
