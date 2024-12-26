@@ -1,5 +1,5 @@
 const logger = require("log4js").getLogger();
-const { submissionsChannelID }= require("../config.json")
+const { submissionsChannelID } = require("../config.json");
 module.exports = {
     name: "updateCache",
     cron: "0 5 0 * * *",
@@ -11,7 +11,11 @@ module.exports = {
         logger.log("Scheduled - Submissions reset!");
 
         // please work
-        const logChannel = await interaction.guild.channels.cache.get(submissionsChannelID);
-        return await logChannel.send("The monthly submissions has been reset to 0 for all users!");
+        const logChannel = await interaction.guild.channels.cache.get(
+            submissionsChannelID
+        );
+        return await logChannel.send(
+            "The monthly submissions has been reset to 0 for all users!"
+        );
     },
 };
