@@ -207,7 +207,7 @@ module.exports = {
             // check if user has 3 submissions already
             if (user.submissions >= 3)
                 return interaction.editReply(
-                    ":x: You have reached the maximum number of submissions per month."
+                    ":x: You have reached the maximum number of 3 submissions per month."
                 );
 
             if (user.banned)
