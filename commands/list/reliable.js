@@ -196,7 +196,7 @@ module.exports = {
                     if (voteMessage) await voteMessage.pin();
 
                     const message = await interaction.channel.send(
-                        `The vote is now at **${count}-${matchNo[1]}**.`
+                        `The vote is now at **${matchYes[1]}-${count}**.`
                     );
 
                     await interaction.channel.setName(
