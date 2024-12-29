@@ -295,10 +295,13 @@ module.exports = {
                     `Reason: ${interaction.options.getString("reason")}`
                 );
             await interaction.editReply("Sending message...");
-            await submissionsChannel.send({
+            const submissionMessage = await submissionsChannel.send({
                 embeds: [embed],
                 content: `<@${submission.submitter}>`,
             });
+
+            await submissionMessage.react("👍");
+            await submissionMessage.react("👎");
 
             await interaction.editReply({
                 content: "Updating thread name...",
