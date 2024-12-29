@@ -187,7 +187,6 @@ module.exports = {
                         break;
                 }
             }
-
             const level1 = interaction.options.getString("level1") || null;
             const level2 = interaction.options.getString("level2") || null;
             const level3 = interaction.options.getString("level3") || null;
@@ -283,7 +282,85 @@ module.exports = {
                 ":white_check_mark: Pack created successfully!"
             );
 
-        } else if (subcommand === "edit" || subcommand === "remove") {
+        } else if (subcommand === "remove") {
+            const pack = interaction.options.getString("pack");
+
+            // fetch github data path / _packs.json
+            let fileResponse;
+            try {
+                fileResponse = await octokit.rest.repos.getContent({
+                    owner: githubOwner,
+                    repo: githubRepo,
+                    path: githubDataPath + `/_packs.json`,
+                    branch: githubBranch,
+                });
+            } catch (fetchError) {
+                logger.info(`Couldn't fetch flags.json: \n${fetchError}`);
+                return await interaction.editReply(
+                    `:x: Couldn't fetch flags.json: \n${fetchError}`
+                );
+            }
+
+            let parsedData;
+            try {
+                parsedData = JSON.parse(
+                    Buffer.from(fileResponse.data.content, "base64").toString(
+                        "utf-8"
+                    )
+                );
+            } catch (parseError) {
+                logger.info(`Unable to parse flags data:\n${parseError}`);
+                return await interaction.editReply(
+                    `:x: Unable to parse flags data:\n${parseError}`
+                );
+            }
+
+            const packIndex = parsedData.findIndex((pack) => pack.name === pack);
+
+            if (packIndex === -1)
+                return await interaction.editReply(
+                    `:x: A pack with the name ${pack} doesn't exist!`
+                );
+            
+            parsedData.splice(packIndex, 1);
+
+            // commit
+            let fileSha;
+            try {
+                const response = await octokit.repos.getContent({
+                    owner: githubOwner,
+                    repo: githubRepo,
+                    path: githubDataPath + `/_packs.json`,
+                });
+                fileSha = response.data.sha;
+            } catch (error) {
+                logger.info(`Error fetching _packs.json SHA:\n${error}`);
+                return await interaction.editReply(
+                    `:x: Couldn't fetch data from _packs.json`
+                );
+            }
+            try {
+                await octokit.repos.createOrUpdateFileContents({
+                    owner: githubOwner,
+                    repo: githubRepo,
+                    path: githubDataPath + `/_packs.json`,
+                    branch: githubBranch,
+                    message: `Added ${name} to _packs.json)`,
+                    content: Buffer.from(
+                        JSON.stringify(parsedData, null, "\t")
+                    ).toString("base64"),
+                    sha: fileSha,
+                });
+            } catch (updateError) {
+                logger.info(`Couldn't update flags.json: \n${updateError}`);
+                return await interaction.editReply(
+                    `:x: Couldn't update flags.json: \n${updateError}`
+                );
+            }
+            return await interaction.editReply(
+                ":white_check_mark: Pack removed successfully!"
+            );
+        } else if (subcommand === "edit" ) {
             return await interaction.editReply(
                 ":x: This command is not yet implemented"
             );
