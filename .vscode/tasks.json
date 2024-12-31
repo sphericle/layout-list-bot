@@ -4,6 +4,12 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "kill node",
+            "type": "shell",
+            "command": "pkill -f 'node ./bot.js'",
+            "problemMatcher": []
+        },
+        {
             "label": "run node",
             "type": "shell",
             "command": "node ./bot.js",
@@ -14,7 +20,8 @@
             },
             "options": {
                 "cwd": "${workspaceFolder}"
-            }
+            },
+            "dependsOn": "kill node"
         }
     ]
 }
