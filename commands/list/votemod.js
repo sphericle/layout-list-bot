@@ -45,7 +45,7 @@ module.exports = {
                 .setDescription("Submission ban a user")
                 .addStringOption((option) =>
                     option
-                        .setName("submitteruser")
+                        .setName("submitter")
                         .setDescription("The user to ban from submitting")
                         .setAutocomplete(true)
                         .setRequired(true)
@@ -66,7 +66,7 @@ module.exports = {
                 .setDescription("debug")
                 .addStringOption((option) =>
                     option
-                        .setName("submitteruser")
+                        .setName("submitter")
                         .setDescription("The name of the user to insert")
                         .setRequired(true)
                         .setAutocomplete(true)
@@ -150,7 +150,7 @@ module.exports = {
 
             const text = await interaction.channel.name;
             const matchLevelName = text.match(/^(.*)\s\d+-\d+$/);
-            const user = await interaction.options.getString("submitteruser");
+            const user = await interaction.options.getString("submitter");
             const matchYes = text.match(/(\d+)-\d+$/);
             const matchNo = text.match(/\d+-(\d+)$/);
 
@@ -204,7 +204,7 @@ module.exports = {
             );
         } else if (interaction.options.getSubcommand() === "submitban") {
             const { db } = require("../../index.js");
-            const user = await interaction.options.getString("submitteruser");
+            const user = await interaction.options.getString("submitter");
             const unban = await interaction.options.getInteger("unban");
             if (unban === 1) {
                 await db.submitters.update(

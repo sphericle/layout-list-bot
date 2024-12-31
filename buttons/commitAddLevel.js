@@ -35,7 +35,7 @@ module.exports = {
                 path: githubDataPath + "/_list.json",
                 branch: githubBranch,
             });
-        } catch (_) {
+        } catch {
             return await interaction.editReply(
                 ":x: Something went wrong while fetching data from github, please try again later"
             );
@@ -48,7 +48,7 @@ module.exports = {
                 path: githubDataPath + "/_changelog.json",
                 branch: githubBranch,
             });
-        } catch (_) {
+        } catch {
             logger.info("No changelog file found, creating a new one");
         }
 
@@ -107,7 +107,7 @@ module.exports = {
             return await interaction.editReply(
                 ":x: The file for this level already exists"
             );
-        } catch (_) {
+        } catch {
             // File does not exist
 
             const changes = [

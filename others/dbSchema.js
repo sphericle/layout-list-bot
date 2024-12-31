@@ -199,6 +199,7 @@ module.exports = {
         const {
             updateCachedLevels,
             updateCachedUsers,
+            updateCachedPacks
         } = require("./cacheUpdate.js");
         cache.levels = sequelize_cache.define("levels", {
             name: Sequelize.STRING,
@@ -222,9 +223,15 @@ module.exports = {
             name: Sequelize.STRING,
             user_id: Sequelize.STRING,
         });
+        cache.packs = sequelize_cache.define("packs", {
+            name: Sequelize.STRING,
+            difficulty: Sequelize.INTEGER,
+            isDiff: Sequelize.BOOLEAN,
+        });
 
         cache.updateLevels = async () => await updateCachedLevels();
         cache.updateUsers = async () => await updateCachedUsers();
+        cache.updatePacks = async () => await updateCachedPacks();
         return cache;
     },
 };

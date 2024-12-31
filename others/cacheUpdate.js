@@ -87,4 +87,41 @@ module.exports = {
             );
         }
     },
+    async updateCachedPacks() {
+        const { cache } = require("../index.js");
+        const fs = require("fs");
+        const path = require("path");
+        const { localRepoPath } = require("../config.json");
+        const packs = [];
+        logger.info("Updating cached packs...");
+
+        let parsedData;
+        try {
+            parsedData = JSON.parse(
+                fs.readFileSync(
+                    path.join(localRepoPath, `data/_packs.json`),
+                    "utf8"
+                )
+            );
+        } catch (parseError) {
+            logger.error(
+                "Git - " +
+                    `Unable to parse data from _packs.json:\n${parseError}`
+            );
+        }
+        packs.push({
+            name: parsedData.name,
+            difficulty: parsedData.difficulty,
+            isDiff: parsedData.levels && parsedData.levels.length > 0,
+        })
+        cache.packs.destroy({ where: {} });
+        try {
+            cache.packs.bulkCreate(packs);
+            logger.info(`Successfully updated ${packs.length} cached packs.`);
+        } catch (error) {
+            logger.info(
+                `Couldn't udate cached packs, something went wrong with sequelize: ${error}`
+            );
+        }
+    }
 };

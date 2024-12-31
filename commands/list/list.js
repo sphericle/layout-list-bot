@@ -11,7 +11,6 @@ const {
     githubRepo,
     githubDataPath,
     githubBranch,
-    guildId,
 } = require("../../config.json");
 const logger = require("log4js").getLogger();
 const Sequelize = require("sequelize");
@@ -410,7 +409,7 @@ module.exports = {
                     path: githubDataPath + "/_list.json",
                     branch: githubBranch,
                 });
-            } catch (_) {
+            } catch {
                 return await interaction.editReply(
                     ":x: Something went wrong while fetching data from github, please try again later"
                 );
@@ -823,7 +822,7 @@ module.exports = {
                     path: githubDataPath + "/_list.json",
                     branch: githubBranch,
                 });
-            } catch (_) {
+            } catch {
                 return await interaction.editReply(
                     ":x: Something went wrong while fetching data from github, please try again later"
                 );
@@ -905,7 +904,7 @@ module.exports = {
                     path: githubDataPath + "/_list.json",
                     branch: githubBranch,
                 });
-            } catch (_) {
+            } catch {
                 return await interaction.editReply(
                     ":x: Something went wrong while fetching data from github, please try again later"
                 );
@@ -974,7 +973,7 @@ module.exports = {
                     path: githubDataPath + "/_list.json",
                     branch: githubBranch,
                 });
-            } catch (_) {
+            } catch {
                 return await interaction.editReply(
                     ":x: Something went wrong while fetching data from github, please try again later"
                 );
@@ -1606,7 +1605,7 @@ module.exports = {
                     path: githubDataPath + "/_list.json",
                     branch: githubBranch,
                 });
-            } catch (_) {
+            } catch {
                 return await interaction.editReply(
                     ":x: Something went wrong while fetching data from github, please try again later"
                 );
@@ -1625,7 +1624,7 @@ module.exports = {
                     path: githubDataPath + "/_list.json",
                     branch: githubBranch,
                 });
-            } catch (_) {
+            } catch {
                 return await interaction.editReply(
                     ":x: Something went wrong while fetching data from github, please try again later"
                 );
@@ -1638,7 +1637,7 @@ module.exports = {
                     path: githubDataPath + "/_changelog.json",
                     branch: githubBranch,
                 });
-            } catch (_) {
+            } catch {
                 logger.info("No changelog file found, creating a new one");
             }
 
