@@ -28,13 +28,13 @@ module.exports = {
             } catch (error) {
                 logger.error(
                     "Scheduled - " +
-                        `Couldn't udate cached levels, something went wrong with sequelize: ${error}`
+                        `Couldn't update cached levels, something went wrong with sequelize: ${error}`
                 );
             }
         } else {
             logger.error(
                 "Scheduled - " +
-                    "Canceled updating levels cachee: no levels found."
+                    "Canceled updating levels cache: no levels found."
             );
         }
 
@@ -91,7 +91,7 @@ module.exports = {
         const { cache } = require("../index.js");
         const fs = require("fs");
         const path = require("path");
-        const { localRepoPath } = require("../config.json");
+        const localRepoPath = path.resolve(__dirname, "../data/repo/")
         const packs = [];
         logger.info("Updating cached packs...");
 
@@ -104,16 +104,18 @@ module.exports = {
                 )
             );
         } catch (parseError) {
-            logger.error(
+            return logger.error(
                 "Git - " +
                     `Unable to parse data from _packs.json:\n${parseError}`
             );
         }
-        packs.push({
-            name: parsedData.name,
-            difficulty: parsedData.difficulty,
-            isDiff: parsedData.levels && parsedData.levels.length > 0,
-        })
+        for (const pack of parsedData) {
+            packs.push({
+                name: pack.name,
+                difficulty: pack.difficulty,
+                isDiff: pack.levels && pack.levels.length > 0,
+            })
+        }
         cache.packs.destroy({ where: {} });
         try {
             cache.packs.bulkCreate(packs);

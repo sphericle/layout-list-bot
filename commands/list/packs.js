@@ -112,6 +112,7 @@ module.exports = {
                             "The pack you want to edit"
                         )
                         .setRequired(true)
+                        .setAutocomplete(true)
                 )
                 .addStringOption((option) =>
                     option

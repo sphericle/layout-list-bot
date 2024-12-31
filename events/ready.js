@@ -19,6 +19,8 @@ module.exports = {
         await cache.updateLevels();
         // Update users cache
         await cache.updateUsers();
+        // Update packs cache
+        await cache.updatePacks();
 
         logger.info("Checking pending record data...");
 
@@ -41,7 +43,7 @@ module.exports = {
                     await pendingChannel.messages.fetch(
                         pendingRecords[i].discordid
                     );
-            } catch (_) {
+            } catch {
                 await db.pendingRecords.destroy({
                     where: { discordid: pendingRecords[i].discordid },
                 });
@@ -64,7 +66,7 @@ module.exports = {
                                 pendingRecords[i].embedDiscordid
                             )
                         ).delete();
-                } catch (__) {
+                } catch  {
                     // Nothing to do
                 }
             }

@@ -21,7 +21,6 @@
             "options": {
                 "cwd": "${workspaceFolder}"
             },
-            "dependsOn": "kill node"
         }
     ]
 }

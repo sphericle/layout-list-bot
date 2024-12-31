@@ -11,5 +11,6 @@ module.exports = {
         const { cache } = require("../index.js");
         cache.updateLevels();
         cache.updateUsers();
+        cache.updatePacks()
     },
 };
