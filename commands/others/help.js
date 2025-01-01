@@ -1,5 +1,4 @@
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
-const commands = require("../../commands.json");
 
 module.exports = {
     enabled: true,
@@ -14,6 +13,7 @@ module.exports = {
                 .setRequired(true)
         ),
     async autocomplete(interaction) {
+        const commands = require("../../commands.json");
         await interaction.respond(
             commands.map((command) => ({
                 name: command.name,
@@ -22,6 +22,7 @@ module.exports = {
         );
     },
     async execute(interaction) {
+        const commands = require("../../commands.json");
         await interaction.deferReply();
         const type = (await interaction.options.getInteger("type")) || 1;
 
@@ -37,7 +38,7 @@ module.exports = {
 
         const iconURL =
             "https://cdn.discordapp.com/icons/855211848362098699/e4cccd8155996534f28a7db33d2eeaab.png";
-
+        
         let exampleEmbed;
 
         exampleEmbed = new EmbedBuilder()

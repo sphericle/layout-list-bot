@@ -11,32 +11,7 @@ module.exports = {
         .setDescription("Moderator commands for levels in voting")
         .addSubcommand((subcommand) =>
             subcommand
-                .setName("setsubmissions")
-                .setDescription(
-                    "Set the submission count of all users for the month to 0"
-                )
-                .addStringOption((option) =>
-                    option
-                        .setName("user")
-                        .setDescription("The user to reset the submissions for")
-                        .setAutocomplete(true)
-                )
-                .addIntegerOption((option) =>
-                    option
-                        .setName("submissions")
-                        .setDescription("The new submission count")
-                )
-        )
-        .addSubcommand((subcommand) =>
-            subcommand
-                .setName("debugclear")
-                .setDescription(
-                    "Set the submission count of all users for the month to 0"
-                )
-        )
-        .addSubcommand((subcommand) =>
-            subcommand
-                .setName("setvote")
+                .setName("set")
                 .setDescription("Update the information of a level in voting")
         )
         .addSubcommand((subcommand) =>
@@ -62,8 +37,8 @@ module.exports = {
         )
         .addSubcommand((subcommand) =>
             subcommand
-                .setName("voteinsert")
-                .setDescription("debug")
+                .setName("insert")
+                .setDescription("Start a new voting (debug, for if this thread wasn't created by the bot)")
                 .addStringOption((option) =>
                     option
                         .setName("submitter")
@@ -78,7 +53,7 @@ module.exports = {
         if (
             subcommand === "submitban" ||
             subcommand === "setsubmissions" ||
-            subcommand === "voteinsert"
+            subcommand === "insert"
         ) {
             const members = interaction.guild.members.cache;
             const filtered = members
@@ -102,12 +77,6 @@ module.exports = {
     },
     async execute(interaction) {
         await interaction.deferReply({ ephemeral: true });
-        
-        // setsubmissions
-        // debugclear
-        // setvote
-        // submitban (rename to ban)
-        // voteinsert
 
         if (interaction.options.getSubcommand() === "setsubmissions") {
             const { db } = require("../../index.js");
@@ -145,7 +114,7 @@ module.exports = {
             }
 
             return interaction.editReply(":white_check_mark: Levels cleared!");
-        } else if (interaction.options.getSubcommand() === "voteinsert") {
+        } else if (interaction.options.getSubcommand() === "insert") {
             const { db } = require("../../index.js");
 
             const text = await interaction.channel.name;
@@ -175,7 +144,7 @@ module.exports = {
                 nos: matchNo[1],
             });
             interaction.editReply(":white_check_mark: Vote inserted!");
-        } else if (interaction.options.getSubcommand() === "setvote") {
+        } else if (interaction.options.getSubcommand() === "set") {
             const { db } = require("../../index.js");
 
             const text = await interaction.channel.name;
