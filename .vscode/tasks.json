@@ -12,7 +12,11 @@
         {
             "label": "run node",
             "type": "shell",
-            "command": "node ./bot.js",
+            "command": "npm start",
+            "presentation": {
+                "close": true,
+                "panel": "shared"
+            },
             "problemMatcher": [],
             "group": {
                 "kind": "build",
