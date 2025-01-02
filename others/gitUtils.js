@@ -81,6 +81,8 @@ module.exports = {
     },
 
     async parseUsers(useLegacy) {
+        const { cache } = require("../index");
+        const { createUser } = require("../commands/records/records.js");
         const userset = new Set();
         const localRepoPath = path.resolve(__dirname, `../data/repo/`);
         const listFilename = useLegacy
@@ -92,11 +94,10 @@ module.exports = {
                 fs.readFileSync(path.join(localRepoPath, listFilename), "utf8")
             );
         } catch (parseError) {
-            logger.error(
+            return (
                 "Git - " +
                     `Unable to parse data from ${listFilename}:\n${parseError}`
             );
-            return -1;
         }
 
         for (const filename of list_data) {
@@ -108,18 +109,18 @@ module.exports = {
                         "utf8"
                     )
                 );
+                if (parsedData.name.startsWith("_")) continue;
 
                 userset.add(parsedData.author);
                 userset.add(parsedData.verifier);
 
-                for (const creator of parsedData.creators) {
+                for (const creator of parsedData.creators) 
                     userset.add(creator);
-                }
-                for (const record of parsedData.records) {
+                
+                for (const record of parsedData.records) 
                     userset.add(record.user);
-                }
+                
             } catch (parseError) {
-                if (!filename.startsWith("_"))
                     logger.error(
                         "Git - " +
                             `Unable to parse data from ${filename}.json:\n${parseError}`
@@ -129,6 +130,28 @@ module.exports = {
         }
 
         const users = Array.from(userset);
-        return users;
+        if (users.length == 0)
+            return 404;
+
+        logger.info("Parsing users...");
+        try {
+            await cache.users.destroy({ where: {} });
+            await cache.users.bulkCreate(users);
+            logger.info(
+                `Successfully updated ${users.length} cached users.`
+            );
+        } catch (error) {
+            return `Couldn't add users, something went wrong with sequelize: ${error}`;
+        }
+
+        try {
+            await createUser("_", users);
+            logger.log("Successfully added users.");
+        } catch (error) {
+            return (
+                `Couldn't add users, something went wrong with sequelize: ${error}`
+            );
+        }
+        return 200;
     },
 };

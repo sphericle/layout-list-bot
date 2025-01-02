@@ -905,7 +905,7 @@ module.exports = {
                     const dmMessage2 = `${rawGithubCode}`;
                     await interaction.user.send({ content: dmMessage });
                     await interaction.user.send({ content: dmMessage2 });
-                } catch (_) {
+                } catch {
                     logger.info(
                         `Failed to send in moderator ${interaction.user.id} dms, ignoring send in dms setting`
                     );
