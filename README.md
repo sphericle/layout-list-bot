@@ -2,7 +2,7 @@
 
 ## This is a fork of the [All Rated Extreme Demon List](https://aredl.net)'s bot.
 
-*The developer of this bot (sphericle) has gotten permission from an AREDL developer (windoge) to build and host this.* Most of the hard work has been done by them!
+*The developer of this bot (sphericle) has gotten permission from the AREDL developer team to build and host this.* Most of the hard work has been done by them!
 
 ## Original Readme:
 
