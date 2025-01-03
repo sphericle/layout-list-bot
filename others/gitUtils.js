@@ -94,15 +94,17 @@ module.exports = {
                 fs.readFileSync(path.join(localRepoPath, listFilename), "utf8")
             );
         } catch (parseError) {
-            return (
-                "Git - " +
-                    `Unable to parse data from ${listFilename}:\n${parseError}`
-            );
+            if (!listFilename.startsWith("_"))
+                return (
+                    "Git - " +
+                        `Unable to parse data from ${listFilename}:\n${parseError}`
+                );
         }
 
         for (const filename of list_data) {
             let parsedData;
             try {
+                if (filename.startsWith("_")) continue;
                 parsedData = JSON.parse(
                     fs.readFileSync(
                         path.join(localRepoPath, `data/${filename}.json`),

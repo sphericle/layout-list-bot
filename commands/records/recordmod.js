@@ -25,7 +25,7 @@ const { ChartJSNodeCanvas } = require("chartjs-node-canvas");
 const logger = require("log4js").getLogger();
 const { octokit } = require("../../index.js");
 const { createUser } = require("./records.js");
-const { parseUsers } = require("../../others/gitUtils.js");
+const updateData = require("../../scheduled/cacheUpdate.js");
 
 module.exports = {
     enabled: true,
@@ -344,9 +344,9 @@ module.exports = {
         )
         .addSubcommand((subcommand) =>
             subcommand
-                .setName("updateusers")
+                .setName("updatedata")
                 .setDescription(
-                    "Syncs all the users in the list with the cache"
+                    "Syncs all the level and user data from the levels to the bot"
                 )
         ),
     async autocomplete(interaction) {
@@ -1458,7 +1458,7 @@ module.exports = {
                     const dmMessage2 = `\`${rawGithubCode}\``;
                     await interaction.user.send({ content: dmMessage });
                     await interaction.user.send({ content: dmMessage2 });
-                } catch (_) {
+                } catch {
                     logger.info(
                         `Failed to send in moderator ${interaction.user.id} dms, ignoring send in dms setting`
                     );
@@ -2345,37 +2345,11 @@ module.exports = {
                 `Successfully created commit on ${githubBranch} (record update): ${newCommit.data.sha}`
             );
             return await interaction.editReply("This record has been updated!");
-        } else if (interaction.options.getSubcommand() === "updateusers") {
-            await interaction.deferReply({ ephemeral: true });
-            const { cache } = require("../../index.js");
-            const users = await parseUsers();
-            if (users.length > 0) {
-                logger.info("Parsing users...");
-                await cache.users.destroy({ where: {} });
-                try {
-                    await cache.users.bulkCreate(users);
-                    logger.info(
-                        `Successfully updated ${users.length} cached users.`
-                    );
-                } catch (error) {
-                    logger.error(
-                        `Couldn't update cached users, something went wrong with sequelize: ${error}`
-                    );
-                }
-
-                try {
-                    await createUser("_", users);
-                    interaction.editReply(
-                        `:white_check_mark: Added ${users.length} users.`
-                    );
-                } catch (error) {
-                    logger.error(
-                        `Couldn't add users, something went wrong with sequelize: ${error}`
-                    );
-                }
-            } else {
-                interaction.editReply(":x: No users to update.");
-            }
+        } else if (interaction.options.getSubcommand() === "updatedata") {
+            await updateData.execute();
+            return await interaction.reply(
+                ":white_check_mark: Data has been updated"
+            );
         } else if (interaction.options.getSubcommand() === "shift") {
             await interaction.deferReply({ ephemeral: true });
             const { cache, octokit } = require("../../index.js");

@@ -4,6 +4,7 @@ const Sequelize = require("sequelize");
 const { Client, GatewayIntentBits, ActivityType } = require("discord.js");
 const { Octokit } = require("@octokit/rest");
 const { createDbSchema, createCacheDbSchema } = require("./others/dbSchema.js");
+const { parseUsers } = require("./others/gitUtils.js");
 const {
     clientInit,
     sequelizeInit,
@@ -82,10 +83,20 @@ async function start() {
     try {
         logger.info("Logging in client with discord...");
         await client.login(process.env.TOKEN);
-        logger.info(`Client logged in as ${client.user.tag}`);
+        logger.info(`Client logged in as ${client.user.username}`);
     } catch (error) {
         logger.error("Unable to login client: \n", error);
         process.exit(1);
+    }
+    try {
+        logger.info("Updating cached users...");
+        let result = await parseUsers();
+        if (typeof result === "string")
+            throw new Error(result);
+        if (result === 404)
+            logger.info("No new users.");
+    } catch (e) {
+        logger.error(e);
     }
     try {
         client.user.setPresence({
@@ -95,7 +106,7 @@ async function start() {
                     type: ActivityType.Playing,
                 },
             ],
-            status: "offline",
+            status: "online",
         });
     } catch (e) {
         logger.error(`Error setting presence: ${e}`);
