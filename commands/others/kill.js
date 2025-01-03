@@ -7,8 +7,8 @@ module.exports = {
         .setDescription("Stops the bot process (only works if you are sphericle)"),
     async execute(interaction) {
         if (interaction.user.id !== "581990926948237322")
-            return await interaction.editReply("You are not sphericle....");
-        interaction.editReply(
+            return await interaction.reply("You are not sphericle....");
+        interaction.reply(
             `Stopping...`
         );
         process.exit();
