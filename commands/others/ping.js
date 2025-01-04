@@ -12,11 +12,7 @@ module.exports = {
             ephemeral: true,
         });
         interaction.editReply(
-            `Websocket heartbeat: ${
-                interaction.client.ws.ping
-            }ms.\nRoundtrip latency: ${
-                sent.createdTimestamp - interaction.createdTimestamp
-            }ms`
+            `Pong! ${sent.createdTimestamp - interaction.createdTimestamp}ms`
         );
     },
 };
