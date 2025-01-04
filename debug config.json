@@ -12,8 +12,8 @@
     "scheduleCacheUpdate": "30 * * * *",
     "scheduleChangelog": "00 22 * * *",
 
-    "githubOwner": "layout-list",
-    "githubRepo": "layout-list",
+    "githubOwner": "sphericle",
+    "githubRepo": "ll-bot-test",
     "githubDataPath": "data",
     "githubBranch": "main",
 
@@ -24,25 +24,25 @@
     "priorityRoleID": "0",
     "submissionLockRoleID": "0",
 
-    "pendingRecordsID": "1314957271742287954",
-    "priorityRecordsID": "1314957271742287954",
+    "pendingRecordsID": "1324848672147771533",
+    "priorityRecordsID": "1324848672147771533",
 
     "acceptedRecordsID": "0",
     "deniedRecordsID": "0",
-    "archiveRecordsID": "1314957271742287954",
-    "recordsID": "1314957271742287954",
+    "archiveRecordsID": "1324848672147771533",
+    "recordsID": "1324848672147771533",
 
-    "changelogID": "1314957271742287954",
+    "changelogID": "1324848672147771533",
     "changelogRoleID": "0",
 
-    "guildMemberAddID": "1178399916125597716",
+    "guildMemberAddID": "1324848672147771533",
 
     "shiftsReminderID": "1212119449994526801",
     "shiftsLogsID": "1219796853822849084",
     "recordsPerWeek": 60,
 
-    "submissionResultsID": "1314957293275840593",
-    "reliableThreadID": "1315441998278164531",
+    "submissionResultsID": "1324848672147771533",
+    "reliableThreadID": "1324848402500026428",
     "staffRole": "1320770731985866803",
-    "submissionsChannelID": "1314957278981652491"
+    "submissionsChannelID": "1324846545207820349"
 }

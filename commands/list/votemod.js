@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require("discord.js");
 const {
-    guildId
+    guildId, 
+    debug
 } = require("../../config.json");
 const logger = require("log4js").getLogger();
 
@@ -13,6 +14,11 @@ module.exports = {
             subcommand
                 .setName("set")
                 .setDescription("Update the information of a level in voting")
+        )
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName("debugclear")
+                .setDescription("Don't run this pls")
         )
         .addSubcommand((subcommand) =>
             subcommand
@@ -103,6 +109,7 @@ module.exports = {
         } else if (interaction.options.getSubcommand() === "debugclear") {
             const { db } = require("../../index.js");
 
+            if (!debug) return await interaction.reply("Nope!");
             try {
                 await db.levelsInVoting.destroy({ where: {} });
                 await db.submitters.destroy({ where: {} });
@@ -142,6 +149,7 @@ module.exports = {
                 discordid: interaction.channel.id,
                 yeses: matchYes[1],
                 nos: matchNo[1],
+                shared: `${submitter};`
             });
             interaction.editReply(":white_check_mark: Vote inserted!");
         } else if (interaction.options.getSubcommand() === "set") {

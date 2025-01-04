@@ -6,6 +6,7 @@ const {
     ButtonStyle,
 } = require("discord.js");
 const logger = require("log4js").getLogger();
+const Sequelize = require("sequelize");
 const { submissionResultsID, guildId } = require("../../config.json");
 
 module.exports = {
@@ -122,20 +123,33 @@ module.exports = {
                     if (dbEntry) {
                         const entry = dbEntry.dataValues;
 
-                        const submitterDb = await db.submitters.findOne({
-                            where: { discordid: entry.submitter },
-                        });
+                        let shared = entry.shared.split(";");
+                        shared.pop();
 
-                        // check if the user has dmFlag set to true
-                        if (submitterDb.dataValues.dmFlag) {
-                            // get user by id of entry.submitter
-                            const submitter =
-                                await interaction.guild.members.fetch(
-                                    entry.submitter
+                        logger.log(shared);
+
+                        for (const user of shared) {
+                            const submitterDb = await db.submitters.findOne({
+                                where: { discordid: 
+                                            Sequelize.where(
+                                                Sequelize.fn("LOWER", Sequelize.col("discordid")),
+                                                "LIKE",
+                                                "%" + user + "%"
+                                            ),
+                                        },
+                            });
+
+                            // check if the user has dmFlag set to true
+                            if (submitterDb.dataValues.dmFlag) {
+                                // get user by id of entry.submitter
+                                const submitter =
+                                    await interaction.guild.members.fetch(
+                                        entry.submitter
+                                    );
+                                await submitter.send(
+                                    `The level _${matchLevelName[1]}_ has received a new yes vote!\nThe vote is now at **${count}-${matchNo[1]}**.\n-# _To disable these messages, use the \`/vote dm\` command._`
                                 );
-                            await submitter.send(
-                                `Your level _${matchLevelName[1]}_ has received a new yes vote!\nThe vote is now at **${count}-${matchNo[1]}**.\n-# _To disable these messages, use the \`/vote dm\` command._`
-                            );
+                            }
                         }
                     }
                 } catch (e) {
@@ -295,9 +309,15 @@ module.exports = {
                     `Reason: ${interaction.options.getString("reason")}`
                 );
             await interaction.editReply("Sending message...");
+            const shared = submission.shared.split(";");
+            shared.pop();
+            logger.log(shared);
+            let pingMessage = "";
+            for (const user of shared) pingMessage += `<@${user}> `;
+
             const submissionMessage = await submissionsChannel.send({
                 embeds: [embed],
-                content: `<@${submission.submitter}>`,
+                content: pingMessage,
             });
 
             await submissionMessage.react("👍");

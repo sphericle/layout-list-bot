@@ -180,6 +180,7 @@ module.exports = {
             discordid: Sequelize.STRING,
             yeses: Sequelize.INTEGER,
             nos: Sequelize.INTEGER,
+            shared: Sequelize.STRING,
         });
         db.submitters = sequelize.define("submitters", {
             discordid: {

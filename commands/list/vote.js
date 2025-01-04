@@ -6,6 +6,7 @@ const {
     submissionsChannelID,
 } = require("../../config.json");
 const logger = require("log4js").getLogger();
+const Sequelize = require("sequelize");
 
 module.exports = {
     enabled: true,
@@ -130,19 +131,47 @@ module.exports = {
                         .setAutocomplete(true)
                         .setRequired(true)
                 )
+        )
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName("share")
+                .setDescription("Allow another user to see the vote of a level you submitted")
+                .addStringOption((option) =>
+                    option
+                        .setName("levelname")
+                        .setDescription(
+                            "The name of the level you want to share"
+                        )
+                        .setAutocomplete(true)
+                        .setRequired(true)
+                )
+                .addStringOption((option) =>
+                    option
+                        .setName("user")
+                        .setDescription(
+                            "The user you want to share the level's vote with"
+                        )
+                        .setAutocomplete(true)
+                        .setRequired(true)
+                )
         ),
     async autocomplete(interaction) {
         const focused = interaction.options.getFocused(true);
         const { db } = require("../../index.js");
-        const subcommand = interaction.options.getSubcommand();
-        if (subcommand === "status") {
+        if (focused.name === "levelname") {
             // if user has staff role, show all levels in voting
             let levels;
             if (await interaction.member.roles.cache.has(staffRole))
                 levels = await db.levelsInVoting.findAll();
             else
                 levels = await db.levelsInVoting.findAll({
-                    where: { submitter: interaction.user.id },
+                    where: { shared: 
+                                Sequelize.where(
+                                    Sequelize.fn("LOWER", Sequelize.col("shared")),
+                                    "LIKE",
+                                    "%" + interaction.user.id + "%"
+                                ), 
+                            },
                 });
             return await interaction.respond(
                 levels
@@ -156,6 +185,25 @@ module.exports = {
                         name: lvl.levelname,
                         value: `${lvl.discordid}`,
                     }))
+            );
+        } else if (focused.name === "user") {
+            const members = interaction.guild.members.cache;
+            const filtered = members
+                .filter((member) =>
+                    member.user.username
+                        .toLowerCase()
+                        .includes(focused.value.toLowerCase())
+                )
+                .map((member) => {
+                    return {
+                        name: member.user.username,
+                        value: member.id,
+                    };
+                });
+            await interaction.respond(
+                filtered.slice(0, 25).map((user) => {
+                    return { name: user.name, value: user.value };
+                })
             );
         }
     },
@@ -247,12 +295,13 @@ module.exports = {
             });
             await submitter.increment("submissions");
 
-            db.levelsInVoting.create({
+            await db.levelsInVoting.create({
                 levelname: levelname,
                 submitter: interaction.user.id,
                 discordid: thread.id,
                 yeses: 0,
                 nos: 0,
+                shared: `${interaction.user.id};`
             });
 
             return interaction.editReply(":white_check_mark: Level submitted!");
@@ -263,14 +312,18 @@ module.exports = {
 
             const status = numStatus === 1 ? true : false;
 
-            const submitter = await db.submitters.findOne({
+            let submitter
+            submitter = await db.submitters.findOne({
                 where: { discordid: interaction.user.id },
             });
 
             if (!submitter)
-                return interaction.editReply(
-                    ":x: You have not submitted a level using the bot!"
-                );
+                submitter = await db.submitters.create({
+                    discordid: interaction.user.id,
+                    submissions: 0,
+                    dmFlag: false,
+                    banned: false,
+                });
 
             try {
                 await db.submitters.update(
@@ -303,6 +356,47 @@ module.exports = {
                     where: !hasStaffRole
                         ? {
                               discordid: level,
+                              shared: 
+                                Sequelize.where(
+                                    Sequelize.fn("LOWER", Sequelize.col("shared")),
+                                    "LIKE",
+                                    "%" + interaction.user.id + "%"
+                                ),
+                          }
+                        : {
+                              discordid: level,
+                          },
+                });
+            } catch (error) {
+                logger.error(error);
+                return interaction.editReply(
+                    ":x: An error occurred while fetching the status of your level. Please try again later."
+                );
+            }
+
+            if (!submission)
+                return interaction.editReply(
+                    ":x: You have not submitted a level with that name."
+                );
+
+            return interaction.editReply(
+                `The vote for ${submission.levelname} is currently ${submission.yeses}-${submission.nos}.`
+            );
+        } else if (subcommand === "share") {
+            const { db } = require("../../index.js");
+            const level = await interaction.options.getString("levelname");
+            const user = await interaction.options.getString("user");
+
+            const hasStaffRole = await interaction.member.roles.cache.has(
+                staffRole
+            );
+
+            let submission;
+            try {
+                submission = await db.levelsInVoting.findOne({
+                    where: !hasStaffRole
+                        ? {
+                              discordid: level,
                               submitter: interaction.user.id,
                           }
                         : {
@@ -320,6 +414,23 @@ module.exports = {
                 return interaction.editReply(
                     ":x: You have not submitted a level with that name."
                 );
+
+            const shared = submission.shared.split(";");
+            if (shared.includes(user))
+                return interaction.editReply(
+                    ":x: You have already shared this level with that user."
+                );
+
+            await db.levelsInVoting.update(
+                {
+                    shared: `${submission.shared}${user};`,
+                },
+                {
+                    where: {
+                        discordid: level,
+                    },
+                }
+            );
 
             return interaction.editReply(
                 `The vote for ${submission.levelname} is currently ${submission.yeses}-${submission.nos}.`

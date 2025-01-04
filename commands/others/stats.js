@@ -388,7 +388,8 @@ module.exports = {
                 submitters.columns = [
                     { header: "discordid", key: "discordid", width: 25 },
                     { header: "submissions", key: "submissions", width: 30 },
-                    { header: "dbFlag", key: "dbFlag", width: 20 },
+                    { header: "dmFlag", key: "dmFlag", width: 20 },
+                    { header: "banned", key: "banned", width: 20 },
                 ];
 
                 levelsInVoting.columns = [
@@ -397,6 +398,7 @@ module.exports = {
                     { header: "discordid", key: "discordid", width: 20 },
                     { header: "yeses", key: "yeses", width: 20 },
                     { header: "nos", key: "nos", width: 20 },
+                    { header: "shared", key: "shared", width: 20 },
                 ];
 
                 dailyStatsSheet.columns = [
@@ -466,7 +468,7 @@ module.exports = {
                 });
 
                 const submittersData = await db.submitters.findAll({
-                    attributes: ["discordid", "submissions", "dmFlag"],
+                    attributes: ["discordid", "submissions", "dmFlag", "banned"],
                 });
 
                 const levelsInVotingData = await db.levelsInVoting.findAll({
@@ -476,6 +478,7 @@ module.exports = {
                         "discordid",
                         "yeses",
                         "nos",
+                        "shared",
                     ],
                 });
 

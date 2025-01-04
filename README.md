@@ -10,13 +10,13 @@ This repository hosts the code for the discord bot made to help record submissio
 
 ## Setup
 
-This bot does not provide any hosting, meaning that you will need to find a way to host it yourself.This bot was made with [discord.js](https://discord.js.org/): You will need to have [NodeJS](https://nodejs.org/en) installed (v16.11.0 or higher) to run itAfter node has been installed, to install the dependencies, run `npm install` in the bot's root directory
+This bot does not provide any hosting, meaning that you will need to find a way to host it yourself.This bot was made with [discord.js](https://discord.js.org/): You will need to have [NodeJS](https://nodejs.org/en) installed (v16.11.0 or higher) to run it. After node has been installed, to install the dependencies, run `npm install` in the bot's root directory
 You will then need to create a config file (an example file is provided in `example_config.json`) and name it `config.json` in the root directory. It should contain the following:
 
 > * `enableSeparateStaffServer`: Enable this if there is a staff discord server for handling records that is not the public discord server. Will be used to fetch the following channels: `pendingRecordsID`,`priorityRecordsID`,`acceptedRecordsID`,`deniedRecordsID`,`archiveRecordsID`,`shiftsReminderID`,`shiftsLogsID`
 > * `enableShifts`: Whether or not to enable the shift system. Each day, it assigns records to selected moderators on selected days, depending on how many pending records there are at the moment.
 > * `enablePriorityRole`: Whether or not to enable the priority system. Records from users with a given role will be sent to a separate records channel and should be given priority to.
-> * `enableWelcomeMessage`: Whether or not to send a message when a user joins the server. This was only added to replace the Mee6 one.
+> * `enableWelcomeMessage`: Whether or not to send a message when a user joins the server.
 
 > * `clientId`: The discord user ID of the bot.
 > * `guildId`: The discord server ID of your public server
