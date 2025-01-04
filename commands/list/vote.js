@@ -387,6 +387,20 @@ module.exports = {
             const level = await interaction.options.getString("levelname");
             const user = await interaction.options.getString("user");
 
+            // lookup user in server
+            const guild = await interaction.client.guilds.fetch(guildId);
+            const member = await guild.members.fetch(user);
+            if (!member)
+                return interaction.editReply(
+                    ":x: The user you specified is not in the server."
+                );
+
+            if (user === interaction.user.id) {
+                return interaction.editReply(
+                    ":x: Nice try!"
+                );
+            }
+
             const hasStaffRole = await interaction.member.roles.cache.has(
                 staffRole
             );

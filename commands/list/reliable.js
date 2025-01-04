@@ -126,8 +126,6 @@ module.exports = {
                         let shared = entry.shared.split(";");
                         shared.pop();
 
-                        logger.log(shared);
-
                         for (const user of shared) {
                             const submitterDb = await db.submitters.findOne({
                                 where: { discordid: 
@@ -224,7 +222,7 @@ module.exports = {
                         { nos: count },
                         { where: { discordid: await interaction.channel.id } }
                     );
-
+                    
                     const dbEntry = await db.levelsInVoting.findOne({
                         where: { discordid: await interaction.channel.id },
                     });
@@ -232,20 +230,31 @@ module.exports = {
                     if (dbEntry) {
                         const entry = dbEntry.dataValues;
 
-                        const submitterDb = await db.submitters.findOne({
-                            where: { discordid: entry.submitter },
-                        });
+                        let shared = entry.shared.split(";");
+                        shared.pop();
 
-                        // check if the user has dmFlag set to true
-                        if (submitterDb.dataValues.dmFlag) {
-                            // get user by id of entry.submitter
-                            const submitter =
-                                await interaction.guild.members.fetch(
-                                    entry.submitter
+                        for (const user of shared) {
+                            const submitterDb = await db.submitters.findOne({
+                                where: { discordid: 
+                                            Sequelize.where(
+                                                Sequelize.fn("LOWER", Sequelize.col("discordid")),
+                                                "LIKE",
+                                                "%" + user + "%"
+                                            ),
+                                        },
+                            });
+
+                            // check if the user has dmFlag set to true
+                            if (submitterDb.dataValues.dmFlag) {
+                                // get user by id of entry.submitter
+                                const submitter =
+                                    await interaction.guild.members.fetch(
+                                        entry.submitter
+                                    );
+                                await submitter.send(
+                                    `The level _${matchLevelName[1]}_ has received a new yes vote!\nThe vote is now at **${count}-${matchNo[1]}**.\n-# _To disable these messages, use the \`/vote dm\` command._`
                                 );
-                            await submitter.send(
-                                `Your level _${matchLevelName[1]}_ has received a no vote...\nThe vote is now at **${matchYes[1]}-${count}**.\n-# _To disable these messages, use the \`/vote dm\` command._`
-                            );
+                            }
                         }
                     }
                 } catch (e) {
