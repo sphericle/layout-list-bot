@@ -2,9 +2,6 @@ name: Deploy Bot
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - "main"
 
 jobs:
   sync_to_backend:
@@ -26,14 +23,6 @@ jobs:
           key: ${{ secrets.DEPLOY_KEY }}
           script: sudo git pull
 
-      - name: Restart service
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ secrets.DEPLOY_HOST }}
-          username: ${{ secrets.DEPLOY_USER }}
-          key: ${{ secrets.DEPLOY_KEY }}
-          script: sudo systemctl restart aredl-manager-main
-
       - name: Deploy commands
         uses: appleboy/ssh-action@v1.0.0
         with:
@@ -42,4 +31,4 @@ jobs:
           key: ${{ secrets.DEPLOY_KEY }}
           script: |
             cd bot/${{ github.ref_name }}
-            node ./deploy-commands.js
+            sudo forever restartall
