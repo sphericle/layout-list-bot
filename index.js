@@ -111,27 +111,6 @@ async function start() {
     } catch (e) {
         logger.error(`Error setting presence: ${e}`);
     }
-
-    const levels = await db.levelsInVoting.findAll();
-
-    for (const level of levels) {
-        try {
-            if (!level.shared || level.shared == "") {
-                await db.levelsInVoting.update({
-                    shared: level.submitter + ";",
-                }, {
-                    where: {
-                        discordid: level.discordid,
-                    },
-                })
-            }
-        } catch (error) {
-            logger.error(
-                `Couldn't react to message ${level.messageId} in channel ${level.channelId}: \n${error}`
-            );
-        }
-    }
-
 }
 
 start();
