@@ -98,7 +98,7 @@ module.exports = {
                     );
 
                     // pin the message
-                    if (voteMessage) await voteMessage.pin();
+                    if (voteMessage) await voteMessage.pin(`Vote added by ${interaction.user.username}`);
 
                     const message = await interaction.channel.send(
                         `The vote is now at **${count}-${matchNo[1]}**.`
