@@ -97,7 +97,7 @@ module.exports = {
                     option
                         .setName("nong")
                         .setDescription(
-                            "The NONG song for this level. You can use cobalt.tools to download the file from youtube if needed."
+                            "The NONG file for this level. You can also paste a link in the song-name field"
                         )
                 )
         )
