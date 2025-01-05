@@ -93,6 +93,13 @@ module.exports = {
                             "Where do you think this level should be placed?"
                         )
                 )
+                .addIntegerOption((option) =>
+                    option
+                        .setName("enjoyment")
+                        .setDescription(
+                            "The verifier's enjoyment rating (1-10) for their list profile."
+                        )
+                )
                 .addAttachmentOption((option) =>
                     option
                         .setName("nong")
@@ -226,6 +233,10 @@ module.exports = {
             const raw = interaction.options.getString("raw");
             const opinion = interaction.options.getString("opinion");
             const nong = interaction.options.getAttachment("nong");
+            const enjoyment = interaction.options.getInteger("enjoyment");
+
+            if (enjoyment > 10 || enjoyment < 1) 
+                return await interaction.editReply(":x: The verifier's enjoyment should be a whole number from 1-10.");
 
             // get the submitter from the db
             let user;
@@ -275,6 +286,7 @@ module.exports = {
                 (password ? `\nPassword: ${password}` : "") +
                 (raw ? `\nRaw: ${raw}` : "") +
                 (opinion ? `\nDifficulty opinion: ${opinion}` : "") +
+                (enjoyment ? `\nVerifier's enjoyment: ${enjoyment}/10` : "") +
                 (nong ? `\nNONG: ${nong.url}` : "");
             const thread = await voteChannel.threads.create({
                 name: `${levelname} 0-0`,
