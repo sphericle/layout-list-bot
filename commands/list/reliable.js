@@ -213,7 +213,7 @@ module.exports = {
 
                     await interaction.channel.setName(
                         `${matchLevelName[1]} ${matchYes[1]}-${count}`
-                    ); // Set the channel name to the same thing but with the added yes
+                    ); // Set the channel name to the same thing but with the added no
 
                     await message.delete();
 
@@ -252,7 +252,7 @@ module.exports = {
                                         entry.submitter
                                     );
                                 await submitter.send(
-                                    `The level _${matchLevelName[1]}_ has received a new yes vote!\nThe vote is now at **${count}-${matchNo[1]}**.\n-# _To disable these messages, use the \`/vote dm\` command._`
+                                    `The level _${matchLevelName[1]}_ has received a no vote...\nThe vote is now at **${matchYes[1]}-${count}**.\n-# _To disable these messages, use the \`/vote dm\` command._`
                                 );
                             }
                         }
