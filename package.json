@@ -15,7 +15,7 @@
         "@napi-rs/canvas-darwin-arm64": "^0.1.65",
         "@octokit/rest": "^21.0.2",
         "chartjs-node-canvas": "^4.1.6",
-        "discord.js": "^14.13.0",
+        "discord.js": "^14.17.2",
         "dotenv": "^16.4.7",
         "exceljs": "^4.4.0",
         "is-url-http": "^2.3.8",
