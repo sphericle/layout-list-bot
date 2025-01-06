@@ -235,7 +235,7 @@ module.exports = {
             const nong = interaction.options.getAttachment("nong");
             const enjoyment = interaction.options.getInteger("enjoyment");
 
-            if (enjoyment > 10 || enjoyment < 1) 
+            if (enjoyment && (enjoyment > 10 || enjoyment < 1)) 
                 return await interaction.editReply(":x: The verifier's enjoyment should be a whole number from 1-10.");
 
             // get the submitter from the db

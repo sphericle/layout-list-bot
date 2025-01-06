@@ -791,9 +791,6 @@ module.exports = {
                 }
 
                 await interaction.message.delete();
-                await interaction.editReply(
-                    ":white_check_mark: The record has been accepted"
-                );
             }
 
             logger.info(
@@ -1249,7 +1246,7 @@ module.exports = {
             }
             cache.updateUsers();
             logger.info(
-                `${interaction.user.tag} (${interaction.user.id}) renamed ${olduser} to ${newuser}`
+                `${interaction.user.tag} renamed ${olduser} to ${newuser}`
             );
             return await interaction.editReply(
                 `:white_check_mark: Successfully renamed **${olduser}** to **${newuser}**`
