@@ -57,7 +57,7 @@ async function createUser(interaction, user) {
         const idLower = Math.pow(10, idDigits - 1);
         const idUpper = Math.pow(10, idDigits) - 1;
 
-        let newCount = 0
+        let newCount = 0;
         for (const singleUser of user) {
             // Check if user already exists
             const existingUser = await cache.users.findOne({

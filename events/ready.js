@@ -66,7 +66,7 @@ module.exports = {
                                 pendingRecords[i].embedDiscordid
                             )
                         ).delete();
-                } catch  {
+                } catch {
                     // Nothing to do
                 }
             }

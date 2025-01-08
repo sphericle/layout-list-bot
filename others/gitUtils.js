@@ -97,7 +97,7 @@ module.exports = {
             if (!listFilename.startsWith("_"))
                 return (
                     "Git - " +
-                        `Unable to parse data from ${listFilename}:\n${parseError}`
+                    `Unable to parse data from ${listFilename}:\n${parseError}`
                 );
         }
 
@@ -116,32 +116,27 @@ module.exports = {
                 userset.add(parsedData.author);
                 userset.add(parsedData.verifier);
 
-                for (const creator of parsedData.creators) 
-                    userset.add(creator);
-                
-                for (const record of parsedData.records) 
+                for (const creator of parsedData.creators) userset.add(creator);
+
+                for (const record of parsedData.records)
                     userset.add(record.user);
-                
             } catch (parseError) {
-                    logger.error(
-                        "Git - " +
-                            `Unable to parse data from ${filename}.json:\n${parseError}`
-                    );
+                logger.error(
+                    "Git - " +
+                        `Unable to parse data from ${filename}.json:\n${parseError}`
+                );
                 continue;
             }
         }
 
         const users = Array.from(userset);
-        if (users.length == 0)
-            return 404;
+        if (users.length == 0) return 404;
 
         logger.info("Parsing users...");
         try {
             await cache.users.destroy({ where: {} });
             await cache.users.bulkCreate(users);
-            logger.info(
-                `Successfully updated ${users.length} cached users.`
-            );
+            logger.info(`Successfully updated ${users.length} cached users.`);
         } catch (error) {
             return `Couldn't add users, something went wrong with sequelize: ${error}`;
         }
@@ -150,9 +145,7 @@ module.exports = {
             await createUser("_", users);
             logger.log("Successfully added users.");
         } catch (error) {
-            return (
-                `Couldn't add users, something went wrong with sequelize: ${error}`
-            );
+            return `Couldn't add users, something went wrong with sequelize: ${error}`;
         }
         return 200;
     },

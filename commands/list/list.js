@@ -1781,6 +1781,6 @@ module.exports = {
             return await interaction.editReply(
                 ":white_check_mark: Restored the level!"
             );
-        } 
+        }
     },
 };

@@ -11,7 +11,8 @@ module.exports = {
 
             if (interaction.guildId !== guildId) {
                 return interaction.reply({
-                    content: "Hey!!! This bot is for the Layout List discord only, please kick it from this server. No commands will work. Thanks!",
+                    content:
+                        "Hey!!! This bot is for the Layout List discord only, please kick it from this server. No commands will work. Thanks!",
                     ephemeral: true,
                 });
             }

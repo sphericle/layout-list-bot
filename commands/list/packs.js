@@ -42,48 +42,36 @@ module.exports = {
                 .addStringOption((option) =>
                     option
                         .setName("name")
-                        .setDescription(
-                            "The name of the pack"
-                        )
+                        .setDescription("The name of the pack")
                 )
                 .addStringOption((option) =>
                     option
                         .setName("level1")
-                        .setDescription(
-                            "The first level in the pack"
-                        )
+                        .setDescription("The first level in the pack")
                         .setAutocomplete(true)
                 )
                 .addStringOption((option) =>
                     option
                         .setName("level2")
-                        .setDescription(
-                            "The second level in the pack"
-                        )
+                        .setDescription("The second level in the pack")
                         .setAutocomplete(true)
                 )
                 .addStringOption((option) =>
                     option
                         .setName("level3")
-                        .setDescription(
-                            "The third level in the pack"
-                        )
+                        .setDescription("The third level in the pack")
                         .setAutocomplete(true)
                 )
                 .addStringOption((option) =>
                     option
                         .setName("level4")
-                        .setDescription(
-                            "The fourth level in the pack"
-                        )
+                        .setDescription("The fourth level in the pack")
                         .setAutocomplete(true)
                 )
                 .addStringOption((option) =>
                     option
                         .setName("level5")
-                        .setDescription(
-                            "The fifth level in the pack"
-                        )
+                        .setDescription("The fifth level in the pack")
                         .setAutocomplete(true)
                 )
         )
@@ -94,9 +82,7 @@ module.exports = {
                 .addStringOption((option) =>
                     option
                         .setName("pack")
-                        .setDescription(
-                            "The name of the pack to remove"
-                        )
+                        .setDescription("The name of the pack to remove")
                         .setRequired(true)
                         .setAutocomplete(true)
                 )
@@ -108,18 +94,14 @@ module.exports = {
                 .addStringOption((option) =>
                     option
                         .setName("pack")
-                        .setDescription(
-                            "The pack you want to edit"
-                        )
+                        .setDescription("The pack you want to edit")
                         .setRequired(true)
                         .setAutocomplete(true)
                 )
                 .addStringOption((option) =>
                     option
                         .setName("newname")
-                        .setDescription(
-                            "The new name of the pack"
-                        )
+                        .setDescription("The new name of the pack")
                 )
                 .addIntegerOption((option) =>
                     option
@@ -160,10 +142,12 @@ module.exports = {
             return await interaction.respond(
                 levels
                     .slice(0, 25)
-                    .map((level) => ({ name: level.name, value: level.filename }))
+                    .map((level) => ({
+                        name: level.name,
+                        value: level.filename,
+                    }))
             );
-        }
-        else if (focused.name === "pack") {
+        } else if (focused.name === "pack") {
             let packs = await cache.packs.findAll({
                 where: {
                     name: Sequelize.where(
@@ -235,8 +219,8 @@ module.exports = {
             const level3 = interaction.options.getString("level3") || null;
             const level4 = interaction.options.getString("level4") || null;
             const level5 = interaction.options.getString("level5") || null;
-            
-            logger.log(`creating pack ${name}`)
+
+            logger.log(`creating pack ${name}`);
             const pack = {
                 name: name,
                 difficulty: difficulty,
@@ -331,7 +315,6 @@ module.exports = {
             return await interaction.editReply(
                 ":white_check_mark: Pack created successfully!"
             );
-
         } else if (subcommand === "remove") {
             const pack = interaction.options.getString("pack");
 
@@ -365,13 +348,15 @@ module.exports = {
                 );
             }
 
-            const packIndex = parsedData.findIndex((foundPack) => foundPack.name === pack);
+            const packIndex = parsedData.findIndex(
+                (foundPack) => foundPack.name === pack
+            );
 
             if (packIndex === -1)
                 return await interaction.editReply(
                     `:x: A pack with the name ${pack} doesn't exist!`
                 );
-            
+
             parsedData.splice(packIndex, 1);
 
             // commit
@@ -411,10 +396,11 @@ module.exports = {
             return await interaction.editReply(
                 ":white_check_mark: Pack removed successfully!"
             );
-        } else if (subcommand === "edit" ) {
+        } else if (subcommand === "edit") {
             const pack = interaction.options.getString("pack") || null;
             const newName = interaction.options.getString("newname") || null;
-            const newDifficulty = interaction.options.getInteger("difficulty") || null;
+            const newDifficulty =
+                interaction.options.getInteger("difficulty") || null;
 
             // fetch github data path / _packs.json
             let fileResponse;
@@ -446,7 +432,9 @@ module.exports = {
                 );
             }
 
-            const packIndex = parsedData.findIndex((foundPack) => foundPack.name === pack);
+            const packIndex = parsedData.findIndex(
+                (foundPack) => foundPack.name === pack
+            );
 
             if (packIndex === -1)
                 return await interaction.editReply(":x: Pack not found");
@@ -489,11 +477,14 @@ module.exports = {
                 );
             }
 
-            cache.packs.update({
-                name: newName,
-                difficulty: newDifficulty,
-            }, { where: { name: pack } });
-            
+            cache.packs.update(
+                {
+                    name: newName,
+                    difficulty: newDifficulty,
+                },
+                { where: { name: pack } }
+            );
+
             return await interaction.editReply(
                 `:white_check_mark: Edited ${pack}!`
             );

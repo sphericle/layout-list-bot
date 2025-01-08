@@ -200,7 +200,7 @@ module.exports = {
         const {
             updateCachedLevels,
             updateCachedUsers,
-            updateCachedPacks
+            updateCachedPacks,
         } = require("./cacheUpdate.js");
         cache.levels = sequelize_cache.define("levels", {
             name: Sequelize.STRING,

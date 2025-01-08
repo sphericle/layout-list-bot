@@ -1,8 +1,5 @@
 const { SlashCommandBuilder } = require("discord.js");
-const {
-    guildId, 
-    debug
-} = require("../../config.json");
+const { guildId, debug } = require("../../config.json");
 const logger = require("log4js").getLogger();
 
 module.exports = {
@@ -44,7 +41,9 @@ module.exports = {
         .addSubcommand((subcommand) =>
             subcommand
                 .setName("insert")
-                .setDescription("Start a new voting (debug, for if this thread wasn't created by the bot)")
+                .setDescription(
+                    "Start a new voting (debug, for if this thread wasn't created by the bot)"
+                )
                 .addStringOption((option) =>
                     option
                         .setName("submitter")
@@ -79,7 +78,7 @@ module.exports = {
                     return { name: user.name, value: user.value };
                 })
             );
-        } 
+        }
     },
     async execute(interaction) {
         await interaction.deferReply({ ephemeral: true });
@@ -149,7 +148,7 @@ module.exports = {
                 discordid: interaction.channel.id,
                 yeses: matchYes[1],
                 nos: matchNo[1],
-                shared: `${submitter};`
+                shared: `${submitter};`,
             });
             interaction.editReply(":white_check_mark: Vote inserted!");
         } else if (interaction.options.getSubcommand() === "set") {

@@ -468,7 +468,12 @@ module.exports = {
                 });
 
                 const submittersData = await db.submitters.findAll({
-                    attributes: ["discordid", "submissions", "dmFlag", "banned"],
+                    attributes: [
+                        "discordid",
+                        "submissions",
+                        "dmFlag",
+                        "banned",
+                    ],
                 });
 
                 const levelsInVotingData = await db.levelsInVoting.findAll({

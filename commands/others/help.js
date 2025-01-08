@@ -38,7 +38,7 @@ module.exports = {
 
         const iconURL =
             "https://cdn.discordapp.com/icons/855211848362098699/e4cccd8155996534f28a7db33d2eeaab.png";
-        
+
         let exampleEmbed;
 
         exampleEmbed = new EmbedBuilder()

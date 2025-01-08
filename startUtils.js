@@ -131,10 +131,10 @@ module.exports = {
             await db[table].sync({ alter: true });
         for (const table of Object.keys(cache)) {
             if (
-                table !== "updateLevels" && 
-                table !== "updateUsers" && 
+                table !== "updateLevels" &&
+                table !== "updateUsers" &&
                 table !== "updatePacks"
-               )
+            )
                 await cache[table].sync({ alter: true });
         }
 

@@ -91,7 +91,7 @@ module.exports = {
         const { cache } = require("../index.js");
         const fs = require("fs");
         const path = require("path");
-        const localRepoPath = path.resolve(__dirname, "../data/repo/")
+        const localRepoPath = path.resolve(__dirname, "../data/repo/");
         const packs = [];
         logger.info("Updating cached packs...");
 
@@ -114,7 +114,7 @@ module.exports = {
                 name: pack.name,
                 difficulty: pack.difficulty,
                 isDiff: pack.levels && pack.levels.length > 0,
-            })
+            });
         }
         cache.packs.destroy({ where: {} });
         try {
@@ -125,5 +125,5 @@ module.exports = {
                 `Couldn't udate cached packs, something went wrong with sequelize: ${error}`
             );
         }
-    }
+    },
 };

@@ -98,7 +98,10 @@ module.exports = {
                     );
 
                     // pin the message
-                    if (voteMessage) await voteMessage.pin(`Vote added by ${interaction.user.username}`);
+                    if (voteMessage)
+                        await voteMessage.pin(
+                            `Vote added by ${interaction.user.username}`
+                        );
 
                     const message = await interaction.channel.send(
                         `The vote is now at **${count}-${matchNo[1]}**.`
@@ -128,13 +131,16 @@ module.exports = {
 
                         for (const user of shared) {
                             const submitterDb = await db.submitters.findOne({
-                                where: { discordid: 
-                                            Sequelize.where(
-                                                Sequelize.fn("LOWER", Sequelize.col("discordid")),
-                                                "LIKE",
-                                                "%" + user + "%"
-                                            ),
-                                        },
+                                where: {
+                                    discordid: Sequelize.where(
+                                        Sequelize.fn(
+                                            "LOWER",
+                                            Sequelize.col("discordid")
+                                        ),
+                                        "LIKE",
+                                        "%" + user + "%"
+                                    ),
+                                },
                             });
 
                             // check if the user has dmFlag set to true
@@ -222,7 +228,7 @@ module.exports = {
                         { nos: count },
                         { where: { discordid: await interaction.channel.id } }
                     );
-                    
+
                     const dbEntry = await db.levelsInVoting.findOne({
                         where: { discordid: await interaction.channel.id },
                     });
@@ -235,13 +241,16 @@ module.exports = {
 
                         for (const user of shared) {
                             const submitterDb = await db.submitters.findOne({
-                                where: { discordid: 
-                                            Sequelize.where(
-                                                Sequelize.fn("LOWER", Sequelize.col("discordid")),
-                                                "LIKE",
-                                                "%" + user + "%"
-                                            ),
-                                        },
+                                where: {
+                                    discordid: Sequelize.where(
+                                        Sequelize.fn(
+                                            "LOWER",
+                                            Sequelize.col("discordid")
+                                        ),
+                                        "LIKE",
+                                        "%" + user + "%"
+                                    ),
+                                },
                             });
 
                             // check if the user has dmFlag set to true
@@ -366,7 +375,7 @@ module.exports = {
             });
             if (command === "reject") {
                 interaction.channel.setArchived(true);
-                interaction.channel.setLocked(true)
+                interaction.channel.setLocked(true);
             }
 
             await db.levelsInVoting.destroy({

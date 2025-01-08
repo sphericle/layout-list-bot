@@ -12,11 +12,15 @@ module.exports = {
     enabled: true,
     data: new SlashCommandBuilder()
         .setName("vote")
-        .setDescription("Commands to manage your levels submitted to the Layout List.")
+        .setDescription(
+            "Commands to manage your levels submitted to the Layout List."
+        )
         .addSubcommand((subcommand) =>
             subcommand
                 .setName("submit")
-                .setDescription("Submit a level to be voted on by the reliable team")
+                .setDescription(
+                    "Submit a level to be voted on by the reliable team"
+                )
                 .addStringOption((option) =>
                     option
                         .setName("levelname")
@@ -111,9 +115,7 @@ module.exports = {
         .addSubcommand((subcommand) =>
             subcommand
                 .setName("dm")
-                .setDescription(
-                    "Toggle DMs when someone votes for your level"
-                )
+                .setDescription("Toggle DMs when someone votes for your level")
                 .addIntegerOption((option) =>
                     option
                         .setName("status")
@@ -142,7 +144,9 @@ module.exports = {
         .addSubcommand((subcommand) =>
             subcommand
                 .setName("share")
-                .setDescription("Allow another user to see the vote of a level you submitted")
+                .setDescription(
+                    "Allow another user to see the vote of a level you submitted"
+                )
                 .addStringOption((option) =>
                     option
                         .setName("levelname")
@@ -172,13 +176,13 @@ module.exports = {
                 levels = await db.levelsInVoting.findAll();
             else
                 levels = await db.levelsInVoting.findAll({
-                    where: { shared: 
-                                Sequelize.where(
-                                    Sequelize.fn("LOWER", Sequelize.col("shared")),
-                                    "LIKE",
-                                    "%" + interaction.user.id + "%"
-                                ), 
-                            },
+                    where: {
+                        shared: Sequelize.where(
+                            Sequelize.fn("LOWER", Sequelize.col("shared")),
+                            "LIKE",
+                            "%" + interaction.user.id + "%"
+                        ),
+                    },
                 });
             return await interaction.respond(
                 levels
@@ -235,8 +239,10 @@ module.exports = {
             const nong = interaction.options.getAttachment("nong");
             const enjoyment = interaction.options.getInteger("enjoyment");
 
-            if (enjoyment && (enjoyment > 10 || enjoyment < 1)) 
-                return await interaction.editReply(":x: The verifier's enjoyment should be a whole number from 1-10.");
+            if (enjoyment && (enjoyment > 10 || enjoyment < 1))
+                return await interaction.editReply(
+                    ":x: The verifier's enjoyment should be a whole number from 1-10."
+                );
 
             // get the submitter from the db
             let user;
@@ -313,7 +319,7 @@ module.exports = {
                 discordid: thread.id,
                 yeses: 0,
                 nos: 0,
-                shared: `${interaction.user.id};`
+                shared: `${interaction.user.id};`,
             });
 
             return interaction.editReply(":white_check_mark: Level submitted!");
@@ -324,7 +330,7 @@ module.exports = {
 
             const status = numStatus === 1 ? true : false;
 
-            let submitter
+            let submitter;
             submitter = await db.submitters.findOne({
                 where: { discordid: interaction.user.id },
             });
@@ -368,12 +374,14 @@ module.exports = {
                     where: !hasStaffRole
                         ? {
                               discordid: level,
-                              shared: 
-                                Sequelize.where(
-                                    Sequelize.fn("LOWER", Sequelize.col("shared")),
-                                    "LIKE",
-                                    "%" + interaction.user.id + "%"
-                                ),
+                              shared: Sequelize.where(
+                                  Sequelize.fn(
+                                      "LOWER",
+                                      Sequelize.col("shared")
+                                  ),
+                                  "LIKE",
+                                  "%" + interaction.user.id + "%"
+                              ),
                           }
                         : {
                               discordid: level,
@@ -408,9 +416,7 @@ module.exports = {
                 );
 
             if (user === interaction.user.id) {
-                return interaction.editReply(
-                    ":x: Nice try!"
-                );
+                return interaction.editReply(":x: Nice try!");
             }
 
             const hasStaffRole = await interaction.member.roles.cache.has(

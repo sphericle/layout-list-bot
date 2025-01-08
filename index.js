@@ -91,10 +91,8 @@ async function start() {
     try {
         logger.info("Updating cached users...");
         let result = await parseUsers();
-        if (typeof result === "string")
-            throw new Error(result);
-        if (result === 404)
-            logger.info("No new users.");
+        if (typeof result === "string") throw new Error(result);
+        if (result === 404) logger.info("No new users.");
     } catch (e) {
         logger.error(e);
     }
