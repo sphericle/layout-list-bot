@@ -140,12 +140,10 @@ module.exports = {
                 },
             });
             return await interaction.respond(
-                levels
-                    .slice(0, 25)
-                    .map((level) => ({
-                        name: level.name,
-                        value: level.filename,
-                    }))
+                levels.slice(0, 25).map((level) => ({
+                    name: level.name,
+                    value: level.filename,
+                }))
             );
         } else if (focused.name === "pack") {
             let packs = await cache.packs.findAll({
