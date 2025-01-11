@@ -129,7 +129,7 @@ module.exports = {
 
             
             const member = await interaction.guild.members.cache.get(skipper.user);
-            return await interaction.editReply(`Count for ${member.user.username} has been increased to ${skipper.count}.`);
+            return await interaction.editReply(`Count for ${member.user.username} has been decreased to ${skipper.count}.`);
         }
     },
 };
