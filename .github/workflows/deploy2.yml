@@ -1,0 +1,17 @@
+name: Deploy Bot
+
+on:
+  workflow_dispatch:
+
+jobs:
+  sync_to_backend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: deploy
+        uses: google-github-actions/ssh-compute@v1.1.1
+        with:
+            instance_name: instance-20250107-223152
+            zone: us-east5-c
+            ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
+            command: ./deploy.sh
