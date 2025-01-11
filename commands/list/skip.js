@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require("discord.js");
-const { feedbackBanID } = require("../../config.json");
+const { feedbackBanID, maxSkipCount } = require("../../config.json");
 const logger = require("log4js").getLogger();
 
 module.exports = {
@@ -43,30 +43,27 @@ module.exports = {
             .filter((member) =>
                 member.user.username
                     .toLowerCase()
-                    .includes(focused.toLowerCase())
+                    .includes(focused.toLowerCase()) &&
+                !member.roles.cache.has(feedbackBanID)
             )
         
-        await response
-            .map(async (member) => {
+        const responseArray = await Promise.all(
+            response.map(async (member) => {
                 let count = 0;
-                /*
                 let dbMember = await db.skippers.findOne({
                     where: {
                         user: member.id
                     }
                 })
-                logger.log(`Db member: ${dbMember}`)
                 count = dbMember ? dbMember.count : 0;
-                */
-                logger.log(`Count: ${count}`)
                 return {
-                    name: `${member.user.username}`,
+                    name: `${member.user.username} (${count}/${maxSkipCount})`,
                     value: member.id,
                 }
             })
-        logger.log(response);
+        );
 
-        await interaction.respond(response);
+        await interaction.respond(responseArray);
     },
     async execute(interaction) {
         await interaction.deferReply({ ephemeral: true });
@@ -80,47 +77,59 @@ module.exports = {
                     user: username
                 }
             })
-            if (!dbUser)
+            if (!dbUser) {
                 dbUser = await db.skippers.create({
                     user: username,
                     count: 0,
-                }).dataValues;
-            await dbUser.increment("count");
-            // ban the user if they at 3 now
-            if (dbUser.count === 3) {
-                const member = await interaction.guild.members.cache.get(dbUser.user);
+                });
+            }
+            await dbUser.increment("count"); // value in database
+            let skipper = dbUser.dataValues;
+            skipper.count += 1 // local var
+
+            
+            const member = await interaction.guild.members.cache.get(skipper.user);
+            // ban the user if they at [maxSkipCount] now
+            if (skipper.count === maxSkipCount) {
                 if (member) {
                     await member.roles.add(feedbackBanID);
-                    logger.info(`Feedback banned user ${username}`);
+                    logger.info(`Feedback banned user ${member.user.username}`);
                     await db.skippers.destroy({
                         where: {
                             user: username
                         }
                     })
-                    return await interaction.editReply(`${username} has been banned from feedback.`)
+                    return await interaction.editReply(`${member.user.username} has been banned from feedback.`)
                 } else {
-                    logger.warn(`User with ID ${dbUser.user} not found in guild`);
-                    return await interaction.editReply("Count increased to 3, but an error occurred while trying to add the feedback ban role.")
+                    logger.warn(`User with ID ${skipper.user} not found in guild`);
+                    return await interaction.editReply(`Count increased to ${maxSkipCount}, but an error occurred while trying to add the feedback ban role.`)
                 }
             }
-            return await interaction.editReply(`Skip count for ${username} has been increased to ${dbUser.count}.`);
+            return await interaction.editReply(`Count for ${member.user.username} has been increased to ${skipper.count}.`);
         } else if (subcommand === "remove") {
             const username = interaction.options.getString("user");
-            let user;
-            user = await db.skippers.findOne({
+            let dbUser;
+            dbUser = await db.skippers.findOne({
                 where: {
-                    name: username
+                    user: username
                 }
             })
-            if (!user)
-                user = await db.skippers.create({
-                    name: username,
+            if (!dbUser) {
+                dbUser = await db.skippers.create({
+                    user: username,
                     count: 0,
-                }).dataValues;
+                });
+            }
+            let skipper = dbUser.dataValues;
+            if (skipper.count === 0)
+                return await interaction.editReply(":x: Count is already at 0!")
             
+            await dbUser.decrement("count"); // value in database
+            skipper.count -= 1 // local var
+
             
-            user.increment("count");
-            return await interaction.editReply(`Skip count for ${username} has been increased to ${user.count}.`);
+            const member = await interaction.guild.members.cache.get(skipper.user);
+            return await interaction.editReply(`Count for ${member.user.username} has been increased to ${skipper.count}.`);
         }
     },
 };

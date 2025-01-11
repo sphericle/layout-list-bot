@@ -46,5 +46,6 @@
     "staffRole": "1320770731985866803",
     "submissionsChannelID": "1324846545207820349",
 
-    "feedbackBanID": "1327481553567223919"
+    "feedbackBanID": "1327481553567223919",
+    "maxSkipCount": 3
 }
