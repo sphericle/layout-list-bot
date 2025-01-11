@@ -191,6 +191,13 @@ module.exports = {
             dmFlag: Sequelize.BOOLEAN,
             banned: Sequelize.BOOLEAN,
         });
+        db.skippers = sequelize.define("skippers", {
+            user: {
+                type: Sequelize.STRING,
+                unique: true,
+            },
+            count: Sequelize.INTEGER
+        });
 
         return db;
     },

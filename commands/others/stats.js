@@ -362,6 +362,7 @@ module.exports = {
                 const submitters = workbook.addWorksheet("Submitters");
                 const levelsInVoting =
                     workbook.addWorksheet("Levels In Voting");
+                const skippers = workbook.addWorksheet("Skip counts")
 
                 // Add columns to the sheets
                 pendingSheet.columns = [
@@ -399,6 +400,10 @@ module.exports = {
                     { header: "yeses", key: "yeses", width: 20 },
                     { header: "nos", key: "nos", width: 20 },
                     { header: "shared", key: "shared", width: 20 },
+                ];
+                skippers.columns = [
+                    { header: "user", key: "user", width: 25 },
+                    { header: "count", key: "count", width: 25 },
                 ];
 
                 dailyStatsSheet.columns = [
@@ -487,6 +492,13 @@ module.exports = {
                     ],
                 });
 
+                const skippersData = await db.skippers.findAll({
+                    attributes: [
+                        "user",
+                        "count",
+                    ],
+                });
+
                 pendingRecords.forEach((record) =>
                     pendingSheet.addRow(record.toJSON())
                 );
@@ -504,6 +516,9 @@ module.exports = {
                 );
                 levelsInVotingData.forEach((stat) =>
                     levelsInVoting.addRow(stat.toJSON())
+                );
+                skippersData.forEach((stat) =>
+                    skippers.addRow(stat.toJSON())
                 );
 
                 await workbook.xlsx.writeFile(filePath);
