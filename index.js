@@ -109,6 +109,9 @@ async function start() {
     } catch (e) {
         logger.error(`Error setting presence: ${e}`);
     }
+    await db.nextGif.create({
+        value: "1736559776.897244"
+    })
 }
 
 start();
