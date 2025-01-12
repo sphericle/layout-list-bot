@@ -124,6 +124,25 @@ module.exports = {
                             "The tier the level is in (1-10, see the list website for details)"
                         )
                 )
+        )
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName("addlevel")
+                .setDescription("Add a level to the pack")
+                .addStringOption((option) =>
+                    option
+                        .setName("pack")
+                        .setDescription("The name of the pack")
+                        .setRequired(true)
+                        .setAutocomplete(true)
+                )
+                .addStringOption((option) =>
+                    option
+                        .setName("level")
+                        .setDescription("The level to add")
+                        .setRequired(true)
+                        .setAutocomplete(true)
+                )
         ),
     async autocomplete(interaction) {
         const focused = interaction.options.getFocused(true);
@@ -482,6 +501,93 @@ module.exports = {
                 },
                 { where: { name: pack } }
             );
+
+            return await interaction.editReply(
+                `:white_check_mark: Edited ${pack}!`
+            );
+        } else if (subcommand === "addlevel") {
+            const packName = interaction.options.getString("pack") || null;
+            const levelName = interaction.options.getString("level") || null;
+                
+            const pack = await cache.packs.findOne({ where: { name: packName } });
+
+            if (!pack)
+                return await interaction.editReply(":x: This pack doesn't exist!");
+
+            const level = await cache.levels.findOne({ where: { filename: levelName }})
+
+            if (!level)
+                return await interaction.editReply(":x: That level doesn't exist!");
+
+            // fetch github data path / _packs.json
+            let fileResponse;
+            try {
+                fileResponse = await octokit.rest.repos.getContent({
+                    owner: githubOwner,
+                    repo: githubRepo,
+                    path: githubDataPath + `/_packs.json`,
+                    branch: githubBranch,
+                });
+            } catch (fetchError) {
+                logger.info(`Couldn't fetch flags.json: \n${fetchError}`);
+                return await interaction.editReply(
+                    `:x: Couldn't fetch flags.json: \n${fetchError}`
+                );
+            }
+
+            let parsedData;
+            try {
+                parsedData = JSON.parse(
+                    Buffer.from(fileResponse.data.content, "base64").toString(
+                        "utf-8"
+                    )
+                );
+            } catch (parseError) {
+                logger.info(`Unable to parse flags data:\n${parseError}`);
+                return await interaction.editReply(
+                    `:x: Unable to parse flags data:\n${parseError}`
+                );
+            }
+
+            const packIndex = parsedData.findIndex(
+                (foundPack) => foundPack.name === pack.name
+            );
+
+            parsedData.levels.push(level.filename)
+
+            // commit
+            let fileSha;
+            try {
+                const response = await octokit.repos.getContent({
+                    owner: githubOwner,
+                    repo: githubRepo,
+                    path: githubDataPath + `/_packs.json`,
+                });
+                fileSha = response.data.sha;
+            } catch (error) {
+                logger.info(`Error fetching _packs.json SHA:\n${error}`);
+                return await interaction.editReply(
+                    `:x: Couldn't fetch data from _packs.json`
+                );
+            }
+            try {
+                await octokit.repos.createOrUpdateFileContents({
+                    owner: githubOwner,
+                    repo: githubRepo,
+                    path: githubDataPath + `/_packs.json`,
+                    branch: githubBranch,
+                    message: `Updated ${parsedData[packIndex].name}`,
+                    content: Buffer.from(
+                        JSON.stringify(parsedData, null, "\t")
+                    ).toString("base64"),
+                    sha: fileSha,
+                });
+            } catch (updateError) {
+                logger.info(`Couldn't update flags.json: \n${updateError}`);
+                return await interaction.editReply(
+                    `:x: Couldn't update flags.json: \n${updateError}`
+                );
+            }
 
             return await interaction.editReply(
                 `:white_check_mark: Edited ${pack}!`
