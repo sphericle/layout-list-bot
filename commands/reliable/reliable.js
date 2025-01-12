@@ -65,11 +65,11 @@ module.exports = {
             // if the current channel is not a thread
             if (!(await interaction.channel.isThread())) {
                 return await interaction.editReply(
-                    "You must be in a thread to use this command"
+                    "Bro lock in this isnt a reliable thread"
                 );
             }
 
-            await interaction.editReply("Fetching thread info...");
+            await interaction.editReply("Checking thread name...");
             // get the thread name
             const text = await interaction.channel.name;
             const matchLevelName = text.match(/^(.*)\s\d+-\d+$/);
@@ -83,7 +83,7 @@ module.exports = {
 
                     await interaction.editReply({
                         content:
-                            "Updating thread name, this could take a while...",
+                            "Changing thread name, this could take a while...",
                         ephemeral: true,
                     });
 
@@ -104,7 +104,7 @@ module.exports = {
                         );
 
                     const message = await interaction.channel.send(
-                        `The vote is now at **${count}-${matchNo[1]}**.`
+                        `The vote is now at **${count}-${matchNo[1]}**. The thread name is being updated!!`
                     );
 
                     await interaction.channel.setName(
@@ -169,17 +169,14 @@ module.exports = {
             }
 
             // ping user if needed
-            return await interaction.editReply({
-                content: "The thread has been updated!",
-                ephemeral: true,
-            });
+            return await interaction.editReply("Updated!");
         } else if (interaction.options.getSubcommand() === "no") {
             const { db } = require("../../index.js");
-            await interaction.editReply("Fetching thread info...");
+            await interaction.editReply("Checking thread name...");
             // if the current channel is not a thread
             if (!interaction.channel.isThread()) {
                 return await interaction.editReply(
-                    "You must be in a thread to use this command"
+                    "Bro lock in this isnt a reliable thread"
                 );
             }
 
@@ -196,7 +193,7 @@ module.exports = {
 
                     await interaction.editReply({
                         content:
-                            "Updating thread name, this could take a while...",
+                            "Changing thread name, this could take a while...",
                         ephemeral: true,
                     });
 
@@ -279,7 +276,7 @@ module.exports = {
             }
 
             // ping user if needed
-            return await interaction.editReply("The thread has been updated!");
+            return await interaction.editReply("Updated!");
         } else if (
             interaction.options.getSubcommand() === "accept" ||
             interaction.options.getSubcommand() === "reject"
@@ -299,7 +296,7 @@ module.exports = {
             // if the current channel is not a thread
             if (!interaction.channel.isThread()) {
                 return await interaction.editReply(
-                    "You must be in a thread to use this command"
+                    "Bro lock in this isnt a reliable thread"
                 );
             }
             await interaction.editReply("Fetching thread info...");
@@ -308,7 +305,7 @@ module.exports = {
             const matchLevelName = text.match(/^(.*)\s\d+-\d+$/);
             if (!matchLevelName) {
                 return await interaction.editReply(
-                    "This thread name is not formatted correctly! (Level name #-#)"
+                    "This thread's name is not formatted correctly! (Level name #-#)"
                 );
             }
             const levelName = matchLevelName[1];
