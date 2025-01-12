@@ -362,7 +362,7 @@ module.exports = {
                 const submitters = workbook.addWorksheet("Submitters");
                 const levelsInVoting =
                     workbook.addWorksheet("Levels In Voting");
-                const skippers = workbook.addWorksheet("Skip counts")
+                const skippers = workbook.addWorksheet("Skip counts");
 
                 // Add columns to the sheets
                 pendingSheet.columns = [
@@ -493,10 +493,7 @@ module.exports = {
                 });
 
                 const skippersData = await db.skippers.findAll({
-                    attributes: [
-                        "user",
-                        "count",
-                    ],
+                    attributes: ["user", "count"],
                 });
 
                 pendingRecords.forEach((record) =>
@@ -517,9 +514,7 @@ module.exports = {
                 levelsInVotingData.forEach((stat) =>
                     levelsInVoting.addRow(stat.toJSON())
                 );
-                skippersData.forEach((stat) =>
-                    skippers.addRow(stat.toJSON())
-                );
+                skippersData.forEach((stat) => skippers.addRow(stat.toJSON()));
 
                 await workbook.xlsx.writeFile(filePath);
 

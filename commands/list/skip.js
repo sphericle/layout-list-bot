@@ -14,9 +14,7 @@ module.exports = {
                 .addStringOption((option) =>
                     option
                         .setName("user")
-                        .setDescription(
-                            "The discord user"
-                        )
+                        .setDescription("The discord user")
                         .setRequired(true)
                         .setAutocomplete(true)
                 )
@@ -28,9 +26,7 @@ module.exports = {
                 .addStringOption((option) =>
                     option
                         .setName("user")
-                        .setDescription(
-                            "The discord user"
-                        )
+                        .setDescription("The discord user")
                         .setRequired(true)
                         .setAutocomplete(true)
                 )
@@ -39,27 +35,27 @@ module.exports = {
         const { db } = require("../../index.js");
         const focused = interaction.options.getFocused();
         const members = interaction.guild.members.cache;
-        const response = await members
-            .filter((member) =>
+        const response = await members.filter(
+            (member) =>
                 member.user.username
                     .toLowerCase()
                     .includes(focused.toLowerCase()) &&
                 !member.roles.cache.has(feedbackBanID)
-            )
-        
+        );
+
         const responseArray = await Promise.all(
             response.map(async (member) => {
                 let count = 0;
                 let dbMember = await db.skippers.findOne({
                     where: {
-                        user: member.id
-                    }
-                })
+                        user: member.id,
+                    },
+                });
                 count = dbMember ? dbMember.count : 0;
                 return {
                     name: `${member.user.username} (${count}/${maxSkipCount})`,
                     value: member.id,
-                }
+                };
             })
         );
 
@@ -74,9 +70,9 @@ module.exports = {
             let dbUser;
             dbUser = await db.skippers.findOne({
                 where: {
-                    user: username
-                }
-            })
+                    user: username,
+                },
+            });
             if (!dbUser) {
                 dbUser = await db.skippers.create({
                     user: username,
@@ -85,10 +81,11 @@ module.exports = {
             }
             await dbUser.increment("count"); // value in database
             let skipper = dbUser.dataValues;
-            skipper.count += 1 // local var
+            skipper.count += 1; // local var
 
-            
-            const member = await interaction.guild.members.cache.get(skipper.user);
+            const member = await interaction.guild.members.cache.get(
+                skipper.user
+            );
             // ban the user if they at [maxSkipCount] now
             if (skipper.count === maxSkipCount) {
                 if (member) {
@@ -96,24 +93,32 @@ module.exports = {
                     logger.info(`Feedback banned user ${member.user.username}`);
                     await db.skippers.destroy({
                         where: {
-                            user: username
-                        }
-                    })
-                    return await interaction.editReply(`${member.user.username} has been banned from feedback.`)
+                            user: username,
+                        },
+                    });
+                    return await interaction.editReply(
+                        `${member.user.username} has been banned from feedback.`
+                    );
                 } else {
-                    logger.warn(`User with ID ${skipper.user} not found in guild`);
-                    return await interaction.editReply(`Count increased to ${maxSkipCount}, but an error occurred while trying to add the feedback ban role.`)
+                    logger.warn(
+                        `User with ID ${skipper.user} not found in guild`
+                    );
+                    return await interaction.editReply(
+                        `Count increased to ${maxSkipCount}, but an error occurred while trying to add the feedback ban role.`
+                    );
                 }
             }
-            return await interaction.editReply(`Count for ${member.user.username} has been increased to ${skipper.count}.`);
+            return await interaction.editReply(
+                `Count for ${member.user.username} has been increased to ${skipper.count}.`
+            );
         } else if (subcommand === "remove") {
             const username = interaction.options.getString("user");
             let dbUser;
             dbUser = await db.skippers.findOne({
                 where: {
-                    user: username
-                }
-            })
+                    user: username,
+                },
+            });
             if (!dbUser) {
                 dbUser = await db.skippers.create({
                     user: username,
@@ -122,14 +127,19 @@ module.exports = {
             }
             let skipper = dbUser.dataValues;
             if (skipper.count === 0)
-                return await interaction.editReply(":x: Count is already at 0!")
-            
-            await dbUser.decrement("count"); // value in database
-            skipper.count -= 1 // local var
+                return await interaction.editReply(
+                    ":x: Count is already at 0!"
+                );
 
-            
-            const member = await interaction.guild.members.cache.get(skipper.user);
-            return await interaction.editReply(`Count for ${member.user.username} has been decreased to ${skipper.count}.`);
+            await dbUser.decrement("count"); // value in database
+            skipper.count -= 1; // local var
+
+            const member = await interaction.guild.members.cache.get(
+                skipper.user
+            );
+            return await interaction.editReply(
+                `Count for ${member.user.username} has been decreased to ${skipper.count}.`
+            );
         }
     },
 };

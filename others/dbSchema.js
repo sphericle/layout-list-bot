@@ -196,7 +196,7 @@ module.exports = {
                 type: Sequelize.STRING,
                 unique: true,
             },
-            count: Sequelize.INTEGER
+            count: Sequelize.INTEGER,
         });
 
         return db;
