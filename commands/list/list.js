@@ -14,8 +14,6 @@ const {
 } = require("../../config.json");
 const logger = require("log4js").getLogger();
 const Sequelize = require("sequelize");
-const assert = require("node:assert");
-const test = require("node:test");
 
 module.exports = {
     enabled: true,
@@ -1785,86 +1783,4 @@ module.exports = {
             );
         }
     },
-    async test() {
-        const { db, octokit, cache } = require("../../index.js");
-
-            const levelfile = "aura"
-            const position = 100
-
-            let list_response;
-            try {
-                list_response = await octokit.rest.repos.getContent({
-                    owner: githubOwner,
-                    repo: githubRepo,
-                    path: githubDataPath + "/_list.json",
-                    branch: githubBranch,
-                });
-            } catch {
-                return logger.log("Error fetching from _list.json")
-            }
-
-            const list = JSON.parse(
-                Buffer.from(list_response.data.content, "base64").toString(
-                    "utf-8"
-                )
-            );
-            const noDiv = list.filter((level) => !level.startsWith("_"));
-            const currentPosition = list.indexOf(levelfile);
-            const lowered = currentPosition < position;
-            const indexBelow = noDiv[position - 1];
-
-            const levelBelow = await cache.levels.findOne({
-                where: { filename: indexBelow },
-            });
-            const levelAbove = await cache.levels.findOne({
-                where: { position: levelBelow.position - 1 },
-            });
-
-            if (currentPosition == -1)
-                return await interaction.editReply(
-                    ":x: The level you are trying to move is not on the list"
-                );
-
-            const moveEmbed = new EmbedBuilder()
-                .setColor(0x8fce00)
-                .setTitle(`Move Level: ${levelfile}`)
-                .setDescription(
-                    `**${levelfile}** will be ${
-                        lowered ? "lowered" : "raised"
-                    } to **#${position}**, above **${
-                        levelBelow.name ?? "-"
-                    }** and below **${levelAbove.name ?? "-"}**`
-                )
-                .setTimestamp();
-
-            // Create commit buttons
-            const commit = new ButtonBuilder()
-                .setCustomId("commitMoveLevel")
-                .setLabel("Commit changes")
-                .setStyle(ButtonStyle.Success);
-
-            const row = new ActionRowBuilder().addComponents(commit);
-
-            await interaction.editReply({
-                embeds: [moveEmbed],
-                components: [row],
-            });
-            const sent = await interaction.fetchReply();
-
-            try {
-                await db.levelsToMove.create({
-                    filename: levelfile,
-                    position: position,
-                    discordid: sent.id,
-                });
-            } catch (error) {
-                logger.info(
-                    `Couldn't register the level to move ; something went wrong with Sequelize : ${error}`
-                );
-                return await interaction.editReply(
-                    ":x: Something went wrong while moving the level; Please try again later"
-                );
-            }
-            return;
-    }
 };
