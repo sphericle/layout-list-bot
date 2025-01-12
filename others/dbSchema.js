@@ -198,7 +198,13 @@ module.exports = {
             },
             count: Sequelize.INTEGER,
         });
-
+        db.nextGif = sequelize.define("nextGif", {
+            value: {
+                type: Sequelize.STRING,
+                unique: true,
+                defaultValue: null,
+            }
+        });
         return db;
     },
 
