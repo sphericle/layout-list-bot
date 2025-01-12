@@ -241,7 +241,7 @@ module.exports = {
 
             if (enjoyment && (enjoyment > 10 || enjoyment < 1))
                 return await interaction.editReply(
-                    ":x: The verifier's enjoyment should be a whole number from 1-10."
+                    ":x: that is NOT an enjoyment!!!! (1-10)."
                 );
 
             // get the submitter from the db
@@ -265,19 +265,19 @@ module.exports = {
             } catch (error) {
                 logger.error(error);
                 return interaction.editReply(
-                    ":x: An error occurred while submitting your level. Please try again later."
+                    `:x: Whoops!!! An error occurred!!! (error trying to find/create db entry: \n${error})`
                 );
             }
 
             // check if user has 3 submissions already
             if (user.submissions >= 3)
                 return interaction.editReply(
-                    ":x: You have reached the maximum number of 3 submissions per month."
+                    ":x: You've already submitted 3 levels this month! Please close the GD editor and touch some grass."
                 );
 
             if (user.banned)
                 return interaction.editReply(
-                    ":x: You have been banned from submitting levels."
+                    ":x: You've been submission banned! No more funny business."
                 );
 
             const guild = await interaction.client.guilds.fetch(guildId);
@@ -322,7 +322,7 @@ module.exports = {
                 shared: `${interaction.user.id};`,
             });
 
-            return interaction.editReply(":white_check_mark: Level submitted!");
+            return interaction.editReply(":white_check_mark: All done! Your level will be voted on by the Reliable team.\nYou can use /vote status to see their progress!");
         } else if (subcommand === "dm") {
             const { db } = require("../../index.js");
 
@@ -351,12 +351,12 @@ module.exports = {
             } catch (error) {
                 logger.error(error);
                 return interaction.editReply(
-                    ":x: An error occurred while updating your DM settings. Please try again later."
+                    `:x: Whoops an error occurred. Please bother zSphericle with this message: ${error}.`
                 );
             }
 
             return interaction.editReply(
-                `:white_check_mark: DMs have been ${
+                `:white_check_mark: Your DMs have been ${
                     status ? "enabled" : "disabled"
                 }!`
             );
@@ -390,13 +390,13 @@ module.exports = {
             } catch (error) {
                 logger.error(error);
                 return interaction.editReply(
-                    ":x: An error occurred while fetching the status of your level. Please try again later."
+                    `:x: A problem occurred fetching your level info. Please spam sphericle's DMs with this message:\n${error}.`
                 );
             }
 
             if (!submission)
                 return interaction.editReply(
-                    ":x: You have not submitted a level with that name."
+                    ":x: You haven't submitted a level with that name..."
                 );
 
             return interaction.editReply(
@@ -412,9 +412,10 @@ module.exports = {
             const member = await guild.members.fetch(user);
             if (!member)
                 return interaction.editReply(
-                    ":x: The user you specified is not in the server."
+                    ":x: Couldn't find that user in this server!."
                 );
 
+            // if you try to share the vote with yourself (LOL)
             if (user === interaction.user.id) {
                 return interaction.editReply(":x: Nice try!");
             }
@@ -438,7 +439,7 @@ module.exports = {
             } catch (error) {
                 logger.error(error);
                 return interaction.editReply(
-                    ":x: An error occurred while fetching the status of your level. Please try again later."
+                    ":x: A problem occurred fetching your level info. Please spam sphericle's DMs with this message:\n${error}."
                 );
             }
 
@@ -450,7 +451,7 @@ module.exports = {
             const shared = submission.shared.split(";");
             if (shared.includes(user))
                 return interaction.editReply(
-                    ":x: You have already shared this level with that user."
+                    ":x: That user already has access to this level!"
                 );
 
             await db.levelsInVoting.update(
