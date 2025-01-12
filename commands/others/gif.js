@@ -15,7 +15,7 @@ module.exports = {
         // find the stored nextVal in the db
         const nextVal = await db.nextGif.findOne({ where: {} });
         const search = interaction.options.getString("search") || null;
-        let url = "https://g.tenor.com/v1/search?key=LIVDSRZULELA&limit=20";
+        let url = "https://g.tenor.com/v1/search?key=LIVDSRZULELA&limit=20&contentfilter=medium";
         if (search) {
             const encodedSearch = encodeURIComponent(search); // filter unusable characters
             url += `&q=${encodedSearch}`;
