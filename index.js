@@ -5,6 +5,7 @@ const { Client, GatewayIntentBits, ActivityType } = require("discord.js");
 const { Octokit } = require("@octokit/rest");
 const { createDbSchema, createCacheDbSchema } = require("./others/dbSchema.js");
 const { parseUsers } = require("./others/gitUtils.js");
+const { test } = require("./test.js");
 const {
     clientInit,
     sequelizeInit,
@@ -80,6 +81,7 @@ async function start() {
         process.exit(1);
     }
     await checkGithubPermissions(octokit);
+    
     try {
         logger.info("Logging in client with discord...");
         await client.login(process.env.TOKEN);
