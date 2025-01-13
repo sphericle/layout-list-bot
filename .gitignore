@@ -5,3 +5,4 @@ logs
 .env.debug
 .env.real
 .DS_Store
+config.json
