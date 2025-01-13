@@ -25,7 +25,6 @@ module.exports = {
         };
         const req = await fetch(url);
         const result = await req.json();
-        await interaction.editReply(result);
         const randomIndex = Math.floor(Math.random() * result.results.length);
         // pick a random gif from the response and send the url
         const gif = result.results[randomIndex];
