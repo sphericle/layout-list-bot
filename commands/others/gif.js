@@ -28,7 +28,7 @@ module.exports = {
         const randomIndex = Math.floor(Math.random() * result.results.length);
         // pick a random gif from the response and send the url
         const gif = result.results[randomIndex];
-        await interaction.editReply(`-# [${gif.content_description}](${gif.url})`);
+        await interaction.editReply(gif.content_description ? `-# [${gif.content_description}](${gif.url})` : gif.url);
         // randomly update the nextVal offset for the tenor api
         // https://tenor.com/gifapi/documentation#endpoints-search
         if (randomIndex % 3 !== 0)
