@@ -40,7 +40,7 @@ module.exports = {
             
             // randomly update the nextVal offset for the tenor api
             // https://tenor.com/gifapi/documentation#endpoints-search
-            if (randomIndex % 5 === 0)
+            if (randomIndex % 5 === 0 && !search)
                 await db.nextGif.update(
                     { value: result.next },
                     { where: {} },
@@ -77,7 +77,7 @@ module.exports = {
             // randomly update the nextVal offset for the tenor api
             // https://tenor.com/gifapi/documentation#endpoints-search
             // 1 in 5 chance
-            if (randomIndex % 5 === 0)
+            if (randomIndex % 5 === 0 && !search)
                 await db.nextGif.update(
                     { value: result.next },
                     { where: {} },
