@@ -574,9 +574,6 @@ module.exports = {
                 (device == "Mobile" ? ',\n\t\t"mobile": true\n}\n' : "\n}");
             const newRecord = JSON.parse(githubCode);
 
-            // {fileRecord} is the record we're looping through, and
-            // {record} is the current record we're trying to commit
-
             let existing = false;
             let updated = false;
             // If duplicate, don't add it to githubCodes
@@ -649,10 +646,6 @@ module.exports = {
             );
 
             await interaction.editReply("Adding record...");
-
-            // DEBUG
-            logger.log(`Exising (true): ${existing}`);
-            logger.log(`Updated (false): ${updated}`);
 
             // if the record does not already exist or existed but has been updated
             if (existing === true && updated === false) {
@@ -824,7 +817,6 @@ module.exports = {
                 logger.info(
                     `Successfully created commit on ${githubBranch} (record addition): ${newCommit.data.sha}`
                 );
-                await interaction.editReply("This record has been added!");
             } else {
                 // Get file SHA
                 let fileSha;
