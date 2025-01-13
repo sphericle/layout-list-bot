@@ -2,6 +2,7 @@ const { SlashCommandBuilder } = require("discord.js");
 const logger = require('log4js').getLogger()
 module.exports = {
     enabled: true,
+    cooldown: 1,
     data: new SlashCommandBuilder()
         .setName("randomgif")
         .setDescription("Get a random gif from Tenor")
