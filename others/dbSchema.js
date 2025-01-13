@@ -203,7 +203,7 @@ module.exports = {
                 type: Sequelize.STRING,
                 unique: true,
                 defaultValue: null,
-            }
+            },
         });
         return db;
     },
