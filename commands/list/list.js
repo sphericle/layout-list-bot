@@ -833,14 +833,19 @@ module.exports = {
             const noDiv = list.filter((level) => !level.startsWith("_"));
             const currentPosition = list.indexOf(levelfile);
             const lowered = currentPosition < position;
+            // not rly sure why this says index bc
+            // it reutrns an entry from the noDiv array LOL
             const indexBelow = noDiv[position - 1];
+            logger.log(`indexBelow: ` + indexBelow)
 
             const levelBelow = await cache.levels.findOne({
                 where: { filename: indexBelow },
             });
+            logger.log(`Below: ${levelBelow.filename}`)
             const levelAbove = await cache.levels.findOne({
                 where: { position: levelBelow.position - 1 },
             });
+            logger.log(`Above: ${levelAbove.filename}`)
 
             if (currentPosition == -1)
                 return await interaction.editReply(
@@ -1662,11 +1667,11 @@ module.exports = {
             logger.log(`Level below: ${levelBelow}`);
 
             // find the index of that level in the real list
-            const realAbove = list.indexOf(levelBelow);
+            const realBelow = list.indexOf(levelBelow);
 
             // insert the level above the real list index
             // -2 because -1 is for indexing and -1 is to put it above levelBelow
-            list.splice(realAbove - 2, 0, filename);
+            list.splice(realBelow - 2, 0, filename);
 
             changelogList.push({
                 date: Math.floor(new Date().getTime() / 1000),

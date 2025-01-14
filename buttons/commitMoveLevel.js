@@ -33,7 +33,7 @@ module.exports = {
                 path: githubDataPath + "/_list.json",
                 branch: githubBranch,
             });
-        } catch (_) {
+        } catch {
             return await interaction.editReply(
                 ":x: Something went wrong while fetching data from github, please try again later"
             );
@@ -46,7 +46,7 @@ module.exports = {
                 path: githubDataPath + "/_changelog.json",
                 branch: githubBranch,
             });
-        } catch (_) {
+        } catch {
             logger.info("No changelog file found, creating a new one");
         }
 
@@ -81,13 +81,13 @@ module.exports = {
 
         // get the level below the level we want to place
         // +2 because 1 is index offset and 1 is to get the above level
-        const levelBelow = noDiv[level.position + 2];
+        const levelBelow = noDiv[level.position - 1];
 
         // find the index of that level in the real list
-        const realAbove = list.indexOf(levelBelow);
+        const realBelow = list.indexOf(levelBelow);
 
         // insert the level above the real list index
-        list.splice(realAbove - 3, 0, level.filename);
+        list.splice(realBelow, 0, level.filename);
 
         // -1 bc indexes
         // insert joke about language with indexing at 1 like maybe they were onto something

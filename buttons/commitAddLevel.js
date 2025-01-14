@@ -3,8 +3,13 @@ const {
     githubRepo,
     githubDataPath,
     githubBranch,
+    guildId,
+    staffGuildId,
+    enableSeparateStaffServer,
+    changelogID,
 } = require("../config.json");
 const logger = require("log4js").getLogger();
+const { EmbedBuilder } = require("discord.js");
 
 module.exports = {
     customId: "commitAddLevel",
@@ -56,9 +61,6 @@ module.exports = {
             Buffer.from(list_response.data.content, "base64").toString("utf-8")
         );
 
-        // filter out all levels that are not dividers
-        const noDiv = list.filter((level) => !level.startsWith("_"));
-
         const changelogList = changelog_response
             ? JSON.parse(
                   Buffer.from(
@@ -74,17 +76,17 @@ module.exports = {
             );
         }
 
-        // get the level below the level we want to place
-        // +1 because we want the level above this one in the index
-        const levelBelow = noDiv[level.position + 1];
-        logger.log(`Level below: ${levelBelow}`);
+        // filter out all levels that are not dividers
+        const noDiv = list.filter((level) => !level.startsWith("_"));
+
+        // get from the index (which is why we use -1)
+        const levelBelow = noDiv[level.position - 1];
 
         // find the index of that level in the real list
-        const realAbove = list.indexOf(levelBelow);
+        const realBelow = list.indexOf(levelBelow);
 
         // insert the level above the real list index
-        // -2 because -1 is for indexing and -1 is to put it above levelBelow
-        list.splice(realAbove - 2, 0, level.filename);
+        list.splice(realBelow, 0, level.filename);
 
         changelogList.push({
             date: Math.floor(new Date().getTime() / 1000),
@@ -92,8 +94,8 @@ module.exports = {
             name: level.filename,
             to_rank: level.position,
             from_rank: null,
-            above: list[level.position] || null,
-            below: list[level.position - 2] || null,
+            above: noDiv[level.position] || null,
+            below: noDiv[level.position - 2] || null,
         });
 
         // Check if file already exists
@@ -109,7 +111,6 @@ module.exports = {
             );
         } catch {
             // File does not exist
-
             const changes = [
                 {
                     path: githubDataPath + "/_list.json",
@@ -221,25 +222,50 @@ module.exports = {
             }
 
             try {
-                const above = list[level.position]
+                // this was changed to -1 because the lvl to place is
+                // never added to the noDiv array
+                const above = noDiv[level.position]
                     ? await cache.levels.findOne({
-                          where: { filename: list[level.position] },
+                          where: { filename: noDiv[level.position - 1] },
                       })
                     : null;
-                const below = list[level.position - 2]
+                const below = noDiv[level.position - 2]
                     ? await cache.levels.findOne({
-                          where: { filename: list[level.position - 2] },
+                          where: { filename: noDiv[level.position - 2] },
                       })
                     : null;
 
                 if (enableChangelogMessage) {
+                    const levelData = JSON.parse(level.githubCode)
                     await db.changelog.create({
-                        levelname: JSON.parse(level.githubCode).name,
+                        levelname: levelData.name,
                         old_position: null,
                         new_position: level.position,
                         level_above: above?.name || null,
                         level_below: below?.name || null,
                         action: "placed",
+                    });
+                    
+                    let message = `${levelData.name} has been placed at #${level.position}, `
+                    if (above) message += `above ${above.name}`
+                    if (above && below) message += ` and `
+                    if (below) message += `below ${below.name}`
+                    message += "."
+
+                    // Create embed to send in public channel
+                    const publicEmbed = new EmbedBuilder()
+                        .setColor(0x8fce00)
+                        .setTitle(`:white_check_mark: ${levelData.name}`) // TODO: maybe make this a random funny message
+                        .setDescription(message)
+                        .setTimestamp();
+
+                    const guild = await interaction.client.guilds.fetch(guildId);
+                    const staffGuild = enableSeparateStaffServer
+                        ? await interaction.client.guilds.fetch(staffGuildId)
+                        : guild;
+                    
+                    staffGuild.channels.cache.get(changelogID).send({
+                        embeds: [publicEmbed],
                     });
                 }
             } catch (changelogErr) {
@@ -271,7 +297,6 @@ module.exports = {
                     `Successfully created commit on ${githubBranch}: ${newCommit.data.sha}, but an error occured while cleaning up:\n${cleanupErr}`
                 );
             }
-
             return await interaction.editReply(
                 `:white_check_mark: Successfully created file: **${level.filename}.json** (${newCommit.data.html_url})`
             );
