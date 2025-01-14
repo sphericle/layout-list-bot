@@ -128,7 +128,26 @@ module.exports = {
         .addSubcommand((subcommand) =>
             subcommand
                 .setName("addlevel")
-                .setDescription("Add a level to the pack")
+                .setDescription("Add a level to a pack")
+                .addStringOption((option) =>
+                    option
+                        .setName("pack")
+                        .setDescription("The name of the pack")
+                        .setRequired(true)
+                        .setAutocomplete(true)
+                )
+                .addStringOption((option) =>
+                    option
+                        .setName("level")
+                        .setDescription("The level to add")
+                        .setRequired(true)
+                        .setAutocomplete(true)
+                )
+        )
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName("removelevel")
+                .setDescription("Remove a level from a pack")
                 .addStringOption((option) =>
                     option
                         .setName("pack")
@@ -553,7 +572,7 @@ module.exports = {
                 (foundPack) => foundPack.name === pack.name
             );
 
-            parsedData.levels.push(level.filename)
+            parsedData[packIndex].levels.push(level.filename)
 
             // commit
             let fileSha;
@@ -576,7 +595,7 @@ module.exports = {
                     repo: githubRepo,
                     path: githubDataPath + `/_packs.json`,
                     branch: githubBranch,
-                    message: `Updated ${parsedData[packIndex].name}`,
+                    message: `Added ${level.name} to ${parsedData[packIndex].name}`,
                     content: Buffer.from(
                         JSON.stringify(parsedData, null, "\t")
                     ).toString("base64"),
@@ -590,7 +609,100 @@ module.exports = {
             }
 
             return await interaction.editReply(
-                `:white_check_mark: Edited ${pack}!`
+                `:white_check_mark: Added ${level.name} to ${pack.name}!`
+            );
+        } else if (subcommand === "removelevel") {
+            const packName = interaction.options.getString("pack") || null;
+            const levelName = interaction.options.getString("level") || null;
+                
+            const pack = await cache.packs.findOne({ where: { name: packName } });
+
+            if (!pack)
+                return await interaction.editReply(":x: This pack doesn't exist!");
+
+            const level = await cache.levels.findOne({ where: { filename: levelName }})
+
+            if (!level)
+                return await interaction.editReply(":x: That level doesn't exist!");
+
+            // fetch github data path / _packs.json
+            let fileResponse;
+            try {
+                fileResponse = await octokit.rest.repos.getContent({
+                    owner: githubOwner,
+                    repo: githubRepo,
+                    path: githubDataPath + `/_packs.json`,
+                    branch: githubBranch,
+                });
+            } catch (fetchError) {
+                logger.info(`Couldn't fetch flags.json: \n${fetchError}`);
+                return await interaction.editReply(
+                    `:x: Couldn't fetch flags.json: \n${fetchError}`
+                );
+            }
+
+            let parsedData;
+            try {
+                parsedData = JSON.parse(
+                    Buffer.from(fileResponse.data.content, "base64").toString(
+                        "utf-8"
+                    )
+                );
+            } catch (parseError) {
+                logger.info(`Unable to parse flags data:\n${parseError}`);
+                return await interaction.editReply(
+                    `:x: Unable to parse flags data:\n${parseError}`
+                );
+            }
+
+            const packIndex = parsedData.findIndex(
+                (foundPack) => foundPack.name === pack.name
+            );
+
+            const levelIndex = parsedData[packIndex].levels.indexOf(level.filename);
+
+            if (levelIndex > -1) {
+                parsedData[packIndex].levels.splice(levelIndex, 1);
+            } else {
+                return await interaction.editReply(`:x: Could not find ${level.name} in ${pack.name}`)
+            }
+
+            // commit
+            let fileSha;
+            try {
+                const response = await octokit.repos.getContent({
+                    owner: githubOwner,
+                    repo: githubRepo,
+                    path: githubDataPath + `/_packs.json`,
+                });
+                fileSha = response.data.sha;
+            } catch (error) {
+                logger.info(`Error fetching _packs.json SHA:\n${error}`);
+                return await interaction.editReply(
+                    `:x: Couldn't fetch data from _packs.json`
+                );
+            }
+            try {
+                await octokit.repos.createOrUpdateFileContents({
+                    owner: githubOwner,
+                    repo: githubRepo,
+                    path: githubDataPath + `/_packs.json`,
+                    branch: githubBranch,
+                    message: `Removed ${level.name} from ${parsedData[packIndex].name}`,
+                    content: Buffer.from(
+                        JSON.stringify(parsedData, null, "\t")
+                    ).toString("base64"),
+                    sha: fileSha,
+                });
+            } catch (updateError) {
+                logger.info(`Couldn't update _packs.json: \n${updateError}`);
+                return await interaction.editReply(
+                    `:x: Couldn't update _packs.json: \n${updateError}`
+                );
+            }
+
+            return await interaction.editReply(
+                `:white_check_mark: Removed ${level.name} from ${pack.name}!`
             );
         }
     },
