@@ -2336,7 +2336,9 @@ module.exports = {
             logger.info(
                 `Successfully created commit on ${githubBranch} (record update): ${newCommit.data.sha}`
             );
-            return await interaction.editReply(":white_check_mark: This record has been updated!");
+            return await interaction.editReply(
+                ":white_check_mark: This record has been updated!"
+            );
         } else if (interaction.options.getSubcommand() === "updatedata") {
             await updateData.execute();
             return await interaction.reply(

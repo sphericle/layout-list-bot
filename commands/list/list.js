@@ -836,16 +836,16 @@ module.exports = {
             // not rly sure why this says index bc
             // it reutrns an entry from the noDiv array LOL
             const indexBelow = noDiv[position - 1];
-            logger.log(`indexBelow: ` + indexBelow)
+            logger.log(`indexBelow: ` + indexBelow);
 
             const levelBelow = await cache.levels.findOne({
                 where: { filename: indexBelow },
             });
-            logger.log(`Below: ${levelBelow.filename}`)
+            logger.log(`Below: ${levelBelow.filename}`);
             const levelAbove = await cache.levels.findOne({
                 where: { position: levelBelow.position - 1 },
             });
-            logger.log(`Above: ${levelAbove.filename}`)
+            logger.log(`Above: ${levelAbove.filename}`);
 
             if (currentPosition == -1)
                 return await interaction.editReply(

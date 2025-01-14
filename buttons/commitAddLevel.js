@@ -236,7 +236,7 @@ module.exports = {
                     : null;
 
                 if (enableChangelogMessage) {
-                    const levelData = JSON.parse(level.githubCode)
+                    const levelData = JSON.parse(level.githubCode);
                     await db.changelog.create({
                         levelname: levelData.name,
                         old_position: null,
@@ -245,12 +245,12 @@ module.exports = {
                         level_below: below?.name || null,
                         action: "placed",
                     });
-                    
-                    let message = `${levelData.name} has been placed at #${level.position}, `
-                    if (above) message += `above ${above.name}`
-                    if (above && below) message += ` and `
-                    if (below) message += `below ${below.name}`
-                    message += "."
+
+                    let message = `${levelData.name} has been placed at #${level.position}, `;
+                    if (above) message += `above ${above.name}`;
+                    if (above && below) message += ` and `;
+                    if (below) message += `below ${below.name}`;
+                    message += ".";
 
                     // Create embed to send in public channel
                     const publicEmbed = new EmbedBuilder()
@@ -259,11 +259,13 @@ module.exports = {
                         .setDescription(message)
                         .setTimestamp();
 
-                    const guild = await interaction.client.guilds.fetch(guildId);
+                    const guild = await interaction.client.guilds.fetch(
+                        guildId
+                    );
                     const staffGuild = enableSeparateStaffServer
                         ? await interaction.client.guilds.fetch(staffGuildId)
                         : guild;
-                    
+
                     staffGuild.channels.cache.get(changelogID).send({
                         embeds: [publicEmbed],
                     });
