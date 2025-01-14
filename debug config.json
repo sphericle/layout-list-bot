@@ -5,7 +5,7 @@
     "enableShifts": false,
     "enablePriorityRole": false,
     "enableWelcomeMessage": false,
-    "enableChangelogMessage": false,
+    "enableChangelogMessage": true,
 
     "scheduleShifts": "10 0 * * *",
     "scheduleShiftsReminder": "10 22 * * *",

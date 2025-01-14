@@ -3,7 +3,12 @@ const {
     githubRepo,
     githubDataPath,
     githubBranch,
+    changelogID,
+    enableSeparateStaffServer,
+    guildId,
+    staffGuildId
 } = require("../config.json");
+const { EmbedBuilder } = require('discord.js');
 const logger = require("log4js").getLogger();
 
 module.exports = {
@@ -214,14 +219,14 @@ module.exports = {
         }
 
         try {
-            const above = list[level.position]
+            const above = noDiv[level.position]
                 ? await cache.levels.findOne({
-                      where: { filename: list[level.position] },
+                      where: { filename: noDiv[level.position] },
                   })
                 : null;
-            const below = list[level.position - 2]
+            const below = noDiv[level.position - 2]
                 ? await cache.levels.findOne({
-                      where: { filename: list[level.position - 2] },
+                      where: { filename: noDiv[level.position - 2] },
                   })
                 : null;
             const levelname = (
@@ -239,6 +244,32 @@ module.exports = {
                     level_below: below?.name || null,
                     action: lowered ? "lowered" : "raised",
                 });
+
+                
+                let message = `${levelname} has been moved from #${currentPosition} to #${level.position}, `;
+                if (above) message += `above ${above?.name}`;
+                if (above && below) message += ` and `;
+                if (below) message += `below ${below?.name}`;
+                message += ".";
+
+                // Create embed to send in public channel
+                const publicEmbed = new EmbedBuilder()
+                    .setColor(0x8fce00)
+                    .setTitle(`:white_check_mark: ${levelname}`) // TODO: maybe make this a random funny message
+                    .setDescription(message)
+                    .setTimestamp();
+
+                const guild = await interaction.client.guilds.fetch(
+                    guildId
+                );
+                const staffGuild = enableSeparateStaffServer
+                    ? await interaction.client.guilds.fetch(staffGuildId)
+                    : guild;
+
+                staffGuild.channels.cache.get(changelogID).send({
+                    embeds: [publicEmbed],
+                });
+                
             }
         } catch (changelogErr) {
             logger.info(

@@ -67,7 +67,6 @@ module.exports = {
             );
             // pick a random gif from the response and send the url
             const gif = result.results[randomIndex];
-            logger.log(gif);
             await interaction.editReply(
                 gif.content_description
                     ? `-# [${gif.content_description}](${gif.url})`

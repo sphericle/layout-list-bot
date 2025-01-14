@@ -247,9 +247,9 @@ module.exports = {
                     });
 
                     let message = `${levelData.name} has been placed at #${level.position}, `;
-                    if (above) message += `above ${above.name}`;
+                    if (above) message += `above ${above?.name}`;
                     if (above && below) message += ` and `;
-                    if (below) message += `below ${below.name}`;
+                    if (below) message += `below ${below?.name}`;
                     message += ".";
 
                     // Create embed to send in public channel
