@@ -6,9 +6,9 @@ const {
     changelogID,
     enableSeparateStaffServer,
     guildId,
-    staffGuildId
+    staffGuildId,
 } = require("../config.json");
-const { EmbedBuilder } = require('discord.js');
+const { EmbedBuilder } = require("discord.js");
 const logger = require("log4js").getLogger();
 
 module.exports = {
@@ -245,7 +245,6 @@ module.exports = {
                     action: lowered ? "lowered" : "raised",
                 });
 
-                
                 let message = `${levelname} has been moved from #${currentPosition} to #${level.position}, `;
                 if (above) message += `above ${above?.name}`;
                 if (above && below) message += ` and `;
@@ -259,9 +258,7 @@ module.exports = {
                     .setDescription(message)
                     .setTimestamp();
 
-                const guild = await interaction.client.guilds.fetch(
-                    guildId
-                );
+                const guild = await interaction.client.guilds.fetch(guildId);
                 const staffGuild = enableSeparateStaffServer
                     ? await interaction.client.guilds.fetch(staffGuildId)
                     : guild;
@@ -269,7 +266,6 @@ module.exports = {
                 staffGuild.channels.cache.get(changelogID).send({
                     embeds: [publicEmbed],
                 });
-                
             }
         } catch (changelogErr) {
             logger.info(

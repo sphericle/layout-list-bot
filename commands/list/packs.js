@@ -527,16 +527,24 @@ module.exports = {
         } else if (subcommand === "addlevel") {
             const packName = interaction.options.getString("pack") || null;
             const levelName = interaction.options.getString("level") || null;
-                
-            const pack = await cache.packs.findOne({ where: { name: packName } });
+
+            const pack = await cache.packs.findOne({
+                where: { name: packName },
+            });
 
             if (!pack)
-                return await interaction.editReply(":x: This pack doesn't exist!");
+                return await interaction.editReply(
+                    ":x: This pack doesn't exist!"
+                );
 
-            const level = await cache.levels.findOne({ where: { filename: levelName }})
+            const level = await cache.levels.findOne({
+                where: { filename: levelName },
+            });
 
             if (!level)
-                return await interaction.editReply(":x: That level doesn't exist!");
+                return await interaction.editReply(
+                    ":x: That level doesn't exist!"
+                );
 
             // fetch github data path / _packs.json
             let fileResponse;
@@ -572,7 +580,7 @@ module.exports = {
                 (foundPack) => foundPack.name === pack.name
             );
 
-            parsedData[packIndex].levels.push(level.filename)
+            parsedData[packIndex].levels.push(level.filename);
 
             // commit
             let fileSha;
@@ -614,16 +622,24 @@ module.exports = {
         } else if (subcommand === "removelevel") {
             const packName = interaction.options.getString("pack") || null;
             const levelName = interaction.options.getString("level") || null;
-                
-            const pack = await cache.packs.findOne({ where: { name: packName } });
+
+            const pack = await cache.packs.findOne({
+                where: { name: packName },
+            });
 
             if (!pack)
-                return await interaction.editReply(":x: This pack doesn't exist!");
+                return await interaction.editReply(
+                    ":x: This pack doesn't exist!"
+                );
 
-            const level = await cache.levels.findOne({ where: { filename: levelName }})
+            const level = await cache.levels.findOne({
+                where: { filename: levelName },
+            });
 
             if (!level)
-                return await interaction.editReply(":x: That level doesn't exist!");
+                return await interaction.editReply(
+                    ":x: That level doesn't exist!"
+                );
 
             // fetch github data path / _packs.json
             let fileResponse;
@@ -659,12 +675,16 @@ module.exports = {
                 (foundPack) => foundPack.name === pack.name
             );
 
-            const levelIndex = parsedData[packIndex].levels.indexOf(level.filename);
+            const levelIndex = parsedData[packIndex].levels.indexOf(
+                level.filename
+            );
 
             if (levelIndex > -1) {
                 parsedData[packIndex].levels.splice(levelIndex, 1);
             } else {
-                return await interaction.editReply(`:x: Could not find ${level.name} in ${pack.name}`)
+                return await interaction.editReply(
+                    `:x: Could not find ${level.name} in ${pack.name}`
+                );
             }
 
             // commit

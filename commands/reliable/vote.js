@@ -322,7 +322,9 @@ module.exports = {
                 shared: `${interaction.user.id};`,
             });
 
-            return interaction.editReply(":white_check_mark: All done! Your level will be voted on by the Reliable team.\nYou can use /vote status to see their progress!");
+            return interaction.editReply(
+                ":white_check_mark: All done! Your level will be voted on by the Reliable team.\nYou can use /vote status to see their progress!"
+            );
         } else if (subcommand === "dm") {
             const { db } = require("../../index.js");
 
