@@ -112,9 +112,9 @@ module.exports = {
                 )
                 .addStringOption((option) =>
                     option
-                        .setName("raw")
+                        .setName("notes")
                         .setDescription(
-                            "Link to your raw footage (Optional, required for top 400 levels)"
+                            "Any other info you'd like to share"
                         )
                         .setMaxLength(1024)
                 )
@@ -160,9 +160,9 @@ module.exports = {
                 )
                 .addStringOption((option) =>
                     option
-                        .setName("additionalnotes")
+                        .setName("notes")
                         .setDescription(
-                            "Any other info you'd like to share with us (Optional)"
+                            "Any other info you'd like to share"
                         )
                         .setMaxLength(1024)
                 )
@@ -424,7 +424,7 @@ module.exports = {
             const enjoyment = await interaction.options.getInteger("enjoyment");
             const percent = await interaction.options.getInteger("percent");
             const linkStr = interaction.options.getString("completionlink");
-            const note = interaction.options.getString("additionalnotes");
+            const note = interaction.options.getString("notes");
             const rawStr = interaction.options.getString("raw");
             const userToPing = interaction.options.getString("discord");
 
@@ -612,7 +612,7 @@ module.exports = {
             await interaction.editReply(`Writing code...`);
 
             // Create embed to send in public channel
-            const publicEmbed = new EmbedBuilder()
+            let publicEmbed = new EmbedBuilder()
                 .setColor(0x8fce00)
                 .setTitle(`:white_check_mark: ${level.name}`)
                 .addFields(
@@ -641,6 +641,15 @@ module.exports = {
                 )
                 .setTimestamp();
 
+            if (note) {
+                publicEmbed.addFields(
+                    {
+                        name: "Note",
+                        value: `**_${note}_**`,
+                        inline: true,
+                    }
+                )
+            }
             logger.info(
                 `${interaction.user.tag} (${interaction.user.id}) accepted record of ${level.name} for ${user.name}`
             );
