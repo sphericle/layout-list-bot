@@ -291,29 +291,6 @@ module.exports = {
                             "Your enjoyment rating on this level (1-10)"
                         )
                 )
-                .addStringOption((option) =>
-                    option
-                        .setName("raw")
-                        .setDescription(
-                            "Link to your raw footage (Optional, required for top 400 levels)"
-                        )
-                        .setMaxLength(1024)
-                )
-                .addIntegerOption((option) =>
-                    option
-                        .setName("ldm")
-                        .setDescription(
-                            "ID for the external LDM you used (Optional)"
-                        )
-                )
-                .addStringOption((option) =>
-                    option
-                        .setName("additionalnotes")
-                        .setDescription(
-                            "Any other info you'd like to share with us (Optional)"
-                        )
-                        .setMaxLength(1024)
-                )
         )
         .addSubcommand((subcommand) =>
             subcommand
@@ -350,62 +327,70 @@ module.exports = {
                 )
         ),
     async autocomplete(interaction) {
+        logger.log(interaction); // debug
         const focused = await interaction.options.getFocused(true);
 
         const { cache } = require("../../index.js");
         const Sequelize = require("sequelize");
-
-        if (focused.name === "levelname") {
-            let levels = await cache.levels.findAll({
-                where: {
-                    name: Sequelize.where(
-                        Sequelize.fn("LOWER", Sequelize.col("name")),
-                        "LIKE",
-                        "%" + focused.value.toLowerCase() + "%"
-                    ),
-                },
-            });
-
-            await interaction.respond(
-                levels.slice(0, 25).map((level) => ({
-                    name: `#${level.position} - ${level.name}`,
-                    value: level.filename,
-                }))
-            );
-        } else if (focused.name === "username" || focused.name === "newuser") {
-            let users = await cache.users.findAll({
-                where: {
-                    name: Sequelize.where(
-                        Sequelize.fn("LOWER", Sequelize.col("name")),
-                        "LIKE",
-                        "%" + focused.value.toLowerCase() + "%"
-                    ),
-                },
-            });
-            await interaction.respond(
-                users
-                    .slice(0, 25)
-                    .map((user) => ({ name: user.name, value: user.name }))
-            );
-        } else if (focused.name === "discord") {
-            const members = interaction.guild.members.cache;
-            const filtered = members
-                .filter((member) =>
-                    member.user.username
-                        .toLowerCase()
-                        .includes(focused.value.toLowerCase())
-                )
-                .map((member) => {
-                    return {
-                        name: member.user.username,
-                        value: member.id,
-                    };
+        
+        try {
+            if (focused.name === "levelname") {
+                let levels = await cache.levels.findAll({
+                    where: {
+                        name: Sequelize.where(
+                            Sequelize.fn("LOWER", Sequelize.col("name")),
+                            "LIKE",
+                            "%" + focused.value.toLowerCase() + "%"
+                        ),
+                    },
                 });
-            await interaction.respond(
-                filtered.slice(0, 25).map((user) => {
-                    return { name: user.name, value: user.value };
-                })
-            );
+
+                return await interaction.respond(
+                    levels.slice(0, 25).map((level) => ({
+                        name: `#${level.position} - ${level.name}`,
+                        value: level.filename,
+                    }))
+                );
+            } else if (focused.name === "username" || focused.name === "newuser") {
+                let users = await cache.users.findAll({
+                    where: {
+                        name: Sequelize.where(
+                            Sequelize.fn("LOWER", Sequelize.col("name")),
+                            "LIKE",
+                            "%" + focused.value.toLowerCase() + "%"
+                        ),
+                    },
+                });
+                return await interaction.respond(
+                    users
+                        .slice(0, 25)
+                        .map((user) => ({ name: user.name, value: user.name }))
+                );
+            } else if (focused.name === "discord") {
+                const members = interaction.guild.members.cache;
+                const filtered = members
+                    .filter((member) =>
+                        member.user.username
+                            .toLowerCase()
+                            .includes(focused.value.toLowerCase())
+                    )
+                    .map((member) => {
+                        return {
+                            name: member.user.username,
+                            value: member.id,
+                        };
+                    });
+                return await interaction.respond(
+                    filtered.slice(0, 25).map((user) => {
+                        return { name: user.name, value: user.value };
+                    })
+                );
+            }
+            if (!interaction.responded) {
+                interaction.respond([])
+            }
+        } catch (e) {
+            logger.log(`Error on autocomplete: ${e}`);
         }
     },
     async execute(interaction) {

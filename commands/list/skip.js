@@ -59,7 +59,7 @@ module.exports = {
             })
         );
 
-        await interaction.respond(responseArray);
+        return await interaction.respond(responseArray);
     },
     async execute(interaction) {
         await interaction.deferReply({ ephemeral: true });

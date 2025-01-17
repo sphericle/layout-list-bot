@@ -65,7 +65,7 @@ module.exports = {
                     ),
                 },
             });
-            await interaction.respond(
+            return await interaction.respond(
                 users
                     .slice(0, 25)
                     .map((user) => ({ name: user.name, value: user.name }))
@@ -73,7 +73,7 @@ module.exports = {
         } else if (focused.name === "flag") {
             const flags = require("../../others/flagmap.json");
 
-            await interaction.respond(
+            return await interaction.respond(
                 Object.entries(flags)
                     .filter(([key]) =>
                         key.toLowerCase().includes(focused.value.toLowerCase())

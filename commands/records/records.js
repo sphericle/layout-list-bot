@@ -513,7 +513,7 @@ module.exports = {
                 },
             });
 
-            await interaction.respond(
+            return await interaction.respond(
                 levels
                     .slice(0, 25)
                     .map((level) => ({ name: level.name, value: level.name }))
@@ -528,7 +528,7 @@ module.exports = {
                     ),
                 },
             });
-            await interaction.respond(
+            return await interaction.respond(
                 users
                     .slice(0, 25)
                     .map((user) => ({ name: user.name, value: user.name }))

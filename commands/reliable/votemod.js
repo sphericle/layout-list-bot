@@ -73,7 +73,7 @@ module.exports = {
                         value: member.id,
                     };
                 });
-            await interaction.respond(
+            return await interaction.respond(
                 filtered.slice(0, 25).map((user) => {
                     return { name: user.name, value: user.value };
                 })
