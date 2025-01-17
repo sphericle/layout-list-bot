@@ -4,6 +4,7 @@ const {
     ButtonBuilder,
     ActionRowBuilder,
     ButtonStyle,
+    AttachmentBuilder,
 } = require("discord.js");
 const logger = require("log4js").getLogger();
 const Sequelize = require("sequelize");
@@ -34,6 +35,11 @@ module.exports = {
                         .setName("reason")
                         .setDescription("The reason for rejecting the level")
                         .setRequired(true)
+                )
+                .addStringOption((option) =>
+                    option
+                        .setName("images")
+                        .setDescription("Links to images to send along with the rejection message (used so the images embed)")
                 )
         ),
     async autocomplete(interaction) {
@@ -330,9 +336,21 @@ module.exports = {
             let pingMessage = "";
             for (const user of shared) pingMessage += `<@${user}> `;
 
+            // add links to message
+            const rawImgs = interaction.options.getString("images")
+            let attachments = []
+            if (rawImgs) {
+                const imgs = rawImgs.split(",")
+                for (const img of imgs) {
+                    const attachment = new AttachmentBuilder(img.trim());
+                    attachments.push(attachment)
+                }
+            }
+
             const submissionMessage = await submissionsChannel.send({
                 embeds: [embed],
                 content: pingMessage,
+                files: attachments
             });
 
             await submissionMessage.react("👍");
