@@ -322,7 +322,6 @@ module.exports = {
                 )
         ),
     async autocomplete(interaction) {
-        logger.log(interaction); // debug
         const focused = await interaction.options.getFocused(true);
 
         const { cache } = require("../../index.js");

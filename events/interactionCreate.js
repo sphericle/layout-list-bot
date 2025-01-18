@@ -69,6 +69,8 @@ module.exports = {
                 logger.error(error);
             }
         } else if (interaction.isAutocomplete()) {
+            // this never logs on /record add D:
+            logger.log("This is an autocomplete interaction (no way)")
             const command = interaction.client.commands.get(
                 interaction.commandName
             );
