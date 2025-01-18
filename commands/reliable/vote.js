@@ -111,6 +111,13 @@ module.exports = {
                             "The NONG file for this level. You can also paste a link in the song-name field"
                         )
                 )
+                .addStringOption((option) =>
+                    option
+                        .setName("note")
+                        .setDescription(
+                            "Additional notes for staff and people voting to accept/reject this level (note that this is public)"
+                        )
+                )
         )
         .addSubcommand((subcommand) =>
             subcommand
@@ -238,6 +245,7 @@ module.exports = {
             const opinion = interaction.options.getString("opinion");
             const nong = interaction.options.getAttachment("nong");
             const enjoyment = interaction.options.getInteger("enjoyment");
+            const note = interaction.options.getString("note");
 
             if (enjoyment && (enjoyment > 10 || enjoyment < 1))
                 return await interaction.editReply(
@@ -293,7 +301,9 @@ module.exports = {
                 (raw ? `\nRaw: ${raw}` : "") +
                 (opinion ? `\nDifficulty opinion: ${opinion}` : "") +
                 (enjoyment ? `\nVerifier's enjoyment: ${enjoyment}/10` : "") +
-                (nong ? `\nNONG: ${nong.url}` : "");
+                (nong ? `\nNONG: ${nong.url}` : "") +
+                (note ? `\n\n_Additional notes: ${note}_` : "");
+
             const thread = await voteChannel.threads.create({
                 name: `${levelname} 0-0`,
                 autoArchiveDuration: 1440,

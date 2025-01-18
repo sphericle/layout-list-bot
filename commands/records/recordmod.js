@@ -32,7 +32,6 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName("record")
         .setDescription("Staff record moderator commands")
-        .setDMPermission(true)
         .addSubcommand((subcommand) =>
             subcommand
                 .setName("stats")
@@ -333,64 +332,57 @@ module.exports = {
         const { cache } = require("../../index.js");
         const Sequelize = require("sequelize");
         
-        try {
-            if (focused.name === "levelname") {
-                let levels = await cache.levels.findAll({
-                    where: {
-                        name: Sequelize.where(
-                            Sequelize.fn("LOWER", Sequelize.col("name")),
-                            "LIKE",
-                            "%" + focused.value.toLowerCase() + "%"
-                        ),
-                    },
-                });
+        if (focused.name === "levelname") {
+            let levels = await cache.levels.findAll({
+                where: {
+                    name: Sequelize.where(
+                        Sequelize.fn("LOWER", Sequelize.col("name")),
+                        "LIKE",
+                        "%" + focused.value.toLowerCase() + "%"
+                    ),
+                },
+            });
 
-                return await interaction.respond(
-                    levels.slice(0, 25).map((level) => ({
-                        name: `#${level.position} - ${level.name}`,
-                        value: level.filename,
-                    }))
-                );
-            } else if (focused.name === "username" || focused.name === "newuser") {
-                let users = await cache.users.findAll({
-                    where: {
-                        name: Sequelize.where(
-                            Sequelize.fn("LOWER", Sequelize.col("name")),
-                            "LIKE",
-                            "%" + focused.value.toLowerCase() + "%"
-                        ),
-                    },
+            return await interaction.respond(
+                levels.slice(0, 25).map((level) => ({
+                    name: `#${level.position} - ${level.name}`,
+                    value: level.filename,
+                }))
+            );
+        } else if (focused.name === "username" || focused.name === "newuser") {
+            let users = await cache.users.findAll({
+                where: {
+                    name: Sequelize.where(
+                        Sequelize.fn("LOWER", Sequelize.col("name")),
+                        "LIKE",
+                        "%" + focused.value.toLowerCase() + "%"
+                    ),
+                },
+            });
+            return await interaction.respond(
+                users
+                    .slice(0, 25)
+                    .map((user) => ({ name: user.name, value: user.name }))
+            );
+        } else if (focused.name === "discord") {
+            const members = interaction.guild.members.cache;
+            const filtered = members
+                .filter((member) =>
+                    member.user.username
+                        .toLowerCase()
+                        .includes(focused.value.toLowerCase())
+                )
+                .map((member) => {
+                    return {
+                        name: member.user.username,
+                        value: member.id,
+                    };
                 });
-                return await interaction.respond(
-                    users
-                        .slice(0, 25)
-                        .map((user) => ({ name: user.name, value: user.name }))
-                );
-            } else if (focused.name === "discord") {
-                const members = interaction.guild.members.cache;
-                const filtered = members
-                    .filter((member) =>
-                        member.user.username
-                            .toLowerCase()
-                            .includes(focused.value.toLowerCase())
-                    )
-                    .map((member) => {
-                        return {
-                            name: member.user.username,
-                            value: member.id,
-                        };
-                    });
-                return await interaction.respond(
-                    filtered.slice(0, 25).map((user) => {
-                        return { name: user.name, value: user.value };
-                    })
-                );
-            }
-            if (!interaction.responded) {
-                interaction.respond([])
-            }
-        } catch (e) {
-            logger.log(`Error on autocomplete: ${e}`);
+            return await interaction.respond(
+                filtered.slice(0, 25).map((user) => {
+                    return { name: user.name, value: user.value };
+                })
+            );
         }
     },
     async execute(interaction) {
