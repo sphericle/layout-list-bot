@@ -428,7 +428,7 @@ module.exports = {
 
             await interaction.editReply("Coding...");
             const githubCode =
-                `{\n\t"id": ${id},\n\t"name": "${levelname}",\n\t"author": "${uploaderName}",\n\t"creators": ${JSON.stringify(
+                `{\n\t"id": ${id},\n\t"name": "${levelname}",\n\t"creators": ${JSON.stringify(
                     finalCreators
                 )},\n\t"verifier": "${verifierName}",\n\t"verification": "${verification}",\n\t"percentToQualify": ${percent},\n\t"password": "${password}",\n\t"difficulty": ${difficulty},\n\t"song": "${songName}",` +
                 (songLink !== null ? `\n\t"songLink": "${songLink}",` : "") +
