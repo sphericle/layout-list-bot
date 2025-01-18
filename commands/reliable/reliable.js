@@ -39,7 +39,9 @@ module.exports = {
                 .addStringOption((option) =>
                     option
                         .setName("images")
-                        .setDescription("Links to images to send along with the rejection message (used so the images embed)")
+                        .setDescription(
+                            "Links to images to send along with the rejection message (used so the images embed)"
+                        )
                 )
         ),
     async autocomplete(interaction) {
@@ -337,20 +339,20 @@ module.exports = {
             for (const user of shared) pingMessage += `<@${user}> `;
 
             // add links to message
-            const rawImgs = interaction.options.getString("images")
-            let attachments = []
+            const rawImgs = interaction.options.getString("images");
+            let attachments = [];
             if (rawImgs) {
-                const imgs = rawImgs.split(",")
+                const imgs = rawImgs.split(",");
                 for (const img of imgs) {
                     const attachment = new AttachmentBuilder(img.trim());
-                    attachments.push(attachment)
+                    attachments.push(attachment);
                 }
             }
 
             const submissionMessage = await submissionsChannel.send({
                 embeds: [embed],
                 content: pingMessage,
-                files: attachments
+                files: attachments,
             });
 
             await submissionMessage.react("👍");

@@ -112,9 +112,7 @@ module.exports = {
                 .addStringOption((option) =>
                     option
                         .setName("notes")
-                        .setDescription(
-                            "Any other info you'd like to share"
-                        )
+                        .setDescription("Any other info you'd like to share")
                         .setMaxLength(1024)
                 )
         )
@@ -160,9 +158,7 @@ module.exports = {
                 .addStringOption((option) =>
                     option
                         .setName("notes")
-                        .setDescription(
-                            "Any other info you'd like to share"
-                        )
+                        .setDescription("Any other info you'd like to share")
                         .setMaxLength(1024)
                 )
         )
@@ -331,7 +327,7 @@ module.exports = {
 
         const { cache } = require("../../index.js");
         const Sequelize = require("sequelize");
-        
+
         if (focused.name === "levelname") {
             let levels = await cache.levels.findAll({
                 where: {
@@ -619,13 +615,11 @@ module.exports = {
                 .setTimestamp();
 
             if (note) {
-                publicEmbed.addFields(
-                    {
-                        name: "Note",
-                        value: `**_${note}_**`,
-                        inline: true,
-                    }
-                )
+                publicEmbed.addFields({
+                    name: "Note",
+                    value: `**_${note}_**`,
+                    inline: true,
+                });
             }
             logger.info(
                 `${interaction.user.tag} (${interaction.user.id}) accepted record of ${level.name} for ${user.name}`
