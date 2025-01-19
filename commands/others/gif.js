@@ -15,10 +15,10 @@ module.exports = {
         await interaction.deferReply();
         const { db } = require("../../index.js");
         // find the stored nextVal in the db
-        let values = await db.nextGif.findAll()
+        let values = await db.nextGif.findAll();
         let nextVal = values[0];
         if (values.length > 1) {
-            await db.nextGif.destroy({ where: {} })
+            await db.nextGif.destroy({ where: {} });
         }
         const search = interaction.options.getString("search") || null;
         let url =
@@ -48,14 +48,14 @@ module.exports = {
             // https://tenor.com/gifapi/documentation#endpoints-search
             if (!nextVal || values.length > 1) {
                 await db.nextGif.create({
-                    value: result.next
-                })
+                    value: result.next,
+                });
             } else if (randomIndex % 4 === 0 && !search) {
                 await db.nextGif.update({ value: result.next }, { where: {} });
             }
             return;
         } else {
-            logger.log("Search failed")
+            logger.log("Search failed");
             // redo literally everything (yikes)
             const search = interaction.options.getString("search") || null;
             let url =
@@ -70,7 +70,9 @@ module.exports = {
                 Math.random() * result.results.length
             );
             if (result.results.length === 0) {
-                return await interaction.editReply(":x: No results found! Wtf are you even looking up... weirdo...")
+                return await interaction.editReply(
+                    ":x: No results found! Wtf are you even looking up... weirdo..."
+                );
             }
             // pick a random gif from the response and send the url
             const gif = result.results[randomIndex];
@@ -83,7 +85,7 @@ module.exports = {
             // randomly update the nextVal offset for the tenor api
             // https://tenor.com/gifapi/documentation#endpoints-search
             // 1 in 5 chance
-            
+
             await db.nextGif.update({ value: result.next }, { where: {} });
             return;
         }
