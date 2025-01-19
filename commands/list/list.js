@@ -66,14 +66,6 @@ module.exports = {
                 )
                 .addStringOption((option) =>
                     option
-                        .setName("uploader")
-                        .setDescription(
-                            "The name of the person who uploaded the level on GD"
-                        )
-                        .setRequired(true)
-                )
-                .addStringOption((option) =>
-                    option
                         .setName("verifier")
                         .setDescription("The name of the verifier")
                         .setRequired(true)
@@ -203,13 +195,6 @@ module.exports = {
                     option
                         .setName("id")
                         .setDescription("The GD ID of the level to place")
-                )
-                .addStringOption((option) =>
-                    option
-                        .setName("uploader")
-                        .setDescription(
-                            "The name of the person who uploaded the level on GD"
-                        )
                 )
                 .addStringOption((option) =>
                     option
@@ -375,7 +360,6 @@ module.exports = {
             const levelname = interaction.options.getString("levelname");
             const position = interaction.options.getInteger("position");
             const id = interaction.options.getInteger("id");
-            const uploaderName = interaction.options.getString("uploader");
             const verifierName = interaction.options.getString("verifier");
             const verification = interaction.options.getString("verification");
             const password =
@@ -451,11 +435,6 @@ module.exports = {
                 )
                 .addFields(
                     { name: "ID:", value: `${id}`, inline: true },
-                    {
-                        name: "Uploader:",
-                        value: `${uploaderName}`,
-                        inline: true,
-                    },
                     {
                         name: "Creators:",
                         value: `${

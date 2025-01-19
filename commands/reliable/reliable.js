@@ -5,6 +5,7 @@ const {
     ActionRowBuilder,
     ButtonStyle,
     AttachmentBuilder,
+    MessageFlags
 } = require("discord.js");
 const logger = require("log4js").getLogger();
 const Sequelize = require("sequelize");
@@ -92,7 +93,7 @@ module.exports = {
                     await interaction.editReply({
                         content:
                             "Changing thread name, this could take a while...",
-                        ephemeral: true,
+                        flags: MessageFlags.Ephemeral,
                     });
 
                     // get last 10 messages in channel
@@ -202,7 +203,7 @@ module.exports = {
                     await interaction.editReply({
                         content:
                             "Changing thread name, this could take a while...",
-                        ephemeral: true,
+                        flags: MessageFlags.Ephemeral,
                     });
 
                     // get last 10 messages in channel
@@ -360,7 +361,7 @@ module.exports = {
 
             await interaction.editReply({
                 content: "Updating thread name...",
-                ephemeral: true,
+                flags: MessageFlags.Ephemeral,
             });
 
             const message = await interaction.channel.send(
@@ -388,7 +389,7 @@ module.exports = {
             await interaction.editReply({
                 content: "The thread has been updated!",
                 components: command === "reject" ? [row] : [],
-                ephemeral: true,
+                flags: MessageFlags.Ephemeral,
             });
             if (command === "reject") {
                 interaction.channel.setArchived(true);

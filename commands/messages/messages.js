@@ -6,6 +6,7 @@ const {
     ModalBuilder,
     TextInputBuilder,
     TextInputStyle,
+    MessageFlags,
 } = require("discord.js");
 const logger = require("log4js").getLogger();
 
@@ -94,7 +95,7 @@ module.exports = {
                 return await interaction.reply({
                     content:
                         ":x: A message with that name already exists in this server",
-                    ephemeral: true,
+                    flags: MessageFlags.Ephemeral,
                 });
             }
 
@@ -104,7 +105,7 @@ module.exports = {
             if (!channelResolved) {
                 return await interaction.reply({
                     content: ":x: Invalid channel",
-                    ephemeral: true,
+                    flags: MessageFlags.Ephemeral,
                 });
             }
 
@@ -135,7 +136,7 @@ module.exports = {
                 return await interaction.followUp({
                     content:
                         ":x: No response received within the time limit. Action cancelled.",
-                    ephemeral: true,
+                    flags: MessageFlags.Ephemeral,
                 });
             }
 
@@ -159,14 +160,14 @@ module.exports = {
                 response = await submittedModal.reply({
                     content: content,
                     components: [row],
-                    ephemeral: true,
+                    flags: MessageFlags.Ephemeral,
                     fetchReply: true,
                 });
             } catch (error) {
                 logger.error(`Failed to create the message preview: ${error}`);
                 return await submittedModal.reply({
                     content: `:x: Failed to create the message preview: ${error}`,
-                    ephemeral: true,
+                    flags: MessageFlags.Ephemeral,
                 });
             }
 
@@ -222,7 +223,7 @@ module.exports = {
             if (!messageEntry) {
                 return await interaction.reply({
                     content: `:x: No message found with the name "${name}"`,
-                    ephemeral: true,
+                    flags: MessageFlags.Ephemeral,
                 });
             }
 
@@ -233,7 +234,7 @@ module.exports = {
                 return await interaction.reply({
                     content:
                         ":x: Could not find the channel where the message was sent.",
-                    ephemeral: true,
+                    flags: MessageFlags.Ephemeral,
                 });
             }
 
@@ -244,7 +245,7 @@ module.exports = {
                 return await interaction.reply({
                     content:
                         ":x: Could not find the original message to edit. It might have been deleted.",
-                    ephemeral: true,
+                    flags: MessageFlags.Ephemeral,
                 });
             }
 
@@ -278,7 +279,7 @@ module.exports = {
                 return await interaction.followUp({
                     content:
                         ":x: No response received within the time limit. Action cancelled.",
-                    ephemeral: true,
+                    flags: MessageFlags.Ephemeral,
                 });
             }
 
@@ -305,7 +306,7 @@ module.exports = {
                 editResponse = await editSubmittedModal.reply({
                     content: newContent,
                     components: [editRow],
-                    ephemeral: true,
+                    flags: MessageFlags.Ephemeral,
                     fetchReply: true,
                 });
             } catch (error) {
@@ -314,7 +315,7 @@ module.exports = {
                 );
                 return await editSubmittedModal.reply({
                     content: `:x: Failed to create the edited message preview: ${error}`,
-                    ephemeral: true,
+                    flags: MessageFlags.Ephemeral,
                 });
             }
 
@@ -356,7 +357,7 @@ module.exports = {
             if (!messageEntry) {
                 return await interaction.reply({
                     content: `:x: No message found with the name "${name}"`,
-                    ephemeral: true,
+                    flags: MessageFlags.Ephemeral,
                 });
             }
 
@@ -367,7 +368,7 @@ module.exports = {
                 return await interaction.reply({
                     content:
                         ":x: Could not find the channel where the message was sent.",
-                    ephemeral: true,
+                    flags: MessageFlags.Ephemeral,
                 });
             }
 
@@ -383,7 +384,7 @@ module.exports = {
                 logger.error(`Failed to delete the message: ${error}`);
                 return await interaction.reply({
                     content: `:x: Failed to delete the message from the bot: ${error}`,
-                    ephemeral: true,
+                    flags: MessageFlags.Ephemeral,
                 });
             }
             try {
@@ -392,12 +393,12 @@ module.exports = {
                 logger.error(`Failed to delete the message: ${error}`);
                 return await interaction.reply({
                     content: `:x: Removed the message from the bot, but failed to delete the message (it may have already been deleted): ${error}`,
-                    ephemeral: true,
+                    flags: MessageFlags.Ephemeral,
                 });
             }
             await interaction.reply({
                 content: `:white_check_mark: Message "${name}" deleted successfully`,
-                ephemeral: true,
+                flags: MessageFlags.Ephemeral,
             });
         }
     },

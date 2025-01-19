@@ -49,14 +49,6 @@ module.exports = {
                         )
                         .setRequired(true)
                 )
-                .addStringOption((option) =>
-                    option
-                        .setName("author")
-                        .setDescription(
-                            "The name of the person who uploaded the level on GD"
-                        )
-                        .setRequired(true)
-                )
                 .addIntegerOption((option) =>
                     option
                         .setName("id")
@@ -236,7 +228,6 @@ module.exports = {
             const verifier = interaction.options.getString("verifier");
             const verification = interaction.options.getString("verification");
             const creators = interaction.options.getString("creators");
-            const author = interaction.options.getString("author");
             const id = interaction.options.getInteger("id");
             const songname = interaction.options.getString("songname");
             const percent = interaction.options.getInteger("percent");
@@ -295,7 +286,7 @@ module.exports = {
             );
 
             const message =
-                `_Submitted by: <@${interaction.user.id}>_\n\nLevel name: ${levelname}\nVerifier: ${verifier}\nVerification: ${verification}\nCreators: ${creators}\nAuthor: ${author}\nID: \`${id}\`\nSong name: ${songname}` + // man don't askl me why itr needs to be formatted like this ik its ugly bro
+                `_Submitted by: <@${interaction.user.id}>_\n\nLevel name: ${levelname}\nVerifier: ${verifier}\nVerification: ${verification}\nCreators: ${creators}\nID: \`${id}\`\nSong name: ${songname}` + // man don't askl me why itr needs to be formatted like this ik its ugly bro
                 (percent ? `\nList percent: ${percent}%` : "") +
                 (password ? `\nPassword: ${password}` : "") +
                 (raw ? `\nRaw: ${raw}` : "") +

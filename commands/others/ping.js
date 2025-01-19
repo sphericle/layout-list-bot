@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require("discord.js");
+const { SlashCommandBuilder, MessageFlags } = require("discord.js");
 
 module.exports = {
     enabled: true,
@@ -9,7 +9,7 @@ module.exports = {
         const sent = await interaction.reply({
             content: "Pinging...",
             fetchReply: true,
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
         });
         interaction.editReply(
             `Pong! ${sent.createdTimestamp - interaction.createdTimestamp}ms`

@@ -8,6 +8,7 @@ const {
     ModalBuilder,
     TextInputBuilder,
     TextInputStyle,
+    MessageFlags
 } = require("discord.js");
 const logger = require("log4js").getLogger();
 
@@ -125,7 +126,7 @@ module.exports = {
                 return await interaction.reply({
                     content:
                         ":x: An embed with that name already exists in this server",
-                    ephemeral: true,
+                    flags: MessageFlags.Ephemeral,
                 });
             }
 
@@ -136,12 +137,12 @@ module.exports = {
                     if (!colorResolved)
                         return await interaction.reply({
                             content: ":x: Invalid color",
-                            ephemeral: true,
+                            flags: MessageFlags.Ephemeral,
                         });
                 } catch (error) {
                     return await interaction.reply({
                         content: `:x: Failed to resolve the color: ${error}`,
-                        ephemeral: true,
+                        flags: MessageFlags.Ephemeral,
                     });
                 }
             }
@@ -152,7 +153,7 @@ module.exports = {
             if (!channelResolved)
                 return await interaction.reply({
                     content: ":x: Invalid channel",
-                    ephemeral: true,
+                    flags: MessageFlags.Ephemeral,
                 });
 
             const modal = new ModalBuilder()
@@ -191,7 +192,7 @@ module.exports = {
                     return await submittedModalInteraction.reply({
                         content:
                             ":x: This embed is empty: you must provide at least a title, a description, or an image",
-                        ephemeral: true,
+                        flags: MessageFlags.Ephemeral,
                     });
 
                 const embed = new EmbedBuilder();
@@ -204,7 +205,7 @@ module.exports = {
                     logger.error(`Failed to set the image: ${error}`);
                     return await submittedModalInteraction.reply({
                         content: `:x: Failed to set the image: ${error}`,
-                        ephemeral: true,
+                        flags: MessageFlags.Ephemeral,
                     });
                 }
 
@@ -229,14 +230,14 @@ module.exports = {
                         content: "Embed preview:",
                         embeds: [embed],
                         components: [row],
-                        ephemeral: true,
+                        flags: MessageFlags.Ephemeral,
                         fetchReply: true,
                     });
                 } catch (error) {
                     logger.error(`Failed to create the embed: ${error}`);
                     return await submittedModalInteraction.reply({
                         content: `:x: Failed to create the embed: ${error}`,
-                        ephemeral: true,
+                        flags: MessageFlags.Ephemeral,
                     });
                 }
 
@@ -302,7 +303,7 @@ module.exports = {
             if (!embedEntry) {
                 return await interaction.reply({
                     content: `:x: No embed found with the name "${name}"`,
-                    ephemeral: true,
+                    flags: MessageFlags.Ephemeral,
                 });
             }
 
@@ -313,7 +314,7 @@ module.exports = {
                 return await interaction.reply({
                     content:
                         ":x: Could not find the channel where the embed was sent.",
-                    ephemeral: true,
+                    flags: MessageFlags.Ephemeral,
                 });
             }
 
@@ -324,7 +325,7 @@ module.exports = {
                 return await interaction.reply({
                     content:
                         ":x: Could not find the original embed to edit. It might have been deleted.",
-                    ephemeral: true,
+                    flags: MessageFlags.Ephemeral,
                 });
             }
 
@@ -332,7 +333,7 @@ module.exports = {
                 return await interaction.reply({
                     content:
                         ":x: The target message does not contain an embed.",
-                    ephemeral: true,
+                    flags: MessageFlags.Ephemeral,
                 });
             }
 
@@ -343,12 +344,12 @@ module.exports = {
                     if (!colorResolved)
                         return await interaction.reply({
                             content: ":x: Invalid color",
-                            ephemeral: true,
+                            flags: MessageFlags.Ephemeral,
                         });
                 } catch (error) {
                     return await interaction.reply({
                         content: `:x: Failed to resolve the color: ${error}`,
-                        ephemeral: true,
+                        flags: MessageFlags.Ephemeral,
                     });
                 }
             }
@@ -383,7 +384,7 @@ module.exports = {
                 return await interaction.followUp({
                     content:
                         ":x: No response received within the time limit. Action cancelled.",
-                    ephemeral: true,
+                    flags: MessageFlags.Ephemeral,
                 });
             }
 
@@ -420,7 +421,7 @@ module.exports = {
                     content: "Embed preview (edited):",
                     embeds: [updatedEmbed],
                     components: [editRow],
-                    ephemeral: true,
+                    flags: MessageFlags.Ephemeral,
                     fetchReply: true,
                 });
             } catch (error) {
@@ -429,7 +430,7 @@ module.exports = {
                 );
                 return await editSubmittedModal.reply({
                     content: `:x: Failed to create the edited embed preview: ${error}`,
-                    ephemeral: true,
+                    flags: MessageFlags.Ephemeral,
                 });
             }
 
@@ -479,7 +480,7 @@ module.exports = {
             if (!embedEntry) {
                 return await interaction.reply({
                     content: `:x: No embed found with the name "${name}"`,
-                    ephemeral: true,
+                    flags: MessageFlags.Ephemeral,
                 });
             }
 
@@ -490,7 +491,7 @@ module.exports = {
                 return await interaction.reply({
                     content:
                         ":x: Could not find the channel where the embed was sent.",
-                    ephemeral: true,
+                    flags: MessageFlags.Ephemeral,
                 });
             }
 
@@ -506,7 +507,7 @@ module.exports = {
                 logger.error(`Failed to delete the embed: ${error}`);
                 return await interaction.reply({
                     content: `:x: Failed to delete the embed from the bot: ${error}`,
-                    ephemeral: true,
+                    flags: MessageFlags.Ephemeral,
                 });
             }
             try {
@@ -515,12 +516,12 @@ module.exports = {
                 logger.error(`Failed to delete the embed: ${error}`);
                 return await interaction.reply({
                     content: `:x: Removed the embed from the bot, but failed to delete the message (it may have already been deleted): ${error}`,
-                    ephemeral: true,
+                    flags: MessageFlags.Ephemeral,
                 });
             }
             await interaction.reply({
                 content: `:white_check_mark: Embed "${name}" deleted successfully`,
-                ephemeral: true,
+                flags: MessageFlags.Ephemeral,
             });
         }
     },
