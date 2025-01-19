@@ -21,13 +21,6 @@ module.exports = {
             subcommand
                 .setName("ban")
                 .setDescription("Submission ban a user")
-                .addStringOption((option) =>
-                    option
-                        .setName("submitter")
-                        .setDescription("The user to ban from submitting")
-                        .setAutocomplete(true)
-                        .setRequired(true)
-                )
                 .addIntegerOption((option) =>
                     option
                         .setName("unban")
@@ -36,6 +29,14 @@ module.exports = {
                             { name: "Yes", value: 1 },
                             { name: "No", value: 0 }
                         )
+                        .setRequired(true)
+                )
+                .addStringOption((option) =>
+                    option
+                        .setName("submitter")
+                        .setDescription("The user to ban from submitting")
+                        .setAutocomplete(true)
+                        .setRequired(true)
                 )
         )
         .addSubcommand((subcommand) =>

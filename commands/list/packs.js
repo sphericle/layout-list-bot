@@ -42,7 +42,7 @@ module.exports = {
                 .addStringOption((option) =>
                     option
                         .setName("name")
-                        .setDescription("The name of the pack")
+                        .setDescription("The name of the pack (leave blank for diff pack)")
                 )
                 .addStringOption((option) =>
                     option
@@ -91,18 +91,6 @@ module.exports = {
             subcommand
                 .setName("edit")
                 .setDescription("Edit a pack's info (not including levels)")
-                .addStringOption((option) =>
-                    option
-                        .setName("pack")
-                        .setDescription("The pack you want to edit")
-                        .setRequired(true)
-                        .setAutocomplete(true)
-                )
-                .addStringOption((option) =>
-                    option
-                        .setName("newname")
-                        .setDescription("The new name of the pack")
-                )
                 .addIntegerOption((option) =>
                     option
                         .setName("difficulty")
@@ -115,14 +103,28 @@ module.exports = {
                             { name: "Mythical", value: 5 },
                             { name: "Extreme", value: 6 },
                             { name: "Supreme", value: 7 },
-                            { name: "Ethereal", value: 8 },
+                            { name: "Ethereal", value: 8 }, 
                             { name: "Lengendary", value: 9 },
                             { name: "Silent", value: 10 },
-                            { name: "Impossible", value: 11 }
+                            { name: "Impossible", value: 11 },
+                            { name: "Don't change", value: -1 }
                         )
                         .setDescription(
                             "The tier the level is in (1-10, see the list website for details)"
                         )
+                        .setRequired(true)
+                )
+                .addStringOption((option) =>
+                    option
+                        .setName("pack")
+                        .setDescription("The pack you want to edit")
+                        .setRequired(true)
+                        .setAutocomplete(true)
+                )
+                .addStringOption((option) =>
+                    option
+                        .setName("newname")
+                        .setDescription("The new name of the pack")
                 )
         )
         .addSubcommand((subcommand) =>
@@ -435,8 +437,12 @@ module.exports = {
         } else if (subcommand === "edit") {
             const pack = interaction.options.getString("pack") || null;
             const newName = interaction.options.getString("newname") || null;
-            const newDifficulty =
+            let newDifficulty =
                 interaction.options.getInteger("difficulty") || null;
+            
+            if (newDifficulty === -1) {
+                newDifficulty = null;
+            }
 
             // fetch github data path / _packs.json
             let fileResponse;

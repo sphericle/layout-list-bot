@@ -229,6 +229,17 @@ module.exports = {
                 .setDescription("Edit a record")
                 .addStringOption((option) =>
                     option
+                        .setName("device")
+                        .setDescription("Device the level was completed on")
+                        .addChoices(
+                            { name: "PC", value: "PC" },
+                            { name: "Mobile", value: "Mobile" },
+                            { name: "Default", value: "default"}
+                        )
+                        .setRequired(true)
+                )
+                .addStringOption((option) =>
+                    option
                         .setName("levelname")
                         .setDescription("The level this record is on")
                         .setRequired(true)
@@ -251,15 +262,6 @@ module.exports = {
                         )
                         .setMaxLength(1024)
                         .setAutocomplete(true)
-                )
-                .addStringOption((option) =>
-                    option
-                        .setName("device")
-                        .setDescription("Device the level was completed on")
-                        .addChoices(
-                            { name: "PC", value: "PC" },
-                            { name: "Mobile", value: "Mobile" }
-                        )
                 )
                 .addStringOption((option) =>
                     option
@@ -2202,7 +2204,7 @@ module.exports = {
             if (enjoyment !== null)
                 parsedData.records[recordIndex].enjoyment = enjoyment;
             if (video !== null) parsedData.records[recordIndex].link = video;
-            if (device !== null) {
+            if (device !== null && device !== "Default") {
                 if (device === "Mobile") {
                     parsedData.records[recordIndex].mobile = true;
                 } else {
