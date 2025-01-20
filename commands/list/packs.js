@@ -42,7 +42,9 @@ module.exports = {
                 .addStringOption((option) =>
                     option
                         .setName("name")
-                        .setDescription("The name of the pack (leave blank for diff pack)")
+                        .setDescription(
+                            "The name of the pack (leave blank for diff pack)"
+                        )
                 )
                 .addStringOption((option) =>
                     option
@@ -103,7 +105,7 @@ module.exports = {
                             { name: "Mythical", value: 5 },
                             { name: "Extreme", value: 6 },
                             { name: "Supreme", value: 7 },
-                            { name: "Ethereal", value: 8 }, 
+                            { name: "Ethereal", value: 8 },
                             { name: "Lengendary", value: 9 },
                             { name: "Silent", value: 10 },
                             { name: "Impossible", value: 11 },
@@ -439,7 +441,7 @@ module.exports = {
             const newName = interaction.options.getString("newname") || null;
             let newDifficulty =
                 interaction.options.getInteger("difficulty") || null;
-            
+
             if (newDifficulty === -1) {
                 newDifficulty = null;
             }

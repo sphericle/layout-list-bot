@@ -8,7 +8,7 @@ const {
     ModalBuilder,
     TextInputBuilder,
     TextInputStyle,
-    MessageFlags
+    MessageFlags,
 } = require("discord.js");
 const logger = require("log4js").getLogger();
 

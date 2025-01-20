@@ -5,7 +5,7 @@ const {
     ActionRowBuilder,
     ButtonStyle,
     AttachmentBuilder,
-    MessageFlags
+    MessageFlags,
 } = require("discord.js");
 const logger = require("log4js").getLogger();
 const Sequelize = require("sequelize");

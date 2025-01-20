@@ -234,7 +234,7 @@ module.exports = {
                         .addChoices(
                             { name: "PC", value: "PC" },
                             { name: "Mobile", value: "Mobile" },
-                            { name: "Default", value: "default"}
+                            { name: "Default", value: "default" }
                         )
                         .setRequired(true)
                 )
