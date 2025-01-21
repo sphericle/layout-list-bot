@@ -2198,7 +2198,7 @@ module.exports = {
 
             if (newuser !== null)
                 parsedData.records[recordIndex].user = newuser;
-            if (fps !== null) parsedData.records[recordIndex].fps = fps;
+            if (fps !== null) parsedData.records[recordIndex].hz = fps;
             if (percent !== null)
                 parsedData.records[recordIndex].percent = percent;
             if (enjoyment !== null)
