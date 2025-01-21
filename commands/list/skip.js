@@ -44,18 +44,18 @@ module.exports = {
         );
 
         const responseArray = await Promise.all(
-            response.map(async (member) => {
-                let count = 0;
-                let dbMember = await db.skippers.findOne({
-                    where: {
-                        user: member.id,
-                    },
-                });
-                count = dbMember ? dbMember.count : 0;
-                return {
-                    name: `${member.user.username} (${count}/${maxSkipCount})`,
-                    value: member.id,
-                };
+            response.slice(0, 25).map(async (member) => {
+            let count = 0;
+            let dbMember = await db.skippers.findOne({
+                where: {
+                user: member.id,
+                },
+            });
+            count = dbMember ? dbMember.count : 0;
+            return {
+                name: `${member.user.username} (${count}/${maxSkipCount})`,
+                value: member.id,
+            };
             })
         );
 
