@@ -1419,8 +1419,8 @@ module.exports = {
                         {
                             user: record.username,
                             link: record.completionlink,
-                            percent: 100,
-                            hz: 360,
+                            percent: record.percent,
+                            hz: record.fps,
                             ...(record.device === "Mobile" && { mobile: true }),
                         },
                         null,
