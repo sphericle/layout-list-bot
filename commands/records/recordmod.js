@@ -866,18 +866,17 @@ module.exports = {
                         {
                             user: record.username,
                             link: record.completionlink,
-                            percent: 100,
-                            hz: 360,
+                            percent: record.percent,
+                            hz: record.fps,
+                            enjoyment: record.enjoyment,
                             ...(record.device === "Mobile" && { mobile: true }),
                         },
                         null,
                         "\t"
                     );
 
-                    const dmMessage = `Accepted record of ${record.levelname} for ${record.username}\nGithub Code:`;
-                    const dmMessage2 = `${rawGithubCode}`;
+                    const dmMessage = `Accepted record of ${record.levelname} for ${record.username}\nGithub Code:\n\n\`${rawGithubCode}\``;
                     await interaction.user.send({ content: dmMessage });
-                    await interaction.user.send({ content: dmMessage2 });
                 } catch {
                     logger.info(
                         `Failed to send in moderator ${interaction.user.id} dms, ignoring send in dms setting`
@@ -1227,7 +1226,6 @@ module.exports = {
             if (updated === false)
                 parsedData.records = parsedData.records.concat(newRecord);
 
-            // not sure why it needs to be done this way but :shrug:
             let changes = [];
             changes.push({
                 path: githubDataPath + `/${filename}.json`,
@@ -1427,10 +1425,8 @@ module.exports = {
                         "\t"
                     );
 
-                    const dmMessage = `Added record of ${record.levelname} for ${record.username}\nGithub Code:`;
-                    const dmMessage2 = `\`${rawGithubCode}\``;
+                    const dmMessage = `Added record of ${record.levelname} for ${record.username}\nGithub Code:\n\n\`${rawGithubCode}\``;
                     await interaction.user.send({ content: dmMessage });
-                    await interaction.user.send({ content: dmMessage2 });
                 } catch {
                     logger.info(
                         `Failed to send in moderator ${interaction.user.id} dms, ignoring send in dms setting`
