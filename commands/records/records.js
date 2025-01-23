@@ -175,7 +175,7 @@ async function createUser(interaction, user) {
         }
 
         // Add all users to cache
-        cache.updateUsers();
+        await cache.updateUsers();
 
         logger.info(`All users have been added to the database.`);
     } else {
@@ -344,7 +344,7 @@ async function createUser(interaction, user) {
         }
 
         // Add user to cache
-        cache.updateUsers();
+        await cache.updateUsers();
 
         logger.info(
             `${interaction.user.tag} (${

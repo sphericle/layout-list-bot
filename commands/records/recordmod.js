@@ -428,7 +428,7 @@ module.exports = {
                     await interaction.editReply(
                         "No user found, attempting to create a new one..."
                     );
-                    await createUser(interaction, [username]);
+                    await createUser("_", [username])
                     // sorry
                     user = await cache.users.findOne({
                         where: { name: username },
