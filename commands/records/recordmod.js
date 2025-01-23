@@ -45,16 +45,6 @@ module.exports = {
                 )
                 .addStringOption((option) =>
                     option
-                        .setName("device")
-                        .setDescription("Device the level was completed on")
-                        .setRequired(true)
-                        .addChoices(
-                            { name: "PC", value: "PC" },
-                            { name: "Mobile", value: "Mobile" }
-                        )
-                )
-                .addStringOption((option) =>
-                    option
                         .setName("username")
                         .setDescription(
                             "The username you're submitting for (Be sure to select one of the available options.)"
@@ -72,6 +62,16 @@ module.exports = {
                         .setMaxLength(1024)
                         .setRequired(true)
                         .setAutocomplete(true)
+                )
+                .addStringOption((option) =>
+                    option
+                        .setName("device")
+                        .setDescription("Device the level was completed on")
+                        .setRequired(true)
+                        .addChoices(
+                            { name: "PC", value: "PC" },
+                            { name: "Mobile", value: "Mobile" }
+                        )
                 )
                 .addStringOption((option) =>
                     option
