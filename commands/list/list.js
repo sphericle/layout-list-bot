@@ -153,29 +153,6 @@ module.exports = {
             subcommand
                 .setName("edit")
                 .setDescription("Edit a level's info")
-                .addIntegerOption((option) =>
-                    option
-                        .setName("difficulty")
-                        .addChoices(
-                            { name: "Beginner", value: 0 },
-                            { name: "Easy", value: 1 },
-                            { name: "Medium", value: 2 },
-                            { name: "Hard", value: 3 },
-                            { name: "Insane", value: 4 },
-                            { name: "Mythical", value: 5 },
-                            { name: "Extreme", value: 6 },
-                            { name: "Supreme", value: 7 },
-                            { name: "Ethereal", value: 8 },
-                            { name: "Lengendary", value: 9 },
-                            { name: "Silent", value: 10 },
-                            { name: "Impossible", value: 11 },
-                            { name: "Don't change", value: -1 }
-                        )
-                        .setDescription(
-                            "The tier the level is in (1-10, see the list website for details)"
-                        )
-                        .setRequired(true)
-                )
                 .addStringOption((option) =>
                     option
                         .setName("level")
@@ -192,6 +169,27 @@ module.exports = {
                     option
                         .setName("position")
                         .setDescription("The position to place the level at")
+                )
+                .addIntegerOption((option) =>
+                    option
+                        .setName("difficulty")
+                        .addChoices(
+                            { name: "Beginner", value: 0 },
+                            { name: "Easy", value: 1 },
+                            { name: "Medium", value: 2 },
+                            { name: "Hard", value: 3 },
+                            { name: "Insane", value: 4 },
+                            { name: "Mythical", value: 5 },
+                            { name: "Extreme", value: 6 },
+                            { name: "Supreme", value: 7 },
+                            { name: "Ethereal", value: 8 },
+                            { name: "Lengendary", value: 9 },
+                            { name: "Silent", value: 10 },
+                            { name: "Impossible", value: 11 }
+                        )
+                        .setDescription(
+                            "The tier the level is in (1-10, see the list website for details)"
+                        )
                 )
                 .addIntegerOption((option) =>
                     option
@@ -520,16 +518,12 @@ module.exports = {
                 interaction.options.getString("creators") || null;
             const creatorNames = rawCreators ? rawCreators.split(",") : [];
             const percent = interaction.options.getInteger("percent") || null;
-            let difficulty =
+            const difficulty =
                 interaction.options.getInteger("difficulty") || null;
             const songName = interaction.options.getString("songname") || null;
             const songLink = interaction.options.getString("songlink") || null;
             const enjoyment =
                 interaction.options.getInteger("enjoyment") || null;
-
-            if (difficulty === -1) {
-                difficulty = null;
-            }
 
             const levelToEdit = await cache.levels.findOne({
                 where: { filename: level },

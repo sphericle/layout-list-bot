@@ -93,6 +93,18 @@ module.exports = {
             subcommand
                 .setName("edit")
                 .setDescription("Edit a pack's info (not including levels)")
+                .addStringOption((option) =>
+                    option
+                        .setName("pack")
+                        .setDescription("The pack you want to edit")
+                        .setRequired(true)
+                        .setAutocomplete(true)
+                )
+                .addStringOption((option) =>
+                    option
+                        .setName("newname")
+                        .setDescription("The new name of the pack")
+                )
                 .addIntegerOption((option) =>
                     option
                         .setName("difficulty")
@@ -108,25 +120,11 @@ module.exports = {
                             { name: "Ethereal", value: 8 },
                             { name: "Lengendary", value: 9 },
                             { name: "Silent", value: 10 },
-                            { name: "Impossible", value: 11 },
-                            { name: "Don't change", value: -1 }
+                            { name: "Impossible", value: 11 }
                         )
                         .setDescription(
                             "The tier the level is in (1-10, see the list website for details)"
                         )
-                        .setRequired(true)
-                )
-                .addStringOption((option) =>
-                    option
-                        .setName("pack")
-                        .setDescription("The pack you want to edit")
-                        .setRequired(true)
-                        .setAutocomplete(true)
-                )
-                .addStringOption((option) =>
-                    option
-                        .setName("newname")
-                        .setDescription("The new name of the pack")
                 )
         )
         .addSubcommand((subcommand) =>
@@ -439,7 +437,7 @@ module.exports = {
         } else if (subcommand === "edit") {
             const pack = interaction.options.getString("pack") || null;
             const newName = interaction.options.getString("newname") || null;
-            let newDifficulty =
+            const newDifficulty =
                 interaction.options.getInteger("difficulty") || null;
 
             if (newDifficulty === -1) {
