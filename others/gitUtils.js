@@ -132,18 +132,9 @@ module.exports = {
         const users = Array.from(userset);
         if (users.length == 0) return 404;
 
-        logger.info("Parsing users...");
         try {
             await cache.users.destroy({ where: {} });
-            await cache.users.bulkCreate(users);
-            logger.info(`Successfully updated ${users.length} cached users.`);
-        } catch (error) {
-            return `Couldn't add users, something went wrong with sequelize: ${error}`;
-        }
-
-        try {
             await createUser("_", users);
-            logger.log("Successfully added users.");
         } catch (error) {
             return `Couldn't add users, something went wrong with sequelize: ${error}`;
         }
