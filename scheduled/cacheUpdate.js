@@ -5,14 +5,15 @@ const logger = require("log4js").getLogger();
 module.exports = {
     name: "updateCache",
     cron: scheduleCacheUpdate,
-    enabled: true,
+    enabled: false,
     async execute() {
         const { cache } = require("../index.js");
         cache.updateLevels();
         cache.updatePacks();
-
-        const users = await parseUsers();
+        
+        await parseUsers();
+        /*
         if (typeof users === "string") logger.info(users);
-        if (users === 404) return logger.info("No new users.");
+        if (users === 404) return logger.info("No new users."); */
     },
 };

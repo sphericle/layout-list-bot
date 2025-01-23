@@ -81,7 +81,7 @@ module.exports = {
     },
 
     async parseUsers(useLegacy) {
-        const { cache } = require("../index");
+        const { cache } = require("../index.js");
         const { createUser } = require("../commands/records/records.js");
         const userset = new Set();
         const localRepoPath = path.resolve(__dirname, `../data/repo/`);
