@@ -860,18 +860,17 @@ module.exports = {
                 });
             } else if (settings.sendAcceptedInDM) {
                 try {
-                    const rawGithubCode = JSON.stringify(
+                    const notRawGithubCode = 
                         {
                             user: record.username,
                             link: record.completionlink,
                             percent: record.percent,
-                            hz: record.fps,
-                            enjoyment: record.enjoyment,
+                            hz: record.fps, 
                             ...(record.device === "Mobile" && { mobile: true }),
-                        },
-                        null,
-                        "\t"
-                    );
+                        };
+                    if (enjoyment) notRawGithubCode.enjoyment = enjoyment;
+
+                    const rawGithubCode = JSON.stringify(notRawGithubCode, null, "\t");
 
                     const dmMessage = `Accepted record of ${record.levelname} for ${record.username}\nGithub Code:\n\n\`${rawGithubCode}\``;
                     await interaction.user.send({ content: dmMessage });
@@ -1411,17 +1410,18 @@ module.exports = {
                 });
             } else if (settings.sendAcceptedInDM) {
                 try {
-                    const rawGithubCode = JSON.stringify(
+                    const notRawGithubCode = 
                         {
                             user: record.username,
                             link: record.completionlink,
                             percent: record.percent,
                             hz: record.fps,
                             ...(record.device === "Mobile" && { mobile: true }),
-                        },
-                        null,
-                        "\t"
-                    );
+                        };
+
+                    if (record.enjoyment) notRawGithubCode.enjoyment = record.enjoyment;
+
+                    const rawGithubCode = JSON.stringify(notRawGithubCode, null, "\t");
 
                     const dmMessage = `Added record of ${record.levelname} for ${record.username}\nGithub Code:\n\n\`${rawGithubCode}\``;
                     await interaction.user.send({ content: dmMessage });
