@@ -8,8 +8,5 @@ module.exports = {
         logger.log("Scheduled - Resetting submissions for all users...");
         await db.submitters.update({ submissions: 0 }, { where: {} });
         logger.log("Scheduled - Submissions reset!");
-        
-
-
     },
 };

@@ -10,9 +10,9 @@ module.exports = {
         const { cache } = require("../index.js");
         cache.updateLevels();
         cache.updatePacks();
-        
+
         const users = await parseUsers();
-        
+
         if (typeof users === "string") logger.info(users);
         if (users === 404) return logger.info("No new users.");
     },

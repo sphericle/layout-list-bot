@@ -426,7 +426,7 @@ module.exports = {
                     await interaction.editReply(
                         "No user found, attempting to create a new one..."
                     );
-                    await createUser("_", [username])
+                    await createUser("_", [username]);
                     // sorry
                     user = await cache.users.findOne({
                         where: { name: username },
@@ -860,17 +860,20 @@ module.exports = {
                 });
             } else if (settings.sendAcceptedInDM) {
                 try {
-                    const notRawGithubCode = 
-                        {
-                            user: record.username,
-                            link: record.completionlink,
-                            percent: record.percent,
-                            hz: record.fps, 
-                            ...(record.device === "Mobile" && { mobile: true }),
-                        };
+                    const notRawGithubCode = {
+                        user: record.username,
+                        link: record.completionlink,
+                        percent: record.percent,
+                        hz: record.fps,
+                        ...(record.device === "Mobile" && { mobile: true }),
+                    };
                     if (enjoyment) notRawGithubCode.enjoyment = enjoyment;
 
-                    const rawGithubCode = JSON.stringify(notRawGithubCode, null, "\t");
+                    const rawGithubCode = JSON.stringify(
+                        notRawGithubCode,
+                        null,
+                        "\t"
+                    );
 
                     const dmMessage = `Accepted record of ${record.levelname} for ${record.username}\nGithub Code:\n\n\`${rawGithubCode}\``;
                     await interaction.user.send({ content: dmMessage });
@@ -1410,18 +1413,22 @@ module.exports = {
                 });
             } else if (settings.sendAcceptedInDM) {
                 try {
-                    const notRawGithubCode = 
-                        {
-                            user: record.username,
-                            link: record.completionlink,
-                            percent: record.percent,
-                            hz: record.fps,
-                            ...(record.device === "Mobile" && { mobile: true }),
-                        };
+                    const notRawGithubCode = {
+                        user: record.username,
+                        link: record.completionlink,
+                        percent: record.percent,
+                        hz: record.fps,
+                        ...(record.device === "Mobile" && { mobile: true }),
+                    };
 
-                    if (record.enjoyment) notRawGithubCode.enjoyment = record.enjoyment;
+                    if (record.enjoyment)
+                        notRawGithubCode.enjoyment = record.enjoyment;
 
-                    const rawGithubCode = JSON.stringify(notRawGithubCode, null, "\t");
+                    const rawGithubCode = JSON.stringify(
+                        notRawGithubCode,
+                        null,
+                        "\t"
+                    );
 
                     const dmMessage = `Added record of ${record.levelname} for ${record.username}\nGithub Code:\n\n\`${rawGithubCode}\``;
                     await interaction.user.send({ content: dmMessage });
