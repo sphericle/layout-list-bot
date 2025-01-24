@@ -187,6 +187,20 @@ module.exports = {
         )
         .addSubcommand((subcommand) =>
             subcommand
+                .setName("ban")
+                .setDescription(
+                    "Remove all records from a user"
+                )
+                .addStringOption((option) =>
+                    option
+                        .setName("username")
+                        .setDescription("The user to ban")
+                        .setRequired(true)
+                        .setAutocomplete(true)
+                )
+        )
+        .addSubcommand((subcommand) =>
+            subcommand
                 .setName("enabledm")
                 .setDescription(
                     "Enables sending the github code to you in dms whenever you accept a record"
@@ -2567,6 +2581,184 @@ module.exports = {
                     );
                 }
             }
+        } else if (interaction.options.getSubcommand() === "ban") {
+            await interaction.deferReply();
+            const path  = require("path");
+            const fs = require("fs");
+
+            const username = interaction.options.getString("username");
+            
+            const localRepoPath = path.resolve(__dirname, `../../data/repo/`);
+            const listFilename = "data/_list.json";
+            let list_data;
+            try {
+                list_data = JSON.parse(
+                    fs.readFileSync(path.join(localRepoPath, listFilename), "utf8")
+                );
+            } catch (parseError) {
+                if (!listFilename.startsWith("_"))
+                    logger.error(
+                        "Git - " +
+                            `Unable to parse data from ${listFilename}:\n${parseError}`
+                    );
+                return -1;
+            }
+    
+            let changes = [];
+
+            for (const filename of list_data) {
+                let parsedData;
+                try {
+                    parsedData = JSON.parse(
+                        fs.readFileSync(
+                            path.join(localRepoPath, `data/${filename}.json`),
+                            "utf8"
+                        )
+                    );
+                } catch (parseError) {
+                    if (!filename.startsWith("_"))
+                        logger.error(
+                            "Git - " +
+                                `Unable to parse data from ${filename}.json:\n${parseError}`
+                        );
+                    continue;
+                }
+                if (!Array.isArray(parsedData.records)) {
+                    continue;
+                }
+
+                const recordIndex = parsedData.records.findIndex(
+                    (record) => record.user === username
+                );
+
+                if (recordIndex === -1)
+                    continue;
+    
+                parsedData.records.splice(recordIndex, 1);
+
+                changes.push({
+                    path: `${githubDataPath}/${filename}.json`,
+                    content: JSON.stringify(parsedData, null, "\t"),
+                })
+
+            }            
+
+            await interaction.editReply("Committing...");
+            
+            let commitSha;
+            try {
+                // Get the SHA of the latest commit from the branch
+                const { data: refData } = await octokit.git.getRef({
+                    owner: githubOwner,
+                    repo: githubRepo,
+                    ref: `heads/${githubBranch}`,
+                });
+                commitSha = refData.object.sha;
+            } catch (getRefError) {
+                logger.info(
+                    `Something went wrong while fetching the latest commit SHA:\n${getRefError}`
+                );
+                await db.messageLocks.destroy({
+                    where: { discordid: interaction.message.id },
+                });
+                return await interaction.editReply(
+                    ":x: Something went wrong while commiting to github, please try again later (getRefError)"
+                );
+            }
+            let treeSha;
+            try {
+                // Get the commit using its SHA
+                const { data: commitData } = await octokit.git.getCommit({
+                    owner: githubOwner,
+                    repo: githubRepo,
+                    commit_sha: commitSha,
+                });
+                treeSha = commitData.tree.sha;
+            } catch (getCommitError) {
+                logger.info(
+                    `Something went wrong while fetching the latest commit:\n${getCommitError}`
+                );
+                await db.messageLocks.destroy({
+                    where: { discordid: interaction.message.id },
+                });
+                return await interaction.editReply(
+                    ":x: Something went wrong while commiting to github, please try again later (getCommitError)"
+                );
+            }
+
+            let newTree;
+            try {
+                // Create a new tree with the changes
+                newTree = await octokit.git.createTree({
+                    owner: githubOwner,
+                    repo: githubRepo,
+                    base_tree: treeSha,
+                    tree: changes.map((change) => ({
+                        path: change.path,
+                        mode: "100644",
+                        type: "blob",
+                        content: change.content,
+                    })),
+                });
+            } catch (createTreeError) {
+                logger.info(
+                    `Something went wrong while creating a new tree:\n${createTreeError}`
+                );
+                await db.messageLocks.destroy({
+                    where: { discordid: interaction.message.id },
+                });
+                return await interaction.editReply(
+                    ":x: Something went wrong while commiting to github, please try again later (createTreeError)"
+                );
+            }
+
+            let newCommit;
+            try {
+                // Create a new commit with this tree
+                newCommit = await octokit.git.createCommit({
+                    owner: githubOwner,
+                    repo: githubRepo,
+                    message: `Banned ${username} from the list (${interaction.user.tag})`,
+                    tree: newTree.data.sha,
+                    parents: [commitSha],
+                });
+            } catch (createCommitError) {
+                logger.info(
+                    `Something went wrong while creating a new commit:\n${createCommitError}`
+                );
+                await db.messageLocks.destroy({
+                    where: { discordid: interaction.message.id },
+                });
+                return await interaction.editReply(
+                    ":x: Something went wrong while commiting to github, please try again later (createCommitError)"
+                );
+            }
+
+            try {
+                // Update the branch to point to the new commit
+                await octokit.git.updateRef({
+                    owner: githubOwner,
+                    repo: githubRepo,
+                    ref: `heads/${githubBranch}`,
+                    sha: newCommit.data.sha,
+                });
+            } catch (updateRefError) {
+                logger.info(
+                    `Something went wrong while updating the branch :\n${updateRefError}`
+                );
+                await db.messageLocks.destroy({
+                    where: { discordid: interaction.message.id },
+                });
+                return await interaction.editReply(
+                    ":x: Something went wrong while commiting to github, please try again later (updateRefError)"
+                );
+            }
+            logger.info(
+                `Successfully created commit on ${githubBranch} (record addition): ${newCommit.data.sha}`
+            );
+
+            await interaction.editReply(`Banned ${username}!`);
+            
         }
     },
 };
