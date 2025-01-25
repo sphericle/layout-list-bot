@@ -138,6 +138,7 @@ module.exports = {
 
             await cache.users.destroy({ where: {} });
             await cache.users.bulkCreate(usersObj);
+            logger.log(`Updated ${usersObj.length} users in cache`);
         } catch (error) {
             return `Couldn't add users, something went wrong with sequelize: ${error}`;
         }
