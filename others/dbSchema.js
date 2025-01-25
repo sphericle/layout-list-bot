@@ -212,9 +212,9 @@ module.exports = {
         const cache = {};
         const {
             updateCachedLevels,
-            updateCachedUsers,
             updateCachedPacks,
         } = require("./cacheUpdate.js");
+        const { parseUsers } = require("../others/gitUtils.js");
         cache.levels = sequelize_cache.define("levels", {
             name: Sequelize.STRING,
             position: Sequelize.INTEGER,
@@ -244,7 +244,7 @@ module.exports = {
         });
 
         cache.updateLevels = async () => await updateCachedLevels();
-        cache.updateUsers = async () => await updateCachedUsers();
+        cache.updateUsers = async () => await parseUsers();
         cache.updatePacks = async () => await updateCachedPacks();
         return cache;
     },

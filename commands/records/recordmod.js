@@ -24,7 +24,6 @@ const {
 const { ChartJSNodeCanvas } = require("chartjs-node-canvas");
 const logger = require("log4js").getLogger();
 const { octokit } = require("../../index.js");
-const { createUser } = require("./records.js");
 const updateData = require("../../scheduled/cacheUpdate.js");
 
 module.exports = {
@@ -438,53 +437,21 @@ module.exports = {
                     await interaction.editReply(
                         "No user found, attempting to create a new one..."
                     );
-                    await createUser("_", [username]);
-                    // sorry
-                    user = await cache.users.findOne({
-                        where: { name: username },
+                    user = await cache.users.create({
+                        name: username,
+                        user_id: Math.floor(1000000000 + Math.random() * 9000000000)
                     });
-                    if (!user) {
-                        logger.error(
-                            `Error automatically creating user on record submit`
-                        );
-                        return await interaction.editReply(
-                            `:x: Error creating a new user, try creating the user manually with /createuser`
-                        );
-                    }
+
+                    logger.log(user);
                 }
             } catch (error) {
                 logger.error(
                     `Error automatically creating user on record submit: ${error}`
                 );
                 return await interaction.editReply(
-                    `:x: Error creating a new user: ${error} (show this to sphericle!)\n
-                    Try creating the user manually with /createuser`
+                    `:x: Error creating a new user: ${error} (show this to sphericle!)`
                 );
             }
-            // Check list banned
-            await interaction.editReply(
-                "Checking if the user is list banned..."
-            );
-            if (interaction.member.roles.cache.has(submissionLockRoleID)) {
-                await interaction.editReply(
-                    ":x: Couldn't add the record: You have been banned from submitting records"
-                );
-                return;
-            }
-
-            // Check record submission status
-            const dbStatus = await db.infos.findOne({
-                where: { name: "records" },
-            });
-            if (!dbStatus)
-                return await interaction.editReply(
-                    ":x: Something wrong happened while executing the command; please try again later"
-                );
-
-            if (dbStatus.status)
-                return await interaction.editReply(
-                    ":x: Couldn't add the record: Submissions are closed at the moment"
-                );
 
             // Check given URLs
             await interaction.editReply("Checking if the URL is valid...");
