@@ -149,6 +149,7 @@ module.exports = {
                 yeses: matchYes[1],
                 nos: matchNo[1],
                 shared: `${submitter};`,
+                paused: false,
             });
             interaction.editReply(":white_check_mark: Vote inserted!");
         } else if (interaction.options.getSubcommand() === "set") {

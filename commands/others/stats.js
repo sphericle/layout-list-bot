@@ -489,6 +489,7 @@ module.exports = {
                         "yeses",
                         "nos",
                         "shared",
+                        "paused",
                     ],
                 });
 

@@ -126,7 +126,6 @@ module.exports = {
         }
 
         const users = Array.from(userset);
-        if (users.length == 0) return 404;
 
         try {
             const usersObj = users.map((user, index) => {
@@ -138,7 +137,6 @@ module.exports = {
 
             await cache.users.destroy({ where: {} });
             await cache.users.bulkCreate(usersObj);
-            logger.log(`Updated ${usersObj.length} users in cache`);
         } catch (error) {
             return `Couldn't add users, something went wrong with sequelize: ${error}`;
         }

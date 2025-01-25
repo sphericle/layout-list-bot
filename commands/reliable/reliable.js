@@ -44,6 +44,9 @@ module.exports = {
                             "Links to images to send along with the rejection message (used so the images embed)"
                         )
                 )
+        )
+        .addSubcommand((subcommand) =>
+            subcommand.setName("pause").setDescription("Set a level's status to paused")
         ),
     async autocomplete(interaction) {
         const focusedOption = interaction.options.getFocused();
@@ -401,6 +404,74 @@ module.exports = {
             });
 
             return;
+        } else if (interaction.options.getSubcommand() === "pause") {
+            const { db } = require("../../index.js");
+            // if the current channel is not a thread
+            if (!interaction.channel.isThread()) {
+                return await interaction.editReply(
+                    "Bro lock in this isnt a reliable thread"
+                );
+            }
+
+            const dbEntry = await db.levelsInVoting.findOne({
+                where: { discordid: interaction.channel.id },
+            });
+
+            if (!dbEntry) return await interaction.editReply(":x: Couldn't find the level in the database!");
+
+
+
+            await interaction.editReply({
+                content: "Changing thread name, this could take a while...",
+                flags: MessageFlags.Ephemeral,
+            });
+
+            const message = await interaction.channel.send(
+                `This level has been ` + (dbEntry.paused ? "unpaused." : "paused.")
+            );
+
+            await interaction.channel.setName(
+                `${dbEntry.levelname} ` + (dbEntry.paused ? `${dbEntry.yeses}-${dbEntry.nos}` : `(PAUSED)`)
+            ); // Set the channel name to the same thing but with pause
+
+            await message.delete();
+
+            // update entry in db
+            await db.levelsInVoting.update(
+                { paused: !dbEntry.paused },
+                { where: { discordid: interaction.channel.id } }
+            );
+
+            await interaction.editReply("The thread has been " + (dbEntry.paused ? "unpaused!" : "paused!"));
+            
+            const entry = dbEntry.dataValues;
+
+            let shared = entry.shared.split(";");
+            shared.pop();
+
+            for (const user of shared) {
+                const submitterDb = await db.submitters.findOne({
+                    where: {
+                        discordid: Sequelize.where(
+                            Sequelize.fn(
+                                "LOWER",
+                                Sequelize.col("discordid")
+                            ),
+                            "LIKE",
+                            "%" + user + "%"
+                        ),
+                    },
+                });
+
+                if (!submitterDb.dmFlag) continue;
+                // get user by id of entry.submitter
+                const submitter = await interaction.guild.members.fetch(
+                    entry.submitter
+                );
+                await submitter.send(
+                    `Voting for the level _${dbEntry.levelname}_ has been ` + (dbEntry.paused ? `unpaused. ` : `paused. Please DM a mod for more info!`) + `\n-# _To disable these messages, use the \`/vote dm\` command._`
+                );
+            }
         }
     },
 };

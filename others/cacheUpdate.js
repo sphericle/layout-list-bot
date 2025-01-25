@@ -1,19 +1,10 @@
-const {
-    githubBranch,
-    githubDataPath,
-    githubOwner,
-    githubRepo,
-} = require("../config.json");
 const logger = require("log4js").getLogger();
 const { cloneOrPullRepo, parseLevels } = require("./gitUtils.js");
 module.exports = {
     async updateCachedLevels() {
         const { cache } = require("../index.js");
 
-        logger.info("Scheduled - " + "Updating cached levels...");
-
         await cloneOrPullRepo();
-        logger.info("Scheduled - " + "Parsing levels...");
 
         const levels = await parseLevels();
 
@@ -21,10 +12,6 @@ module.exports = {
             await cache.levels.destroy({ where: {} });
             try {
                 await cache.levels.bulkCreate(levels);
-                logger.info(
-                    "Scheduled - " +
-                        `Successfully updated ${levels.length} cached levels.`
-                );
             } catch (error) {
                 logger.error(
                     "Scheduled - " +
@@ -37,8 +24,7 @@ module.exports = {
                     "Canceled updating levels cache: no levels found."
             );
         }
-
-        logger.info("Scheduled - " + "Successfully updated cached levels.");
+        return;
     },
     async updateCachedPacks() {
         const { cache } = require("../index.js");
@@ -46,7 +32,6 @@ module.exports = {
         const path = require("path");
         const localRepoPath = path.resolve(__dirname, "../data/repo/");
         const packs = [];
-        logger.info("Updating cached packs...");
 
         let parsedData;
         try {
@@ -72,10 +57,9 @@ module.exports = {
         cache.packs.destroy({ where: {} });
         try {
             cache.packs.bulkCreate(packs);
-            logger.info(`Successfully updated ${packs.length} cached packs.`);
         } catch (error) {
-            logger.info(
-                `Couldn't udate cached packs, something went wrong with sequelize: ${error}`
+            logger.error(
+                `Couldn't update cached packs, something went wrong with sequelize: ${error}`
             );
         }
     },

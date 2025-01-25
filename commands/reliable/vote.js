@@ -343,6 +343,7 @@ module.exports = {
                 yeses: 0,
                 nos: 0,
                 shared: `${interaction.user.id};`,
+                paused: false,
             });
 
             return interaction.editReply(

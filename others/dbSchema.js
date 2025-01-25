@@ -181,6 +181,10 @@ module.exports = {
             yeses: Sequelize.INTEGER,
             nos: Sequelize.INTEGER,
             shared: Sequelize.STRING,
+            paused: {
+                type: Sequelize.BOOLEAN,
+                defaultValue: false,
+            },
         });
         db.submitters = sequelize.define("submitters", {
             discordid: {

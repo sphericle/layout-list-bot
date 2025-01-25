@@ -1,5 +1,4 @@
 const { scheduleCacheUpdate } = require("../config.json");
-const { parseUsers } = require("../others/gitUtils.js");
 
 module.exports = {
     name: "updateCache",
@@ -9,6 +8,7 @@ module.exports = {
         const { cache } = require("../index.js");
         await cache.updateLevels();
         await cache.updatePacks();
-        await parseUsers();
+        await cache.updateUsers();
+        
     },
 };
