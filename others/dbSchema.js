@@ -259,7 +259,6 @@ module.exports = {
             isDiff: {
                 type: Sequelize.BOOLEAN,
                 default: false,
-                allowNull: false,
             },
         });
 
