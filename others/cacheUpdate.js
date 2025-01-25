@@ -77,7 +77,7 @@ module.exports = {
             users.push({ name: users_data[user], user_id: user });
         }
 
-        cache.users.destroy({ where: {} });
+        await cache.users.destroy({ where: {} });
         try {
             cache.users.bulkCreate(users);
             logger.info(`Successfully updated ${users.length} cached users.`);

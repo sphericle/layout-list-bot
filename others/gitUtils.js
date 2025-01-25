@@ -113,13 +113,11 @@ module.exports = {
                 );
                 if (parsedData.name.startsWith("_")) continue;
 
-                userset.add(parsedData.author);
                 userset.add(parsedData.verifier);
-
                 for (const creator of parsedData.creators) userset.add(creator);
-
                 for (const record of parsedData.records)
                     userset.add(record.user);
+                
             } catch (parseError) {
                 logger.error(
                     "Git - " +
@@ -134,7 +132,7 @@ module.exports = {
 
         try {
             await cache.users.destroy({ where: {} });
-            await createUser("_", users);
+            await cache.users.bulkCreate(users)
         } catch (error) {
             return `Couldn't add users, something went wrong with sequelize: ${error}`;
         }
