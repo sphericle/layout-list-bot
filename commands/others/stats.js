@@ -38,7 +38,12 @@ module.exports = {
         .addSubcommand((subcommand) =>
             subcommand
                 .setName("exportdb")
-                .setDescription("Exports the records database")
+                .setDescription("Exports the database")
+        )
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName("exportcache")
+                .setDescription("Exports the cache")
         )
         .addSubcommand((subcommand) =>
             subcommand
@@ -516,6 +521,117 @@ module.exports = {
                     levelsInVoting.addRow(stat.toJSON())
                 );
                 skippersData.forEach((stat) => skippers.addRow(stat.toJSON()));
+
+                await workbook.xlsx.writeFile(filePath);
+
+                const fileAttachment = new AttachmentBuilder(filePath, {
+                    name: "database_export.xlsx",
+                });
+                await interaction.editReply({
+                    content: ":white_check_mark: Exported data successfully:",
+                    files: [fileAttachment],
+                });
+
+                fs.unlinkSync(filePath);
+            } catch (error) {
+                logger.error(error);
+                await interaction.editReply({
+                    content:
+                        ":x: An error occurred while exporting the database.",
+                });
+            }
+        } else if (interaction.options.getSubcommand() === "exportcache") {
+            const { cache } = require("../../index.js");
+
+            const exportDir = path.join(__dirname, "../../data/exports/");
+            if (!fs.existsSync(exportDir)) {
+                fs.mkdirSync(exportDir, { recursive: true });
+            }
+            const filePath = path.join(
+                exportDir,
+                `cache_export_${Date.now()}.xlsx`
+            );
+
+            try {
+                const workbook = new ExcelJS.Workbook();
+
+                const levels = workbook.addWorksheet("Levels");
+                const archived = workbook.addWorksheet("Archived");
+                const packs = workbook.addWorksheet("Packs");
+                const users = workbook.addWorksheet("Users");
+
+                // Add columns to the sheets
+                levels.columns = [
+                    { header: "Name", key: "name", width: 25 },
+                    { header: "Position", key: "position", width: 30 },
+                    { header: "Filename", key: "filename", width: 20 },
+                ];
+
+                archived.columns = [
+                    { header: "Name", key: "name", width: 25 },
+                    { header: "Position", key: "position", width: 30 },
+                    { header: "Filename", key: "filename", width: 20 },
+                ];
+
+                users.columns = [
+                    { header: "Name", key: "name", width: 25 },
+                    { header: "ID", key: "user_id", width: 30 }
+                ];
+
+                packs.columns = [
+                    { header: "Name", key: "name", width: 25 },
+                    { header: "Difficulty", key: "difficulty", width: 30 },
+                    { header: "Diff pack?", key: "isDiff", width: 20 },
+                ];
+
+                
+
+                const levelsData = await cache.levels.findAll({
+                    attributes: [
+                        "name",
+                        "position",
+                        "filename"
+                    ],
+                });
+
+                const archivedData = await cache.archived.findAll({
+                    attributes: [
+                        "name",
+                        "position",
+                        "filename"
+                    ],
+                });
+
+                const usersData = await cache.users.findAll({
+                    attributes: [
+                        "name",
+                        "user_id",
+                    ],
+                });
+
+                const packsData = await cache.packs.findAll({
+                    attributes: [
+                        "name",
+                        "difficulty",
+                        "isDiff"
+                    ],
+                });
+
+                levelsData.forEach((record) =>
+                    levels.addRow(record.toJSON())
+                );
+
+                archivedData.forEach((record) =>
+                    archived.addRow(record.toJSON())
+                );
+
+                usersData.forEach((record) =>
+                    users.addRow(record.toJSON())
+                );
+
+                packsData.forEach((record) =>
+                    packs.addRow(record.toJSON())
+                );
 
                 await workbook.xlsx.writeFile(filePath);
 

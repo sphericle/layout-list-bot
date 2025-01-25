@@ -4,9 +4,10 @@
     "description": "Discord bot for managing the All Rated Extreme Demons List",
     "main": "index.js",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
+        "testenv": "echo '{}' > ./config.json && cp './debug config.json' ./config.json",
+        "start": "node bot.js",
         "format": "prettier --write",
-        "start": "node bot.js"
+        "lint": "eslint ."
     },
     "author": "Minebox260",
     "license": "ISC",

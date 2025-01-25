@@ -1,4 +1,9 @@
 const Sequelize = require("sequelize");
+
+function uidGen() {
+    return Math.floor(1000000000 + Math.random() * 9000000000)
+}
+
 module.exports = {
     createDbSchema(sequelize) {
         const db = {};
@@ -239,12 +244,23 @@ module.exports = {
 
         cache.users = sequelize_cache.define("users", {
             name: Sequelize.STRING,
-            user_id: Sequelize.STRING,
+            user_id: {
+                type: Sequelize.STRING,
+                // should let us easily create a new user without pasting
+                // the same random code. using a function here because idk
+                // if pasting the plain expression will generate the same id
+                // every time.
+                default: uidGen(),
+            },
         });
         cache.packs = sequelize_cache.define("packs", {
             name: Sequelize.STRING,
             difficulty: Sequelize.INTEGER,
-            isDiff: Sequelize.BOOLEAN,
+            isDiff: {
+                type: Sequelize.BOOLEAN,
+                default: false,
+                allowNull: false,
+            },
         });
 
         cache.updateLevels = async () => await updateCachedLevels();

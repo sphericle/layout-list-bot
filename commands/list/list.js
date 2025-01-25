@@ -399,8 +399,34 @@ module.exports = {
 
             if (enjoyment && (enjoyment < 1 || enjoyment > 10))
                 return await interaction.editReply(
-                    ":x: Couldn't add the record: Enjoyment rating must be between 1 and 10"
+                    ":x: Couldn't add the record: Verifier enjoyment rating must be between 1 and 10"
                 );
+
+            if (percent && (percent < 0 || percent > 100))
+                return await interaction.editReply(
+                    ":x: Couldn't add the record: List % must be between 0 and 100"
+                );
+
+            if (creatorNames.length > 0)
+                for (const creatorName of creatorNames) {
+                    let creator = await cache.users.findOne({
+                        where: { name: creatorName },
+                    });
+
+                    if (!creator) 
+                        cache.users.create({
+                            name: creatorName
+                        });
+                }
+
+            const dbVerifier = await cache.users.findOne({
+                where: { name: verifierName },
+            });
+
+            if (!dbVerifier)
+                cache.users.create({
+                    name: verifierName
+                });
 
             let list_response;
             try {
