@@ -116,7 +116,6 @@ module.exports = {
                 for (const creator of parsedData.creators) userset.add(creator);
                 for (const record of parsedData.records)
                     userset.add(record.user);
-                
             } catch (parseError) {
                 logger.error(
                     "Git - " +
@@ -129,7 +128,6 @@ module.exports = {
         const users = Array.from(userset);
         if (users.length == 0) return 404;
 
-        
         try {
             const usersObj = users.map((user, index) => {
                 return {
@@ -138,7 +136,6 @@ module.exports = {
                 };
             });
 
-            
             await cache.users.destroy({ where: {} });
             await cache.users.bulkCreate(usersObj);
         } catch (error) {

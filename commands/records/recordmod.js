@@ -188,9 +188,7 @@ module.exports = {
         .addSubcommand((subcommand) =>
             subcommand
                 .setName("ban")
-                .setDescription(
-                    "Remove all records from a user"
-                )
+                .setDescription("Remove all records from a user")
                 .addStringOption((option) =>
                     option
                         .setName("username")
@@ -2583,17 +2581,20 @@ module.exports = {
             }
         } else if (interaction.options.getSubcommand() === "ban") {
             await interaction.deferReply();
-            const path  = require("path");
+            const path = require("path");
             const fs = require("fs");
 
             const username = interaction.options.getString("username");
-            
+
             const localRepoPath = path.resolve(__dirname, `../../data/repo/`);
             const listFilename = "data/_list.json";
             let list_data;
             try {
                 list_data = JSON.parse(
-                    fs.readFileSync(path.join(localRepoPath, listFilename), "utf8")
+                    fs.readFileSync(
+                        path.join(localRepoPath, listFilename),
+                        "utf8"
+                    )
                 );
             } catch (parseError) {
                 if (!listFilename.startsWith("_"))
@@ -2603,7 +2604,7 @@ module.exports = {
                     );
                 return -1;
             }
-    
+
             let changes = [];
 
             for (const filename of list_data) {
@@ -2631,20 +2632,18 @@ module.exports = {
                     (record) => record.user === username
                 );
 
-                if (recordIndex === -1)
-                    continue;
-    
+                if (recordIndex === -1) continue;
+
                 parsedData.records.splice(recordIndex, 1);
 
                 changes.push({
                     path: `${githubDataPath}/${filename}.json`,
                     content: JSON.stringify(parsedData, null, "\t"),
-                })
-
-            }            
+                });
+            }
 
             await interaction.editReply("Committing...");
-            
+
             let commitSha;
             try {
                 // Get the SHA of the latest commit from the branch
@@ -2758,7 +2757,6 @@ module.exports = {
             );
 
             await interaction.editReply(`Banned ${username}!`);
-            
         }
     },
 };

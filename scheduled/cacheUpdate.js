@@ -11,6 +11,5 @@ module.exports = {
         await cache.updateLevels();
         await cache.updatePacks();
         await parseUsers();
-
     },
 };
