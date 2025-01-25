@@ -6,3 +6,4 @@ logs
 .env.real
 .DS_Store
 config.json
+*.code-workspace
