@@ -7,6 +7,7 @@ const {
 } = require("../../config.json");
 const logger = require("log4js").getLogger();
 const Sequelize = require("sequelize");
+const isUrlHttp = require("is-url-http");
 
 module.exports = {
     enabled: true,
@@ -32,6 +33,7 @@ module.exports = {
                         .setName("verifier")
                         .setDescription("The name of the verifier")
                         .setRequired(true)
+                        .setAutocomplete(true)
                 )
                 .addStringOption((option) =>
                     option
@@ -167,7 +169,7 @@ module.exports = {
         ),
     async autocomplete(interaction) {
         const focused = interaction.options.getFocused(true);
-        const { db } = require("../../index.js");
+        const { db, cache } = require("../../index.js");
         if (focused.name === "levelname") {
             // if user has staff role, show all levels in voting
             let levels;
@@ -214,6 +216,21 @@ module.exports = {
                 filtered.slice(0, 25).map((user) => {
                     return { name: user.name, value: user.value };
                 })
+            );
+        } else if (focused.name ===  "verifier") {
+            let users = await cache.users.findAll({
+                where: {
+                    name: Sequelize.where(
+                        Sequelize.fn("LOWER", Sequelize.col("name")),
+                        "LIKE",
+                        "%" + focused.value.toLowerCase() + "%"
+                    ),
+                },
+            });
+            return await interaction.respond(
+                users
+                    .slice(0, 25)
+                    .map((user) => ({ name: user.name, value: user.name }))
             );
         }
     },
@@ -267,6 +284,11 @@ module.exports = {
                     `:x: Whoops!!! An error occurred!!! (error trying to find/create db entry: \n${error})`
                 );
             }
+
+            if (/\s/g.test(verification) || !isUrlHttp(verification))
+                return await interaction.editReply(
+                    ":x: The verification link is invalid! Please upload the verification to youtube."
+                );
 
             // check if user has 3 submissions already
             if (user.submissions >= 3)

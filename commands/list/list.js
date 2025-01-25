@@ -66,6 +66,14 @@ module.exports = {
                 )
                 .addStringOption((option) =>
                     option
+                        .setName("creators")
+                        .setDescription(
+                            "The list of the creators of the level, each separated by a comma"
+                        )
+                        .setRequired(true)
+                )
+                .addStringOption((option) =>
+                    option
                         .setName("verifier")
                         .setDescription("The name of the verifier")
                         .setRequired(true)
@@ -88,13 +96,6 @@ module.exports = {
                     option
                         .setName("songlink")
                         .setDescription("The NONG link for this level, if any.")
-                )
-                .addStringOption((option) =>
-                    option
-                        .setName("creators")
-                        .setDescription(
-                            "The list of the creators of the level, each separated by a comma"
-                        )
                 )
                 .addStringOption((option) =>
                     option
@@ -328,6 +329,22 @@ module.exports = {
                     name: level.name,
                     value: level.filename,
                 }))
+            );
+        
+        } else if (focused.name ===  "verifier") {
+            let users = await cache.users.findAll({
+                where: {
+                    name: Sequelize.where(
+                        Sequelize.fn("LOWER", Sequelize.col("name")),
+                        "LIKE",
+                        "%" + focused.value.toLowerCase() + "%"
+                    ),
+                },
+            });
+            return await interaction.respond(
+                users
+                    .slice(0, 25)
+                    .map((user) => ({ name: user.name, value: user.name }))
             );
         } else
             return await interaction.respond(
