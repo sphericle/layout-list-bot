@@ -82,7 +82,6 @@ module.exports = {
 
     async parseUsers(useLegacy) {
         const { cache } = require("../index.js");
-        const { createUser } = require("../commands/records/records.js");
         const userset = new Set();
         const localRepoPath = path.resolve(__dirname, `../data/repo/`);
         const listFilename = useLegacy
@@ -130,9 +129,18 @@ module.exports = {
         const users = Array.from(userset);
         if (users.length == 0) return 404;
 
+        
         try {
+            const usersObj = users.map((user, index) => {
+                return {
+                    name: user,
+                    user_id: index,
+                };
+            });
+
+            
             await cache.users.destroy({ where: {} });
-            await cache.users.bulkCreate(users)
+            await cache.users.bulkCreate(usersObj);
         } catch (error) {
             return `Couldn't add users, something went wrong with sequelize: ${error}`;
         }
