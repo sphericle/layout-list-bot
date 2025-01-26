@@ -330,8 +330,7 @@ module.exports = {
                     value: level.filename,
                 }))
             );
-        
-        } else if (focused.name ===  "verifier") {
+        } else if (focused.name === "verifier") {
             let users = await cache.users.findAll({
                 where: {
                     name: Sequelize.where(
@@ -413,9 +412,9 @@ module.exports = {
                         where: { name: creatorName },
                     });
 
-                    if (!creator) 
+                    if (!creator)
                         cache.users.create({
-                            name: creatorName
+                            name: creatorName,
                         });
                 }
 
@@ -425,7 +424,7 @@ module.exports = {
 
             if (!dbVerifier)
                 cache.users.create({
-                    name: verifierName
+                    name: verifierName,
                 });
 
             let list_response;

@@ -9,6 +9,5 @@ module.exports = {
         await cache.updateLevels();
         await cache.updatePacks();
         await cache.updateUsers();
-        
     },
 };

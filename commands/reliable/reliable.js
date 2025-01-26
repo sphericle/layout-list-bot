@@ -46,7 +46,9 @@ module.exports = {
                 )
         )
         .addSubcommand((subcommand) =>
-            subcommand.setName("pause").setDescription("Set a level's status to paused")
+            subcommand
+                .setName("pause")
+                .setDescription("Set a level's status to paused")
         ),
     async autocomplete(interaction) {
         const focusedOption = interaction.options.getFocused();
@@ -88,15 +90,13 @@ module.exports = {
             if (dbEntry.paused) {
                 return await interaction.editReply(
                     "This thread is paused, you can't vote on it!"
-                )
+                );
             }
 
             await interaction.editReply("Checking thread name...");
             try {
-
                 await interaction.editReply({
-                    content:
-                        "Changing thread name, this could take a while...",
+                    content: "Changing thread name, this could take a while...",
                     flags: MessageFlags.Ephemeral,
                 });
 
@@ -117,7 +117,9 @@ module.exports = {
                     );
 
                 const message = await interaction.channel.send(
-                    `The vote is now at **${dbEntry.yeses + 1}-${dbEntry.nos}**. The thread name is being updated!!`
+                    `The vote is now at **${dbEntry.yeses + 1}-${
+                        dbEntry.nos
+                    }**. The thread name is being updated!!`
                 );
 
                 await interaction.channel.setName(
@@ -131,7 +133,7 @@ module.exports = {
                     { yeses: dbEntry.yeses + 1 },
                     { where: { discordid: await interaction.channel.id } }
                 );
-                    
+
                 dbEntry = await db.levelsInVoting.findOne({
                     where: { discordid: await interaction.channel.id },
                 });
@@ -158,16 +160,14 @@ module.exports = {
                     // check if the user has dmFlag set to true
                     if (submitterDb.dataValues.dmFlag) {
                         // get user by id of entry.submitter
-                        const submitter =
-                            await interaction.guild.members.fetch(
-                                entry.submitter
-                            );
+                        const submitter = await interaction.guild.members.fetch(
+                            entry.submitter
+                        );
                         await submitter.send(
                             `The level _${dbEntry.levelname}_ has received a new yes vote!\nThe vote is now at **${dbEntry.yeses}-${dbEntry.nos}**.\n-# _To disable these messages, use the \`/vote dm\` command._`
                         );
                     }
                 }
-                
             } catch (e) {
                 logger.error(`Error: ${e}`);
                 return await interaction.editReply(
@@ -176,7 +176,6 @@ module.exports = {
             }
 
             return await interaction.editReply("Updated!");
-
         } else if (interaction.options.getSubcommand() === "no") {
             const { db } = require("../../index.js");
             await interaction.editReply("Checking thread name...");
@@ -194,14 +193,12 @@ module.exports = {
             if (dbEntry.paused) {
                 return await interaction.editReply(
                     "This thread is paused, you can't vote on it!"
-                )
+                );
             }
-            
-            try {
 
+            try {
                 await interaction.editReply({
-                    content:
-                        "Changing thread name, this could take a while...",
+                    content: "Changing thread name, this could take a while...",
                     flags: MessageFlags.Ephemeral,
                 });
 
@@ -219,7 +216,9 @@ module.exports = {
                 if (voteMessage) await voteMessage.pin();
 
                 const message = await interaction.channel.send(
-                    `The vote is now at **${dbEntry.yeses}-${dbEntry.nos + 1}**.`
+                    `The vote is now at **${dbEntry.yeses}-${
+                        dbEntry.nos + 1
+                    }**.`
                 );
 
                 await interaction.channel.setName(
@@ -260,10 +259,9 @@ module.exports = {
                     // check if the user has dmFlag set to true
                     if (submitterDb.dataValues.dmFlag) {
                         // get user by id of entry.submitter
-                        const submitter =
-                            await interaction.guild.members.fetch(
-                                entry.submitter
-                            );
+                        const submitter = await interaction.guild.members.fetch(
+                            entry.submitter
+                        );
                         await submitter.send(
                             `The level _${dbEntry.levelname}_ has received a no vote...\nThe vote is now at **${dbEntry.yeses}-${dbEntry.nos}**.\n-# _To disable these messages, use the \`/vote dm\` command._`
                         );
@@ -396,9 +394,10 @@ module.exports = {
                 where: { discordid: interaction.channel.id },
             });
 
-            if (!dbEntry) return await interaction.editReply(":x: Couldn't find the level in the database!");
-
-
+            if (!dbEntry)
+                return await interaction.editReply(
+                    ":x: Couldn't find the level in the database!"
+                );
 
             await interaction.editReply({
                 content: "Changing thread name, this could take a while...",
@@ -406,11 +405,15 @@ module.exports = {
             });
 
             const message = await interaction.channel.send(
-                `This level has been ` + (dbEntry.paused ? "unpaused." : "paused.")
+                `This level has been ` +
+                    (dbEntry.paused ? "unpaused." : "paused.")
             );
 
             await interaction.channel.setName(
-                `${dbEntry.levelname} ` + (dbEntry.paused ? `${dbEntry.yeses}-${dbEntry.nos}` : `(PAUSED)`)
+                `${dbEntry.levelname} ` +
+                    (dbEntry.paused
+                        ? `${dbEntry.yeses}-${dbEntry.nos}`
+                        : `(PAUSED)`)
             ); // Set the channel name to the same thing but with pause
 
             await message.delete();
@@ -421,8 +424,11 @@ module.exports = {
                 { where: { discordid: interaction.channel.id } }
             );
 
-            await interaction.editReply("The thread has been " + (dbEntry.paused ? "unpaused!" : "paused!"));
-            
+            await interaction.editReply(
+                "The thread has been " +
+                    (dbEntry.paused ? "unpaused!" : "paused!")
+            );
+
             const entry = dbEntry.dataValues;
 
             let shared = entry.shared.split(";");
@@ -432,10 +438,7 @@ module.exports = {
                 const submitterDb = await db.submitters.findOne({
                     where: {
                         discordid: Sequelize.where(
-                            Sequelize.fn(
-                                "LOWER",
-                                Sequelize.col("discordid")
-                            ),
+                            Sequelize.fn("LOWER", Sequelize.col("discordid")),
                             "LIKE",
                             "%" + user + "%"
                         ),
@@ -448,7 +451,11 @@ module.exports = {
                     entry.submitter
                 );
                 await submitter.send(
-                    `Voting for the level _${dbEntry.levelname}_ has been ` + (dbEntry.paused ? `unpaused. ` : `paused. Please DM a mod for more info!`) + `\n-# _To disable these messages, use the \`/vote dm\` command._`
+                    `Voting for the level _${dbEntry.levelname}_ has been ` +
+                        (dbEntry.paused
+                            ? `unpaused. `
+                            : `paused. Please DM a mod for more info!`) +
+                        `\n-# _To disable these messages, use the \`/vote dm\` command._`
                 );
             }
         }

@@ -217,7 +217,7 @@ module.exports = {
                     return { name: user.name, value: user.value };
                 })
             );
-        } else if (focused.name ===  "verifier") {
+        } else if (focused.name === "verifier") {
             let users = await cache.users.findAll({
                 where: {
                     name: Sequelize.where(

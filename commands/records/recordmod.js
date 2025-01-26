@@ -439,7 +439,9 @@ module.exports = {
                     );
                     user = await cache.users.create({
                         name: username,
-                        user_id: Math.floor(1000000000 + Math.random() * 9000000000)
+                        user_id: Math.floor(
+                            1000000000 + Math.random() * 9000000000
+                        ),
                     });
 
                     logger.log(user);

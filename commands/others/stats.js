@@ -575,7 +575,7 @@ module.exports = {
 
                 users.columns = [
                     { header: "Name", key: "name", width: 25 },
-                    { header: "ID", key: "user_id", width: 30 }
+                    { header: "ID", key: "user_id", width: 30 },
                 ];
 
                 packs.columns = [
@@ -584,54 +584,31 @@ module.exports = {
                     { header: "Diff pack?", key: "isDiff", width: 20 },
                 ];
 
-                
-
                 const levelsData = await cache.levels.findAll({
-                    attributes: [
-                        "name",
-                        "position",
-                        "filename"
-                    ],
+                    attributes: ["name", "position", "filename"],
                 });
 
                 const archivedData = await cache.archived.findAll({
-                    attributes: [
-                        "name",
-                        "position",
-                        "filename"
-                    ],
+                    attributes: ["name", "position", "filename"],
                 });
 
                 const usersData = await cache.users.findAll({
-                    attributes: [
-                        "name",
-                        "user_id",
-                    ],
+                    attributes: ["name", "user_id"],
                 });
 
                 const packsData = await cache.packs.findAll({
-                    attributes: [
-                        "name",
-                        "difficulty",
-                        "isDiff"
-                    ],
+                    attributes: ["name", "difficulty", "isDiff"],
                 });
 
-                levelsData.forEach((record) =>
-                    levels.addRow(record.toJSON())
-                );
+                levelsData.forEach((record) => levels.addRow(record.toJSON()));
 
                 archivedData.forEach((record) =>
                     archived.addRow(record.toJSON())
                 );
 
-                usersData.forEach((record) =>
-                    users.addRow(record.toJSON())
-                );
+                usersData.forEach((record) => users.addRow(record.toJSON()));
 
-                packsData.forEach((record) =>
-                    packs.addRow(record.toJSON())
-                );
+                packsData.forEach((record) => packs.addRow(record.toJSON()));
 
                 await workbook.xlsx.writeFile(filePath);
 
