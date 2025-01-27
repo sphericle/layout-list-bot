@@ -856,7 +856,7 @@ module.exports = {
                         "\t"
                     );
 
-                    const dmMessage = `Accepted record of ${record.levelname} for ${record.username}\nGithub Code:\n\`\`\`${rawGithubCode}\`\`\``;
+                    const dmMessage = `Accepted record of ${record.levelname} for ${record.username}\nGithub Code:\n\`\`\`json${rawGithubCode}\`\`\``;
                     await interaction.user.send({ content: dmMessage });
                 } catch {
                     logger.info(
@@ -1411,7 +1411,7 @@ module.exports = {
                         "\t"
                     );
 
-                    const dmMessage = `Added record of ${record.levelname} for ${record.username}\nGithub Code:\n\`\`\`${rawGithubCode}\`\`\``;
+                    const dmMessage = `Added record of ${record.levelname} for ${record.username}\nGithub Code:\n\`\`\`json${rawGithubCode}\`\`\``;
                     await interaction.user.send({ content: dmMessage });
                 } catch {
                     logger.info(
