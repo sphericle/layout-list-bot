@@ -1,8 +1,8 @@
 const { guildId } = require('../config.json')
 
 module.exports = {
-    name: "resetSubmissions",
-    cron: "0 5 0 * * *",
+    name: "updateLevels",
+    cron: "0 0 */6 * * *",
     enabled: true,
     async execute() {
         const { db, client } = require("../index.js");
