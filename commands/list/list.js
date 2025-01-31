@@ -1454,11 +1454,9 @@ module.exports = {
                     path: githubDataPath + `/archived/${filename}.json`,
                     content: JSON.stringify(parsedData, null, "\t"),
                 },
-                {
-                    path: githubDataPath + `/${filename}.json`,
-                    content: null,
-                },
             ];
+
+            const toDelete = githubDataPath + `/${filename}.json`
 
             let commitSha;
             try {
@@ -1505,9 +1503,9 @@ module.exports = {
                     base_tree: treeSha,
                     tree: changes.map((change) => ({
                         path: change.path,
-                        mode: "100644",
-                        type: "blob",
-                        content: change.content || "",
+                        mode: change.deleted ? "100644" : "100644",
+                        type: change.deleted ? "tree" : "blob",
+                        content: change.deleted ? null : change.content || "",
                     })),
                 });
             } catch (createTreeErr) {
@@ -1525,7 +1523,7 @@ module.exports = {
                 newCommit = await octokit.git.createCommit({
                     owner: githubOwner,
                     repo: githubRepo,
-                    message: `Removed ${levelname} from the list (${interaction.user.tag})`,
+                    message: `Update list files...`,
                     tree: newTree.data.sha,
                     parents: [commitSha],
                 });
@@ -1554,20 +1552,41 @@ module.exports = {
                     ":x: Couldn't commit to github, please try again later (updateRefError)"
                 );
             }
+
+            // Get file SHA
+            let fileSha;
+            try {
+                const response = await octokit.repos.getContent({
+                    owner: githubOwner,
+                    repo: githubRepo,
+                    path: toDelete,
+                });
+                fileSha = response.data.sha;
+            } catch (error) {
+                logger.info(`Error fetching ${toDelete} SHA:\n${error}`);
+                return await interaction.editReply(
+                    `:x: Couldn't delete ${levelToDelete.name}: ${error} (show this to sphericle!)`
+                );
+            }
+
+            try {
+                await octokit.rest.repos.deleteFile({
+                    owner: githubOwner,
+                    repo: githubRepo,
+                    path: toDelete,
+                    message: `... and delete ${levelToDelete.name}`,
+                    sha: fileSha
+                })
+            } catch (e) {
+                logger.error(`Error deleting ${toDelete}: \n ${e}`)
+                return await interaction.editReply(`:x: Couldn't delete ${levelToDelete.name}: \n${e}\n(show this to sphericle!)`)
+            }
+
             try {
                 cache.archived.create({
                     filename: filename,
                     name: levelToDelete.name,
                     position: levelToDelete.position,
-                });
-            } catch (e) {
-                return await interaction.editReply(
-                    `:x: Error removing level from database: ${e}`
-                );
-            }
-            try {
-                cache.levels.destroy({
-                    where: { filename: levelToDelete.filename },
                 });
             } catch (e) {
                 return await interaction.editReply(
