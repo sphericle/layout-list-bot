@@ -1,4 +1,4 @@
-const { guildId } = require('../config.json')
+const { guildId } = require("../config.json");
 
 module.exports = {
     name: "updateLevels",
@@ -8,12 +8,12 @@ module.exports = {
         const { db, client } = require("../index.js");
 
         let list = await db.levelsInVoting.findAll();
-        list = list.map((level) => level = level.discordid);
+        list = list.map((level) => (level = level.discordid));
 
         const guild = client.guilds.cache.get(guildId);
-        
+
         for (const channelID of list) {
-            const channel = guild.channels.cache.get(channelID)
+            const channel = guild.channels.cache.get(channelID);
             const text = channel.name;
             const matchLevelName = text.match(/^(.*)\s\d+-\d+$/);
             const matchYes = text.match(/(\d+)-\d+$/);
@@ -26,7 +26,7 @@ module.exports = {
                     nos: matchNo[1],
                 },
                 { where: { discordid: channelID } }
-            )
+            );
         }
     },
 };

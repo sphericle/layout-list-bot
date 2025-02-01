@@ -1456,7 +1456,7 @@ module.exports = {
                 },
             ];
 
-            const toDelete = githubDataPath + `/${filename}.json`
+            const toDelete = githubDataPath + `/${filename}.json`;
 
             let commitSha;
             try {
@@ -1575,11 +1575,13 @@ module.exports = {
                     repo: githubRepo,
                     path: toDelete,
                     message: `... and delete ${levelToDelete.name}`,
-                    sha: fileSha
-                })
+                    sha: fileSha,
+                });
             } catch (e) {
-                logger.error(`Error deleting ${toDelete}: \n ${e}`)
-                return await interaction.editReply(`:x: Couldn't delete ${levelToDelete.name}: \n${e}\n(show this to sphericle!)`)
+                logger.error(`Error deleting ${toDelete}: \n ${e}`);
+                return await interaction.editReply(
+                    `:x: Couldn't delete ${levelToDelete.name}: \n${e}\n(show this to sphericle!)`
+                );
             }
 
             try {
