@@ -415,17 +415,23 @@ module.exports = {
                 });
             } catch (error) {
                 logger.error(error);
-                return interaction.editReply(
+                return await interaction.editReply(
                     `:x: A problem occurred fetching your level info. Please spam sphericle's DMs with this message:\n${error}.`
                 );
             }
 
             if (!submission)
-                return interaction.editReply(
+                return await interaction.editReply(
                     ":x: You haven't submitted a level with that name..."
                 );
 
-            return interaction.editReply(
+            if (submission.paused === true) {
+                return await interaction.editReply(
+                    `The vote for ${submission.levelname} is currently paused. Please contact a moderator for more info!`
+                )
+            }
+
+            return await interaction.editReply(
                 `The vote for ${submission.levelname} is currently ${submission.yeses}-${submission.nos}.`
             );
         } else if (subcommand === "share") {
@@ -443,7 +449,7 @@ module.exports = {
 
             // if you try to share the vote with yourself (LOL)
             if (user === interaction.user.id) {
-                return interaction.editReply(":x: Nice try!");
+                return interaction.editReply(":death: Nice try!");
             }
 
             const hasStaffRole = await interaction.member.roles.cache.has(
