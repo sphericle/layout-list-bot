@@ -427,12 +427,12 @@ module.exports = {
 
             if (submission.paused === true) {
                 return await interaction.editReply(
-                    `The vote for ${submission.levelname} is currently paused. Please contact a moderator for more info!`
+                    `The vote for _${submission.levelname}_ is currently paused. Please contact a moderator for more info!`
                 )
             }
 
             return await interaction.editReply(
-                `The vote for ${submission.levelname} is currently ${submission.yeses}-${submission.nos}.`
+                `The vote for _${submission.levelname}_ is currently **${submission.yeses}-${submission.nos}**.`
             );
         } else if (subcommand === "share") {
             const { db } = require("../../index.js");
