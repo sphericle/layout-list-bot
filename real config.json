@@ -5,7 +5,7 @@
     "enableShifts": false,
     "enablePriorityRole": false,
     "enableWelcomeMessage": false,
-    "enableChangelogMessage": false,
+    "enableChangelogMessage": true,
 
     "scheduleShifts": "10 0 * * *",
     "scheduleShiftsReminder": "10 22 * * *",
@@ -32,8 +32,8 @@
     "archiveRecordsID": "859514927860416562",
     "recordsID": "859514927860416562",
 
-    "changelogID": "988671478096609290",
-    "changelogRoleID": "1178255860972142662",
+    "changelogID": "855212332047925328",
+    "changelogRoleID": "0",
 
     "guildMemberAddID": "1178399916125597716",
 
