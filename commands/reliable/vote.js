@@ -4,6 +4,7 @@ const {
     reliableThreadID,
     staffRole,
     submissionsChannelID,
+    clientId
 } = require("../../config.json");
 const logger = require("log4js").getLogger();
 const Sequelize = require("sequelize");
@@ -447,8 +448,8 @@ module.exports = {
                     ":x: Couldn't find that user in this server!."
                 );
 
-            // if you try to share the vote with yourself (LOL)
-            if (user === interaction.user.id) {
+            // if you try to share the vote with yourself, the layout list bot, or any other bot
+            if (user === interaction.user.id || user === clientId || member.user.bot) {
                 return interaction.editReply(":death: Nice try!");
             }
 
@@ -498,7 +499,7 @@ module.exports = {
             );
 
             return interaction.editReply(
-                `The vote for ${submission.levelname} is currently ${submission.yeses}-${submission.nos}.`
+                `Shared _${submission.levelname}_ with ${member.user.username}!`
             );
         }
     },
