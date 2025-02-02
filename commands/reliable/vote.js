@@ -428,7 +428,7 @@ module.exports = {
             if (submission.paused === true) {
                 return await interaction.editReply(
                     `The vote for _${submission.levelname}_ is currently paused. Please contact a moderator for more info!`
-                )
+                );
             }
 
             return await interaction.editReply(
