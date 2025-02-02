@@ -33,18 +33,16 @@ module.exports = {
         ),
     async autocomplete(interaction) {
         const { db } = require("../../index.js");
-        const focused = interaction.options.getFocused();
+        const focused = interaction.options.getFocused(true);
         const members = interaction.guild.members.cache;
-        const response = await members.filter(
-            (member) =>
+        let filtered = await members
+            .filter((member) =>
                 member.user.username
                     .toLowerCase()
-                    .includes(focused.toLowerCase()) &&
-                !member.roles.cache.has(feedbackBanID)
-        );
-
-        const responseArray = await Promise.all(
-            response.slice(0, 25).map(async (member) => {
+                    .includes(focused.value.toLowerCase())
+            );
+            
+            filtered = await filtered.map(async (member) => {
                 let count = 0;
                 let dbMember = await db.skippers.findOne({
                     where: {
@@ -56,10 +54,13 @@ module.exports = {
                     name: `${member.user.username} (${count}/${maxSkipCount})`,
                     value: member.id,
                 };
+            });
+        filtered = await Promise.all(filtered);
+        return await interaction.respond(
+            filtered.slice(0, 25).map((user) => {
+                return { name: user.name, value: user.value };
             })
         );
-
-        return await interaction.respond(responseArray);
     },
     async execute(interaction) {
         await interaction.deferReply({ ephemeral: true });
