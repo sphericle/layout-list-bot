@@ -459,7 +459,7 @@ module.exports = {
                 )},\n\t"verifier": "${verifierName}",\n\t"verification": "${verification}",\n\t"percentToQualify": ${percent},\n\t"password": "${password}",\n\t"difficulty": ${difficulty},\n\t"song": "${songName}",` +
                 (songLink !== null ? `\n\t"songLink": "${songLink}",` : "") +
                 (enjoyment !== null ? `\n\t"enjoyment": ${enjoyment},` : "") +
-                `\n\t"records" : []\n}`;
+                `\n\t"records": []\n}`;
 
             const levelBelow = await cache.levels.findOne({
                 where: { filename: indexBelow },
@@ -540,8 +540,6 @@ module.exports = {
                 );
             }
             return;
-        } else if (interaction.options.getSubcommand() === "submit") {
-            return await interaction.editReply("Not implemented yet");
         } else if (interaction.options.getSubcommand() === "edit") {
             const { db, cache } = require("../../index.js");
             const { octokit } = require("../../index.js");
@@ -647,8 +645,7 @@ module.exports = {
                 );
             }
             await interaction.editReply("Committing...");
-
-            // not sure why it needs to be done this way but :shrug:
+            
             let changes = [];
             changes.push({
                 path: githubDataPath + `/${filename}.json`,
