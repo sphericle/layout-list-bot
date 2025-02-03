@@ -124,6 +124,21 @@ module.exports = {
             nbDenied: Sequelize.INTEGER,
         });
 
+        db.levelStats = sequelize.define("levelStats", {
+            submissions: {
+                type: Sequelize.INTEGER,
+                defaultValue: 0
+            },
+            accepts: {
+                type: Sequelize.INTEGER,
+                defaultValue: 0
+            },
+            denies: {
+                type: Sequelize.INTEGER,
+                defaultValue: 0
+            },
+        });
+
         db.shifts = sequelize.define("shifts", {
             moderator: Sequelize.STRING,
             day: Sequelize.STRING,

@@ -165,6 +165,15 @@ module.exports = {
                 name: "commitdebug",
             });
         }
+        if (!(await db.levelStats.count())) {
+            logger.info("Level stats data not found, creating");
+            await db.levelStats.create({
+                submissions: 0,
+                accepts: 0,
+                denies: 0
+            });
+        }
+        
         logger.info("Database sync done");
     },
 

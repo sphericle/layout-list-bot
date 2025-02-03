@@ -339,6 +339,15 @@ module.exports = {
             await submissionMessage.react("👍");
             await submissionMessage.react("👎");
 
+            // i hate this so so so much
+            const levelCount = await db.levelStats.findAll()
+
+            if (levelCount.length !== 1) {
+                logger.log("Fuck you sequelize!")
+            }
+
+            await levelCount[0].increment(command === "accept" ? "accepts" : "denies")
+
             await interaction.editReply({
                 content: "Updating thread name...",
                 flags: MessageFlags.Ephemeral,

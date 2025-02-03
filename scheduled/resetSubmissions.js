@@ -7,6 +7,10 @@ module.exports = {
         const { db } = require("../index.js");
         logger.log("Scheduled - Resetting submissions for all users...");
         await db.submitters.update({ submissions: 0 }, { where: {} });
+        await db.levelStats.update(
+            { submissions: 0, accepts: 0, denies: 0 },
+            { where: {} }
+        )
         logger.log("Scheduled - Submissions reset!");
     },
 };

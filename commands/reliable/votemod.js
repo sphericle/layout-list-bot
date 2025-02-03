@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require("discord.js");
+const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 const { guildId, debug } = require("../../config.json");
 const logger = require("log4js").getLogger();
 
@@ -50,6 +50,13 @@ module.exports = {
                         .setDescription("The name of the user to insert")
                         .setRequired(true)
                         .setAutocomplete(true)
+                )
+        )
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName("stats")
+                .setDescription(
+                    "Display monthly stats for list submissions."
                 )
         ),
     async autocomplete(interaction) {
@@ -235,6 +242,37 @@ module.exports = {
             return await interaction.editReply(
                 ":x: This user has been banned!"
             );
+        } else if (interaction.options.getSubcommand() === "stats") {
+            const { db } = require("../../index.js");
+
+            // i blame sequelize
+            let dbInfo = await db.levelStats.findAll()
+            let modInfo = dbInfo[0]
+          
+            const modInfoEmbed = new EmbedBuilder()
+                .setColor(0xffbf00)
+                .setTitle("Monthly submission info")
+                .addFields(
+                    {
+                        name: "Total submissions:",
+                        value: `${modInfo.submissions}`,
+                        inline: true,
+                    },
+                    {
+                        name: "Accepted levels:",
+                        value: `${modInfo.accepts}`,
+                        inline: true,
+                    },
+                    {
+                        name: "Denied levels:",
+                        value: `${modInfo.denies}`,
+                        inline: true,
+                    }
+                )
+
+            return await interaction.editReply({
+                embeds: [modInfoEmbed],
+            });
         }
     },
 };
