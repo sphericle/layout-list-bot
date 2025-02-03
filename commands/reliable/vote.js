@@ -5,6 +5,7 @@ const {
     staffRole,
     submissionsChannelID,
     clientId,
+    debug
 } = require("../../config.json");
 const logger = require("log4js").getLogger();
 const Sequelize = require("sequelize");
@@ -292,7 +293,7 @@ module.exports = {
                 );
 
             // check if user has 3 submissions already
-            if (user.submissions >= 3)
+            if (user.submissions >= 3 && !debug)
                 return interaction.editReply(
                     ":x: You've already submitted 3 levels this month! Please close the GD editor and touch some grass."
                 );
@@ -308,15 +309,21 @@ module.exports = {
                 reliableThreadID
             );
 
-            const message =
+            let message =
                 `_Submitted by: <@${interaction.user.id}>_\n\nLevel name: ${levelname}\nVerifier: ${verifier}\nVerification: ${verification}\nCreators: ${creators}\nID: \`${id}\`\nSong name: ${songname}` + // man don't askl me why itr needs to be formatted like this ik its ugly bro
                 (percent ? `\nList percent: ${percent}%` : "") +
                 (password ? `\nPassword: ${password}` : "") +
-                (raw ? `\nRaw: ${raw}` : "") +
                 (opinion ? `\nDifficulty opinion: ${opinion}` : "") +
                 (enjoyment ? `\nVerifier's enjoyment: ${enjoyment}/10` : "") +
                 (nong ? `\nNONG: ${nong.url}` : "") +
                 (note ? `\n\n_Additional notes: ${note}_` : "");
+
+            const logChannel = await guild.channels.cache.get(
+                submissionsChannelID
+            );
+            await logChannel.send(message);
+
+            if (raw) message += `\nRaw: ${raw}`
 
             const thread = await voteChannel.threads.create({
                 name: `${levelname} 0-0`,
@@ -326,10 +333,6 @@ module.exports = {
             });
 
             logger.log(`Created thread: ${thread.name}`);
-            const logChannel = await guild.channels.cache.get(
-                submissionsChannelID
-            );
-            await logChannel.send(message);
 
             // increment user's submission count
             const submitter = await db.submitters.findOne({
