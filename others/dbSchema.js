@@ -127,15 +127,15 @@ module.exports = {
         db.levelStats = sequelize.define("levelStats", {
             submissions: {
                 type: Sequelize.INTEGER,
-                defaultValue: 0
+                defaultValue: 0,
             },
             accepts: {
                 type: Sequelize.INTEGER,
-                defaultValue: 0
+                defaultValue: 0,
             },
             denies: {
                 type: Sequelize.INTEGER,
-                defaultValue: 0
+                defaultValue: 0,
             },
         });
 

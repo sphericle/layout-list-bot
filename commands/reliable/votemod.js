@@ -55,9 +55,7 @@ module.exports = {
         .addSubcommand((subcommand) =>
             subcommand
                 .setName("stats")
-                .setDescription(
-                    "Display monthly stats for list submissions."
-                )
+                .setDescription("Display monthly stats for list submissions.")
         ),
     async autocomplete(interaction) {
         const focused = interaction.options.getFocused(true);
@@ -246,9 +244,9 @@ module.exports = {
             const { db } = require("../../index.js");
 
             // i blame sequelize
-            let dbInfo = await db.levelStats.findAll()
-            let modInfo = dbInfo[0]
-          
+            let dbInfo = await db.levelStats.findAll();
+            let modInfo = dbInfo[0];
+
             const modInfoEmbed = new EmbedBuilder()
                 .setColor(0xffbf00)
                 .setTitle("Monthly submission info")
@@ -268,7 +266,7 @@ module.exports = {
                         value: `${modInfo.denies}`,
                         inline: true,
                     }
-                )
+                );
 
             return await interaction.editReply({
                 embeds: [modInfoEmbed],

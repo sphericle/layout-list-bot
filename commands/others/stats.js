@@ -532,7 +532,9 @@ module.exports = {
                     levelsInVoting.addRow(stat.toJSON())
                 );
                 skippersData.forEach((stat) => skippers.addRow(stat.toJSON()));
-                levelStatsData.forEach((stat) => levelStats.addRow(stat.toJSON()));
+                levelStatsData.forEach((stat) =>
+                    levelStats.addRow(stat.toJSON())
+                );
 
                 await workbook.xlsx.writeFile(filePath);
 

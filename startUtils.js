@@ -170,10 +170,10 @@ module.exports = {
             await db.levelStats.create({
                 submissions: 0,
                 accepts: 0,
-                denies: 0
+                denies: 0,
             });
         }
-        
+
         logger.info("Database sync done");
     },
 

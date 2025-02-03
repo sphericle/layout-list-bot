@@ -4,7 +4,7 @@ const {
     reliableThreadID,
     staffRole,
     submissionsChannelID,
-    clientId
+    clientId,
 } = require("../../config.json");
 const logger = require("log4js").getLogger();
 const Sequelize = require("sequelize");
@@ -348,13 +348,13 @@ module.exports = {
             });
 
             // i hate this so so so much
-            const levelCount = await db.levelStats.findAll()
+            const levelCount = await db.levelStats.findAll();
 
             if (levelCount.length !== 1) {
-                logger.log("Fuck you sequelize!")
+                logger.log("Fuck you sequelize!");
             }
 
-            await levelCount[0].increment("submissions")
+            await levelCount[0].increment("submissions");
 
             return interaction.editReply(
                 ":white_check_mark: All done! Your level will be voted on by the Reliable team.\nYou can use /vote status to see their progress!"
@@ -458,7 +458,11 @@ module.exports = {
                 );
 
             // if you try to share the vote with yourself, the layout list bot, or any other bot
-            if (user === interaction.user.id || user === clientId || member.user.bot) {
+            if (
+                user === interaction.user.id ||
+                user === clientId ||
+                member.user.bot
+            ) {
                 return interaction.editReply(":death: Nice try!");
             }
 

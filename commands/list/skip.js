@@ -35,26 +35,25 @@ module.exports = {
         const { db } = require("../../index.js");
         const focused = interaction.options.getFocused(true);
         const members = interaction.guild.members.cache;
-        let filtered = await members
-            .filter((member) =>
-                member.user.username
-                    .toLowerCase()
-                    .includes(focused.value.toLowerCase())
-            );
-            
-            filtered = await filtered.map(async (member) => {
-                let count = 0;
-                let dbMember = await db.skippers.findOne({
-                    where: {
-                        user: member.id,
-                    },
-                });
-                count = dbMember ? dbMember.count : 0;
-                return {
-                    name: `${member.user.username} (${count}/${maxSkipCount})`,
-                    value: member.id,
-                };
+        let filtered = await members.filter((member) =>
+            member.user.username
+                .toLowerCase()
+                .includes(focused.value.toLowerCase())
+        );
+
+        filtered = await filtered.map(async (member) => {
+            let count = 0;
+            let dbMember = await db.skippers.findOne({
+                where: {
+                    user: member.id,
+                },
             });
+            count = dbMember ? dbMember.count : 0;
+            return {
+                name: `${member.user.username} (${count}/${maxSkipCount})`,
+                value: member.id,
+            };
+        });
         filtered = await Promise.all(filtered);
         return await interaction.respond(
             filtered.slice(0, 25).map((user) => {

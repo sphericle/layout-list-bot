@@ -10,7 +10,7 @@ module.exports = {
         await db.levelStats.update(
             { submissions: 0, accepts: 0, denies: 0 },
             { where: {} }
-        )
+        );
         logger.log("Scheduled - Submissions reset!");
     },
 };
