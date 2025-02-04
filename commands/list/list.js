@@ -645,7 +645,7 @@ module.exports = {
                 );
             }
             await interaction.editReply("Committing...");
-            
+
             let changes = [];
             changes.push({
                 path: githubDataPath + `/${filename}.json`,

@@ -5,7 +5,7 @@ const {
     staffRole,
     submissionsChannelID,
     clientId,
-    debug
+    debug,
 } = require("../../config.json");
 const logger = require("log4js").getLogger();
 const Sequelize = require("sequelize");
@@ -323,7 +323,7 @@ module.exports = {
             );
             await logChannel.send(message);
 
-            if (raw) message += `\nRaw: ${raw}`
+            if (raw) message += `\nRaw: ${raw}`;
 
             const thread = await voteChannel.threads.create({
                 name: `${levelname} 0-0`,
