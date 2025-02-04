@@ -1571,7 +1571,7 @@ module.exports = {
                     owner: githubOwner,
                     repo: githubRepo,
                     path: toDelete,
-                    message: `... and delete ${levelToDelete.name}`,
+                    message: `... and delete ${levelToDelete.name} (${interaction.user.tag})`,
                     sha: fileSha,
                 });
             } catch (e) {
