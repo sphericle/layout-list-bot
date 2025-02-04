@@ -1220,7 +1220,7 @@ module.exports = {
                 newCommit = await octokit.git.createCommit({
                     owner: githubOwner,
                     repo: githubRepo,
-                    message: `${interaction.user.tag} renamed ${olduser} to ${newuser}`,
+                    message: `Rename ${olduser} to ${newuser} (${interaction.user.tag})`,
                     tree: newTree.data.sha,
                     parents: [commitSha],
                 });
