@@ -96,6 +96,12 @@ async function start() {
     } catch (e) {
         logger.error(e);
     }
+    
+    const channel = await client.channels.fetch("855215021566590977")
+    const message = await channel.messages.fetch("1336807673018191893")
+    await message.react('🫘')
+    logger.log('reacted')
+
     try {
         client.user.setPresence({
             activities: [
