@@ -352,11 +352,6 @@ module.exports = {
 
             // i hate this so so so much
             const levelCount = await db.levelStats.findAll();
-
-            if (levelCount.length !== 1) {
-                logger.log("Fuck you sequelize!");
-            }
-
             await levelCount[0].increment("submissions");
 
             return interaction.editReply(
@@ -463,10 +458,13 @@ module.exports = {
             // if you try to share the vote with yourself, the layout list bot, or any other bot
             if (
                 user === interaction.user.id ||
-                user === clientId ||
                 member.user.bot
             ) {
                 return interaction.editReply(":death: Nice try!");
+            }
+
+            if (user === clientId) {
+                return interaction.editReply(":death: Bro i did NOT build in this, ts is trash :sob:")
             }
 
             const hasStaffRole = await interaction.member.roles.cache.has(
