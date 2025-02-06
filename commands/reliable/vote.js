@@ -456,15 +456,14 @@ module.exports = {
                 );
 
             // if you try to share the vote with yourself, the layout list bot, or any other bot
-            if (
-                user === interaction.user.id ||
-                member.user.bot
-            ) {
+            if (user === interaction.user.id || member.user.bot) {
                 return interaction.editReply(":death: Nice try!");
             }
 
             if (user === clientId) {
-                return interaction.editReply(":death: Bro i did NOT build in this, ts is trash :sob:")
+                return interaction.editReply(
+                    ":death: Bro i did NOT build in this, ts is trash :sob:"
+                );
             }
 
             const hasStaffRole = await interaction.member.roles.cache.has(
