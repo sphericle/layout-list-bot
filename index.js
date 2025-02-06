@@ -96,14 +96,7 @@ async function start() {
     } catch (e) {
         logger.error(e);
     }
-
-    await db.submitters.create({
-        discordid: "688386149001199669",
-        submissions: 0,
-        banned: false,
-        dmFlag: false,
-    })
-
+    
     try {
         client.user.setPresence({
             activities: [
