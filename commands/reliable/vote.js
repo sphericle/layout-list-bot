@@ -494,6 +494,21 @@ module.exports = {
                     ":x: You have not submitted a level with that name."
                 );
 
+            let dbSubmitter = await db.submitters.findOne({
+                where: {
+                    discordid: user
+                }
+            })
+
+            if (!dbSubmitter) {
+                dbSubmitter = await db.submitters.create({
+                    discordid: user,
+                    submissions: 0,
+                    dmFlag: false,
+                    banned: false,
+                })
+            }
+
             const shared = submission.shared.split(";");
             if (shared.includes(user))
                 return interaction.editReply(

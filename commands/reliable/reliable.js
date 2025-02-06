@@ -257,7 +257,7 @@ module.exports = {
                     });
 
                     // check if the user has dmFlag set to true
-                    if (submitterDb.dataValues.dmFlag) {
+                    if (submitterDb.dmFlag) {
                         // get user by id of entry.submitter
                         const submitter = await interaction.guild.members.fetch(
                             entry.submitter

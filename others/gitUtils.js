@@ -5,9 +5,6 @@ const logger = require("log4js").getLogger();
 module.exports = {
     async cloneOrPullRepo() {
         const { git } = require("../index");
-
-        logger.info("Git - " + "Updating GitHub repository...");
-
         try {
             const { repoUrl } = require("../config.json");
             const localRepoPath = path.resolve(__dirname, `../data/repo/`);
@@ -19,17 +16,12 @@ module.exports = {
                 );
                 await git.clone(repoUrl, localRepoPath);
             } else {
-                logger.info(
-                    "Git - " +
-                        "Pulling the latest changes from the repository..."
-                );
                 await git.cwd(localRepoPath).pull();
             }
         } catch (error) {
             logger.error("Git - " + `Error updating the repository:\n${error}`);
             return -1;
         }
-        logger.info("Git - " + "Successfully updated the repository");
     },
     async parseLevels(useLegacy) {
         const levels = [];
