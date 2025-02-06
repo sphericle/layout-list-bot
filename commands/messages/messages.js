@@ -12,7 +12,7 @@ const logger = require("log4js").getLogger();
 
 module.exports = {
     cooldown: 5,
-    enabled: false,
+    enabled: true,
     data: new SlashCommandBuilder()
         .setName("message")
         .setDescription("Bot messages management")
@@ -207,7 +207,7 @@ module.exports = {
                         components: [],
                     });
                 }
-            } catch (e) {
+            } catch {
                 await submittedModal.editReply({
                     content:
                         ":x: Confirmation not received within 1 minute, cancelling",
@@ -341,7 +341,7 @@ module.exports = {
                         components: [],
                     });
                 }
-            } catch (error) {
+            } catch {
                 await editSubmittedModal.editReply({
                     content:
                         ":x: Confirmation not received within 1 minute, cancelling",
