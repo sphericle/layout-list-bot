@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 const { guildId, debug } = require("../../config.json");
 const logger = require("log4js").getLogger();
+const updateLevels = require("../../scheduled/updateLevels.js")
 
 module.exports = {
     enabled: true,
@@ -56,6 +57,11 @@ module.exports = {
             subcommand
                 .setName("stats")
                 .setDescription("Display monthly stats for list submissions.")
+        )
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName("sync")
+                .setDescription("Manually update the data for submitted levels")
         ),
     async autocomplete(interaction) {
         const focused = interaction.options.getFocused(true);
@@ -271,6 +277,9 @@ module.exports = {
             return await interaction.editReply({
                 embeds: [modInfoEmbed],
             });
+        } else if (interaction.options.getSubcommand() === "sync") {
+            await updateLevels.execute()
+            return await interaction.editReply(":white_check_mark:")
         }
     },
 };
