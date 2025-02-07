@@ -496,9 +496,9 @@ module.exports = {
 
             let dbSubmitter = await db.submitters.findOne({
                 where: {
-                    discordid: user
-                }
-            })
+                    discordid: user,
+                },
+            });
 
             if (!dbSubmitter) {
                 dbSubmitter = await db.submitters.create({
@@ -506,7 +506,7 @@ module.exports = {
                     submissions: 0,
                     dmFlag: false,
                     banned: false,
-                })
+                });
             }
 
             const shared = submission.shared.split(";");

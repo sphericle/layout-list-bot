@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 const { guildId, debug } = require("../../config.json");
 const logger = require("log4js").getLogger();
-const updateLevels = require("../../scheduled/updateLevels.js")
+const updateLevels = require("../../scheduled/updateLevels.js");
 
 module.exports = {
     enabled: true,
@@ -278,8 +278,8 @@ module.exports = {
                 embeds: [modInfoEmbed],
             });
         } else if (interaction.options.getSubcommand() === "sync") {
-            await updateLevels.execute()
-            return await interaction.editReply(":white_check_mark:")
+            await updateLevels.execute();
+            return await interaction.editReply(":white_check_mark:");
         }
     },
 };

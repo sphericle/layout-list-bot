@@ -96,7 +96,7 @@ async function start() {
     } catch (e) {
         logger.error(e);
     }
-    
+
     try {
         client.user.setPresence({
             activities: [
