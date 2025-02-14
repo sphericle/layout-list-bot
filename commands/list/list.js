@@ -49,7 +49,7 @@ module.exports = {
                             { name: "Extreme", value: 6 },
                             { name: "Supreme", value: 7 },
                             { name: "Ethereal", value: 8 },
-                            { name: "Lengendary", value: 9 },
+                            { name: "Legendary", value: 9 },
                             { name: "Silent", value: 10 },
                             { name: "Impossible", value: 11 }
                         )
@@ -184,7 +184,7 @@ module.exports = {
                             { name: "Extreme", value: 6 },
                             { name: "Supreme", value: 7 },
                             { name: "Ethereal", value: 8 },
-                            { name: "Lengendary", value: 9 },
+                            { name: "Legendary", value: 9 },
                             { name: "Silent", value: 10 },
                             { name: "Impossible", value: 11 }
                         )

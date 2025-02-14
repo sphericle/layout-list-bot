@@ -28,11 +28,7 @@ module.exports = {
                             { name: "Insane", value: 4 },
                             { name: "Mythical", value: 5 },
                             { name: "Extreme", value: 6 },
-                            { name: "Supreme", value: 7 },
-                            { name: "Ethereal", value: 8 },
-                            { name: "Lengendary", value: 9 },
-                            { name: "Silent", value: 10 },
-                            { name: "Impossible", value: 11 }
+                            { name: "Legendary", value: 7 },
                         )
                         .setDescription(
                             "The tier the level is in (1-10, see the list website for details)"
@@ -116,11 +112,7 @@ module.exports = {
                             { name: "Insane", value: 4 },
                             { name: "Mythical", value: 5 },
                             { name: "Extreme", value: 6 },
-                            { name: "Supreme", value: 7 },
-                            { name: "Ethereal", value: 8 },
-                            { name: "Lengendary", value: 9 },
-                            { name: "Silent", value: 10 },
-                            { name: "Impossible", value: 11 }
+                            { name: "Legendary", value: 7 },
                         )
                         .setDescription(
                             "The tier the level is in (1-10, see the list website for details)"
@@ -439,10 +431,6 @@ module.exports = {
             const newName = interaction.options.getString("newname") || null;
             const newDifficulty =
                 interaction.options.getInteger("difficulty") || null;
-
-            if (newDifficulty === -1) {
-                newDifficulty = null;
-            }
 
             // fetch github data path / _packs.json
             let fileResponse;
