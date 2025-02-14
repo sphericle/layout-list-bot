@@ -13,9 +13,9 @@
     "license": "ISC",
     "dependencies": {
         "@napi-rs/canvas": "^0.1.67",
-        "@octokit/rest": "^20.0.2",
+        "@octokit/rest": "^21.1.0",
         "chartjs-node-canvas": "^4.1.6",
-        "discord.js": "^14.17.3",
+        "discord.js": "^14.18.0",
         "dotenv": "^16.4.7",
         "exceljs": "^4.4.0",
         "is-url-http": "^2.3.8",
