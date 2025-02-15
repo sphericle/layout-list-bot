@@ -32,6 +32,7 @@ module.exports = {
                 )
         ),
     async autocomplete(interaction) {
+        // TODO: use less db queries
         const { db } = require("../../index.js");
         const focused = interaction.options.getFocused(true);
         const members = interaction.guild.members.cache;
@@ -52,9 +53,13 @@ module.exports = {
             return {
                 name: `${member.user.username} (${count}/${maxSkipCount})`,
                 value: member.id,
+                count: count
             };
         });
         filtered = await Promise.all(filtered);
+
+        filtered = await filtered.sort((a, b) => b.count - a.count)
+        
         return await interaction.respond(
             filtered.slice(0, 25).map((user) => {
                 return { name: user.name, value: user.value };
