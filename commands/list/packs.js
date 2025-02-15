@@ -28,7 +28,7 @@ module.exports = {
                             { name: "Insane", value: 4 },
                             { name: "Mythical", value: 5 },
                             { name: "Extreme", value: 6 },
-                            { name: "Legendary", value: 7 },
+                            { name: "Legendary", value: 7 }
                         )
                         .setDescription(
                             "The tier the level is in (1-10, see the list website for details)"
@@ -112,7 +112,7 @@ module.exports = {
                             { name: "Insane", value: 4 },
                             { name: "Mythical", value: 5 },
                             { name: "Extreme", value: 6 },
-                            { name: "Legendary", value: 7 },
+                            { name: "Legendary", value: 7 }
                         )
                         .setDescription(
                             "The tier the level is in (1-10, see the list website for details)"
