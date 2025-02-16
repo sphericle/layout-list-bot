@@ -11,9 +11,9 @@ module.exports = {
 
         const embed = new EmbedBuilder()
             .setColor(0x34c3eb)
-            .setTitle("No skipping!")
-            .setDescription("Make sure everyone has gotten feedback before you post. Skipping 3 times = ban from feedback channels.")
-            .setFooter({ text: "This message is automatically sent every hour." });
+            .setTitle("Scheduled reminder")
+            .setDescription("No skipping please! Make sure everyone has gotten feedback before you post. Skipping 3 times = ban from feedback channels.")
+            .setFooter({ text: "This message is automatically sent every 4 hours." });
 
         for (const channelID of feedbackChannels) {
             const channel = await client.channels.cache.get(channelID);
