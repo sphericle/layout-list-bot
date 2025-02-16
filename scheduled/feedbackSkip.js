@@ -1,9 +1,10 @@
 const { EmbedBuilder } = require("discord.js");
 const { feedbackChannels, clientId } = require("../config.json");
+const hours = 4
 
 module.exports = {
     name: "feedbackSkip",
-    cron: "0 * * * *",
+    cron: `0 */${hours} * * *`,
     enabled: true,
     async execute() {
         const { client } = require("../index.js");
