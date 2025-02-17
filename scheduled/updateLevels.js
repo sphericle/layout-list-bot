@@ -9,13 +9,13 @@ module.exports = {
         const { db, client } = require("../index.js");
 
         let list = await db.levelsInVoting.findAll();
-        logger.log(list)
         list = list.map((level) => (level = level.discordid));
 
         const guild = client.guilds.cache.get(guildId);
 
         for (const channelID of list) {
             const channel = await guild.channels.cache.get(channelID);
+
             if (!channel) {
                 // discord channel must not exist anymore, so
                 // delete it from the database...
@@ -27,6 +27,7 @@ module.exports = {
                 })
                 continue;
             }
+            
             const text = channel.name;
             const matchLevelName = text.match(/^(.*)\s\d+-\d+$/);
             const matchYes = text.match(/(\d+)-\d+$/);
