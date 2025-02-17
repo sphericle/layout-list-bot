@@ -1,4 +1,5 @@
 const { guildId } = require("../config.json");
+const logger = require("log4js").getLogger()
 
 module.exports = {
     name: "updateLevels",
@@ -13,7 +14,8 @@ module.exports = {
         const guild = client.guilds.cache.get(guildId);
 
         for (const channelID of list) {
-            const channel = guild.channels.cache.get(channelID);
+            const channel = await guild.channels.cache.get(channelID);
+            logger.log(channel)
             const text = channel.name;
             const matchLevelName = text.match(/^(.*)\s\d+-\d+$/);
             const matchYes = text.match(/(\d+)-\d+$/);
