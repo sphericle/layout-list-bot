@@ -229,6 +229,14 @@ module.exports = {
                 defaultValue: null,
             },
         });
+
+        db.feedbackMsg = sequelize.define("feedbackMsg", {
+            feedbackId: {
+                type: Sequelize.STRING,
+                unique: true
+            },
+            messageId: Sequelize.STRING,
+        })
         return db;
     },
 
