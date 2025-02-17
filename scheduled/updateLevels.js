@@ -9,6 +9,7 @@ module.exports = {
         const { db, client } = require("../index.js");
 
         let list = await db.levelsInVoting.findAll();
+        logger.log(list)
         list = list.map((level) => (level = level.discordid));
 
         const guild = client.guilds.cache.get(guildId);
