@@ -97,16 +97,6 @@ async function start() {
         logger.error(e);
     }
 
-    await db.feedbackMsg.create({
-        feedbackId: "897605988704723006",
-        messageId: "1340835107551838230"
-    })
-    
-    await db.feedbackMsg.create({
-        feedbackId: "1326653010851397632",
-        messageId: "1340820009508933732"
-    })
-
     try {
         client.user.setPresence({
             activities: [
