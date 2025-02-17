@@ -16,7 +16,17 @@ module.exports = {
 
         for (const channelID of list) {
             const channel = await guild.channels.cache.get(channelID);
-            logger.log(channel)
+            if (!channel) {
+                // discord channel must not exist anymore, so
+                // delete it from the database...
+                logger.warn(`Deleting reliable entry with ID ${channelID}`)
+                await db.levelsInVoting.destroy({
+                    where: {
+                        discordid: channelID
+                    }
+                })
+                continue;
+            }
             const text = channel.name;
             const matchLevelName = text.match(/^(.*)\s\d+-\d+$/);
             const matchYes = text.match(/(\d+)-\d+$/);
