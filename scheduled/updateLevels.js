@@ -1,5 +1,5 @@
 const { guildId } = require("../config.json");
-const logger = require("log4js").getLogger()
+const logger = require("log4js").getLogger();
 
 module.exports = {
     name: "updateLevels",
@@ -19,15 +19,15 @@ module.exports = {
             if (!channel) {
                 // discord channel must not exist anymore, so
                 // delete it from the database...
-                logger.warn(`Deleting reliable entry with ID ${channelID}`)
+                logger.warn(`Deleting reliable entry with ID ${channelID}`);
                 await db.levelsInVoting.destroy({
                     where: {
-                        discordid: channelID
-                    }
-                })
+                        discordid: channelID,
+                    },
+                });
                 continue;
             }
-            
+
             const text = channel.name;
             const matchLevelName = text.match(/^(.*)\s\d+-\d+$/);
             const matchYes = text.match(/(\d+)-\d+$/);
