@@ -40,7 +40,6 @@ module.exports = {
                 { messageId: sentMessage.id },
                 { where: { feedbackID: dbMessage.feedbackId } }
             );
-            await sentMessage.react("🤓");
         }
     },
 };
