@@ -49,6 +49,11 @@ module.exports = {
             subcommand
                 .setName("pause")
                 .setDescription("Set a level's status to paused")
+        )
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName("reset")
+                .setDescription("Reset a level's votes to 0-0")    
         ),
     async autocomplete(interaction) {
         const focusedOption = interaction.options.getFocused();
@@ -463,6 +468,74 @@ module.exports = {
                             ? `unpaused. `
                             : `paused. Please DM a mod for more info!`) +
                         `\n-# _To disable these messages, use the \`/vote dm\` command._`
+                );
+            }
+        } else if (interaction.options.getSubcommand() === "reset") {
+            const { db } = require("../../index.js");
+            // if the current channel is not a thread
+            if (!interaction.channel.isThread()) {
+                return await interaction.editReply(
+                    "Bro lock in this isnt a reliable thread"
+                );
+            }
+
+            const dbEntry = await db.levelsInVoting.findOne({
+                where: { discordid: interaction.channel.id },
+            });
+
+            if (!dbEntry)
+                return await interaction.editReply(
+                    ":x: Couldn't find the level in the database!"
+                );
+
+            await interaction.editReply({
+                content: "Changing thread name, this could take a while...",
+                flags: MessageFlags.Ephemeral,
+            });
+
+            const message = await interaction.channel.send(
+                `The vote has been reset to 0-0.`
+            );
+
+            await interaction.channel.setName(
+                `${dbEntry.levelname} 0-0`
+            ); // Set the channel name to the same thing but with the added pause
+
+            await message.delete();
+
+            // update entry in db
+            await db.levelsInVoting.update(
+                { yeses: 0, nos: 0 },
+                { where: { discordid: interaction.channel.id } }
+            );
+
+            await interaction.editReply(
+                "The vote has been reset to 0-0!"
+            );
+
+            const entry = dbEntry.dataValues;
+
+            let shared = entry.shared.split(";");
+            shared.pop();
+
+            for (const user of shared) {
+                const submitterDb = await db.submitters.findOne({
+                    where: {
+                        discordid: Sequelize.where(
+                            Sequelize.fn("LOWER", Sequelize.col("discordid")),
+                            "LIKE",
+                            "%" + user + "%"
+                        ),
+                    },
+                });
+
+                if (!submitterDb.dmFlag) continue;
+                // get user by id of entry.submitter
+                const submitter = await interaction.guild.members.fetch(
+                    entry.submitter
+                );
+                await submitter.send(
+                    `The vote for the level _${dbEntry.levelname}_ has been reset to 0-0.\n-# _To disable these messages, use the \`/vote dm\` command._`
                 );
             }
         }
