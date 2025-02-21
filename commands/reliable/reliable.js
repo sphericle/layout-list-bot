@@ -53,7 +53,7 @@ module.exports = {
         .addSubcommand((subcommand) =>
             subcommand
                 .setName("reset")
-                .setDescription("Reset a level's votes to 0-0")    
+                .setDescription("Reset a level's votes to 0-0")
         ),
     async autocomplete(interaction) {
         const focusedOption = interaction.options.getFocused();
@@ -497,9 +497,7 @@ module.exports = {
                 `The vote has been reset to 0-0.`
             );
 
-            await interaction.channel.setName(
-                `${dbEntry.levelname} 0-0`
-            ); // Set the channel name to the same thing but with the added pause
+            await interaction.channel.setName(`${dbEntry.levelname} 0-0`); // Set the channel name to the same thing but with the added pause
 
             await message.delete();
 
@@ -509,9 +507,7 @@ module.exports = {
                 { where: { discordid: interaction.channel.id } }
             );
 
-            await interaction.editReply(
-                "The vote has been reset to 0-0!"
-            );
+            await interaction.editReply("The vote has been reset to 0-0!");
 
             const entry = dbEntry.dataValues;
 
