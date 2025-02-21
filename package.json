@@ -22,7 +22,7 @@
         "log-timestamp": "^0.3.0",
         "log4js": "^6.9.1",
         "node-cron": "^3.0.3",
-        "prettier": "^3.5.0",
+        "prettier": "^3.5.1",
         "sequelize": "^6.35.0",
         "simple-git": "^3.27.0",
         "sqlite3": "^5.1.7"
