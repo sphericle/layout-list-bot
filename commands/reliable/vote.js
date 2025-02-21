@@ -6,7 +6,6 @@ const {
     submissionsChannelID,
     clientId,
     debug,
-    submissionRole,
 } = require("../../config.json");
 const logger = require("log4js").getLogger();
 const Sequelize = require("sequelize");
@@ -242,17 +241,6 @@ module.exports = {
         const subcommand = interaction.options.getSubcommand();
 
         if (subcommand === "submit") {
-
-            const hasPerms = interaction.member.roles.cache.has(submissionRole) ||
-                interaction.member.roles.cache.some((role) => role.name.toLowerCase().startsWith("level"));
-
-            if (!hasPerms) {
-                const arcanePing = "<@437808476106784770>";
-            
-                return await interaction.editReply(
-                    `:x: You do not have permission to submit levels! Chat in the server for a bit and reach Level 2 (\`/rank\` with ${arcanePing}).`
-                );
-            }
             const { db } = require("../../index.js");
 
             const levelname = interaction.options.getString("levelname");
