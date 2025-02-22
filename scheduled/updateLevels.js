@@ -21,7 +21,7 @@ module.exports = {
             if (!channel) {
                 // discord channel must not exist anymore, so
                 // delete it from the database...
-                logger.warn(`Deleting reliable entry with ID ${channelID}`);
+                logger.warn(`Scheduled - Deleting reliable entry with ID ${channelID}`);
                 await db.levelsInVoting.destroy({
                     where: {
                         discordid: channelID,
@@ -31,10 +31,15 @@ module.exports = {
             }
 
             const text = channel.name;
-            if (manual) logger.info(`Scheduled: Processing channel: ${text}`)
+            if (manual) logger.info(`Scheduled - Processing channel ${text}`)
             const matchLevelName = text.match(/^(.*)\s\d+-\d+$/);
             const matchYes = text.match(/(\d+)-\d+$/);
             const matchNo = text.match(/\d+-(\d+)$/);
+
+            if (!matchYes || !matchNo) {
+                logger.error(`Scheduled - Error processing thread ${text}, skipping...`);
+                continue;
+            }
 
             await db.levelsInVoting.update(
                 {
