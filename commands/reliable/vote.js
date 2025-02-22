@@ -242,7 +242,6 @@ module.exports = {
         const subcommand = interaction.options.getSubcommand();
 
         if (subcommand === "submit") {
-            
             const { db } = require("../../index.js");
 
             const levelname = interaction.options.getString("levelname");
@@ -264,10 +263,11 @@ module.exports = {
                     ":x: that is NOT an enjoyment!!!! (1-10)."
                 );
 
-            const hasPerms = await interaction.member.roles.cache.has(submissionRole) ||
-                await interaction.member.roles.cache.some((role) => role.name.toLowerCase().startsWith("level"));
-
-            
+            const hasPerms =
+                (await interaction.member.roles.cache.has(submissionRole)) ||
+                (await interaction.member.roles.cache.some((role) =>
+                    role.name.toLowerCase().startsWith("level")
+                ));
 
             // get the submitter from the db
             let user;
@@ -283,7 +283,7 @@ module.exports = {
                     // if this user is not allowed to submit a level
                     if (!hasPerms) {
                         const arcanePing = "<@437808476106784770>";
-                    
+
                         return await interaction.editReply(
                             `:x: You do not have permission to submit levels! Chat in the server for a bit and reach Level 2 (\`/rank\` with ${arcanePing}).`
                         );

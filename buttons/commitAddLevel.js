@@ -266,11 +266,12 @@ module.exports = {
                         ? await interaction.client.guilds.fetch(staffGuildId)
                         : guild;
 
-                    const announcementMsg = await staffGuild.channels.cache.get(changelogID).send({
-                        embeds: [publicEmbed],
-                    });
+                    const announcementMsg = await staffGuild.channels.cache
+                        .get(changelogID)
+                        .send({
+                            embeds: [publicEmbed],
+                        });
                     await announcementMsg.crosspost();
-
                 }
             } catch (changelogErr) {
                 logger.info(
