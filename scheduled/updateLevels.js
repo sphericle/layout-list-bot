@@ -6,6 +6,7 @@ module.exports = {
     cron: "0 0 */6 * * *",
     enabled: true,
     async execute(manual) {
+        logger.log(manual)
         const { db, client } = require("../index.js");
         if (manual) logger.trace("Scheduled - Updating vote database...")
 
