@@ -117,9 +117,7 @@ module.exports = {
 
                 // pin the message
                 if (voteMessage)
-                    await voteMessage.pin(
-                        `Vote added by ${interaction.user.username}`
-                    );
+                    await voteMessage.pin();
 
                 const message = await interaction.channel.send(
                     `The vote is now at **${dbEntry.yeses + 1}-${
@@ -128,7 +126,8 @@ module.exports = {
                 );
 
                 await interaction.channel.setName(
-                    `${dbEntry.levelname} ${dbEntry.yeses + 1}-${dbEntry.nos}`
+                    `${dbEntry.levelname} ${dbEntry.yeses + 1}-${dbEntry.nos}`,
+                    `Vote added by ${interaction.user.username}`
                 ); // Set the channel name to the same thing but with the added yes
 
                 await message.delete();
@@ -227,7 +226,8 @@ module.exports = {
                 );
 
                 await interaction.channel.setName(
-                    `${dbEntry.levelname} ${dbEntry.yeses}-${dbEntry.nos + 1}`
+                    `${dbEntry.levelname} ${dbEntry.yeses}-${dbEntry.nos + 1}`,
+                    `Vote added by ${interaction.user.username}`
                 ); // Set the channel name to the same thing but with the added no
 
                 await message.delete();
@@ -365,7 +365,8 @@ module.exports = {
             await interaction.channel.setName(
                 `${submission.levelname} (${
                     command === "accept" ? "ACCEPTED" : "REJECTED"
-                })`
+                })`,
+                `Accepted by ${interaction.user.username}`
             ); // Set the channel name to the same thing but with the added yes
 
             await message.delete();
@@ -425,7 +426,8 @@ module.exports = {
                 `${dbEntry.levelname} ` +
                     (dbEntry.paused
                         ? `${dbEntry.yeses}-${dbEntry.nos}`
-                        : `(PAUSED)`)
+                        : `(PAUSED)`),
+                `Paused by ${interaction.user.username}`
             ); // Set the channel name to the same thing but with pause
 
             await message.delete();
@@ -497,7 +499,10 @@ module.exports = {
                 `The vote has been reset to 0-0.`
             );
 
-            await interaction.channel.setName(`${dbEntry.levelname} 0-0`); // Set the channel name to the same thing but with the added pause
+            await interaction.channel.setName(
+                `${dbEntry.levelname} 0-0`,
+                `Reset by ${interaction.user.username}`
+            ); // Set the channel name to the same thing but with the added pause
 
             await message.delete();
 
