@@ -2,8 +2,8 @@ node_modules
 data
 logs
 .env
-.env.debug
-.env.real
+.env.dev
+.env.prod
 .DS_Store
 config.json
 *.code-workspace
