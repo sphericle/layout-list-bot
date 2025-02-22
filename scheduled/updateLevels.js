@@ -5,8 +5,9 @@ module.exports = {
     name: "updateLevels",
     cron: "0 0 */6 * * *",
     enabled: true,
-    async execute() {
+    async execute(manual) {
         const { db, client } = require("../index.js");
+        if (manual) logger.trace("Scheduled - Updating vote database...")
 
         let list = await db.levelsInVoting.findAll();
         list = list.map((level) => (level = level.discordid));
@@ -29,6 +30,7 @@ module.exports = {
             }
 
             const text = channel.name;
+            if (manual) logger.trace(`Scheduled: Processing channel: ${text}`)
             const matchLevelName = text.match(/^(.*)\s\d+-\d+$/);
             const matchYes = text.match(/(\d+)-\d+$/);
             const matchNo = text.match(/\d+-(\d+)$/);

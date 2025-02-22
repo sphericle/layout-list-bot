@@ -278,7 +278,7 @@ module.exports = {
                 embeds: [modInfoEmbed],
             });
         } else if (interaction.options.getSubcommand() === "sync") {
-            await updateLevels.execute();
+            await updateLevels.execute(true);
             return await interaction.editReply(":white_check_mark:");
         }
     },
