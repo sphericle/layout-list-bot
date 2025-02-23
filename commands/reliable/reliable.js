@@ -116,8 +116,7 @@ module.exports = {
                 );
 
                 // pin the message
-                if (voteMessage)
-                    await voteMessage.pin();
+                if (voteMessage) await voteMessage.pin();
 
                 const message = await interaction.channel.send(
                     `The vote is now at **${dbEntry.yeses + 1}-${
