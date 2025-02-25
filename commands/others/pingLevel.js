@@ -22,7 +22,7 @@ module.exports = {
             return;
         } else {
             await interaction.reply(
-                `Not found... try **removing any "art" in the level, or other areas with many blocks.** The GD servers automatically detect levels with images added using mods, but they're not very good at it! Blame robtop!`
+                `Not found... try **removing any "art" in the level, or other areas with many objects in one place.** The GD servers automatically detect levels with images added using mods, but they're not very good at it! Blame robtop!`
             );
             return;
         }
