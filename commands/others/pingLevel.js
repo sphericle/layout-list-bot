@@ -1,18 +1,18 @@
-const { SlashCommandBuilder } = require("discord.js")
+const { SlashCommandBuilder } = require("discord.js");
 
 module.exports = {
     enabled: true,
     data: new SlashCommandBuilder()
         .setName("checklevel")
-        .setDescription("Command to check whether a GD level has been delisted automatically")
+        .setDescription(
+            "Command to check whether a GD level has been delisted automatically"
+        )
         .addStringOption((option) =>
-            option
-                .setName("id")
-                .setDescription("The level ID to check")
+            option.setName("id").setDescription("The level ID to check")
         ),
     async execute(interaction) {
-        const lvlId = interaction.options.getString('id');
-        const url = `https://gdbrowser.com/api/level/${lvlId}`
+        const lvlId = interaction.options.getString("id");
+        const url = `https://gdbrowser.com/api/level/${lvlId}`;
 
         const req = await fetch(url);
         if (req.ok) {
