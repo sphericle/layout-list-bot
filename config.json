@@ -1,5 +1,5 @@
 {
-    "debug": true,
+    "debug": false,
 
     "enableSeparateStaffServer": false,
     "enableShifts": false,
@@ -12,42 +12,42 @@
     "scheduleCacheUpdate": "30 * * * *",
     "scheduleChangelog": "00 22 * * *",
 
-    "githubOwner": "sphericle",
-    "githubRepo": "ll-bot-test",
+    "githubOwner": "layout-list",
+    "githubRepo": "layout-list",
     "githubDataPath": "data",
     "githubBranch": "main",
 
-    "clientId": "1320769215216619601",
-    "guildId": "1308195426410954884",
-    "staffGuildId": "1308195426410954884",
+    "clientId": "1315066782213738597",
+    "guildId": "855211848362098699",
+    "staffGuildId": "1212116091451609088",
 
-    "priorityRoleID": "0",
-    "submissionLockRoleID": "0",
+    "priorityRoleID": "1129273868759089242",
+    "submissionLockRoleID": "1115681352772235274",
 
-    "pendingRecordsID": "1324848672147771533",
-    "priorityRecordsID": "1324848672147771533",
+    "pendingRecordsID": "988671478096609290",
+    "priorityRecordsID": "988671478096609290",
 
     "acceptedRecordsID": "0",
     "deniedRecordsID": "0",
-    "archiveRecordsID": "1324848672147771533",
-    "recordsID": "1324848672147771533",
+    "archiveRecordsID": "859514927860416562",
+    "recordsID": "859514927860416562",
 
-    "changelogID": "1324848672147771533",
+    "changelogID": "855212332047925328",
     "changelogRoleID": "0",
 
-    "guildMemberAddID": "1324848672147771533",
+    "guildMemberAddID": "1178399916125597716",
 
     "shiftsReminderID": "1212119449994526801",
     "shiftsLogsID": "1219796853822849084",
     "recordsPerWeek": 60,
 
-    "submissionResultsID": "1324848672147771533",
-    "reliableThreadID": "1324848402500026428",
-    "staffRole": "1320770731985866803",
-    "submissionsChannelID": "1328535145455812660",
-    "submissionRole": "1342609332872675388",
+    "submissionResultsID": "884614851790524436",
+    "reliableThreadID": "1130258968057487421",
+    "staffRole": "855237332616740895",
+    "submissionsChannelID": "855228426208935936",
+    "submissionRole": "956765961036390421",
 
-    "feedbackChannels": ["1328535145455812660", "1324848639394320464"],
-    "feedbackBanID": "1327481553567223919",
+    "feedbackChannels": ["897605988704723006", "1326653010851397632"],
+    "feedbackBanID": "1326656060303474808",
     "maxSkipCount": 3
 }
