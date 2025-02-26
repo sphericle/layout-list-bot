@@ -85,6 +85,26 @@ module.exports = {
             } catch (error) {
                 logger.error(error);
             }
+        } else if (interaction.isContextMenuCommand()) {
+            await interaction.deferReply({
+                ephemeral: true,
+            });
+            const command = interaction.client.commands.get(
+                interaction.commandName
+            );
+
+            if (!command) {
+                logger.error(
+                    `No command matching ${interaction.commandName} was found.`
+                );
+                return;
+            }
+
+            try {
+                await command.execute(interaction);
+            } catch (error) {
+                logger.error(error);
+            }
         } else if (interaction.isButton()) {
             // Handle button interactions //
             const button = interaction.client.buttons.get(interaction.customId);
