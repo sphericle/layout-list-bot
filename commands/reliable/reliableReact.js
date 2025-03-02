@@ -14,7 +14,7 @@ module.exports = {
         const message = await interaction.channel.messages.fetch(
             interaction.targetId
         );
-    
+
         await message.react("⬆️");
         await message.react("👍");
         await message.react("⬇️");
