@@ -100,13 +100,12 @@ module.exports = {
                             "Your enjoyment rating on this level (1-10)"
                         )
                 )
-                .addStringOption((option) =>
+                .addUserOption((option) =>
                     option
                         .setName("discord")
                         .setDescription(
                             "The person to ping in the records channel"
                         )
-                        .setAutocomplete(true)
                 )
                 .addStringOption((option) =>
                     option
@@ -370,25 +369,6 @@ module.exports = {
                     .slice(0, 25)
                     .map((user) => ({ name: user.name, value: user.name }))
             );
-        } else if (focused.name === "discord") {
-            const members = interaction.guild.members.cache;
-            const filtered = members
-                .filter((member) =>
-                    member.user.username
-                        .toLowerCase()
-                        .includes(focused.value.toLowerCase())
-                )
-                .map((member) => {
-                    return {
-                        name: member.user.username,
-                        value: member.id,
-                    };
-                });
-            return await interaction.respond(
-                filtered.slice(0, 25).map((user) => {
-                    return { name: user.name, value: user.value };
-                })
-            );
         }
     },
     async execute(interaction) {
@@ -409,9 +389,9 @@ module.exports = {
             const linkStr = interaction.options.getString("completionlink");
             const note = interaction.options.getString("notes");
             const rawStr = interaction.options.getString("raw");
-            const userToPing = interaction.options.getString("discord");
+            const userToPing = await interaction.options.getUser("discord");
 
-            if (userToPing && isNaN(parseInt(userToPing))) {
+            if (!userToPing) {
                 return await interaction.editReply(
                     ":x: The provided user is invalid, make sure you pick a suggested option!"
                 );
@@ -826,7 +806,7 @@ module.exports = {
 
             // staffGuild.channels.cache.get(acceptedRecordsID).send({ content: '', embeds: [acceptEmbed], components: [row] });
             staffGuild.channels.cache.get(archiveRecordsID).send({
-                content: userToPing ? `<@${userToPing}>` : "",
+                content: userToPing ? `<@${userToPing.id}>` : "",
                 embeds: [publicEmbed],
             });
 

@@ -160,13 +160,12 @@ module.exports = {
                         .setAutocomplete(true)
                         .setRequired(true)
                 )
-                .addStringOption((option) =>
+                .addUserOption((option) =>
                     option
                         .setName("user")
                         .setDescription(
                             "The user you want to share the level's vote with"
                         )
-                        .setAutocomplete(true)
                         .setRequired(true)
                 )
         ),
@@ -200,25 +199,6 @@ module.exports = {
                         name: lvl.levelname,
                         value: `${lvl.discordid}`,
                     }))
-            );
-        } else if (focused.name === "user") {
-            const members = interaction.guild.members.cache;
-            const filtered = members
-                .filter((member) =>
-                    member.user.username
-                        .toLowerCase()
-                        .includes(focused.value.toLowerCase())
-                )
-                .map((member) => {
-                    return {
-                        name: member.user.username,
-                        value: member.id,
-                    };
-                });
-            return await interaction.respond(
-                filtered.slice(0, 25).map((user) => {
-                    return { name: user.name, value: user.value };
-                })
             );
         } else if (focused.name === "verifier") {
             let users = await cache.users.findAll({
@@ -465,22 +445,14 @@ module.exports = {
         } else if (subcommand === "share") {
             const { db } = require("../../index.js");
             const level = await interaction.options.getString("levelname");
-            const user = await interaction.options.getString("user");
-
-            // lookup user in server
-            const guild = await interaction.client.guilds.fetch(guildId);
-            const member = await guild.members.fetch(user);
-            if (!member)
-                return interaction.editReply(
-                    ":x: Couldn't find that user in this server!."
-                );
+            const user = await interaction.options.getUser("user");
 
             // if you try to share the vote with yourself, the layout list bot, or any other bot
-            if (user === interaction.user.id || member.user.bot) {
+            if (user.id === interaction.user.id || user.bot) {
                 return interaction.editReply(":death: Nice try!");
             }
 
-            if (user === clientId) {
+            if (user.id === clientId) {
                 return interaction.editReply(
                     ":death: Bro i did NOT build in this, ts is trash :sob:"
                 );
@@ -516,13 +488,13 @@ module.exports = {
 
             let dbSubmitter = await db.submitters.findOne({
                 where: {
-                    discordid: user,
+                    discordid: user.id,
                 },
             });
 
             if (!dbSubmitter) {
                 dbSubmitter = await db.submitters.create({
-                    discordid: user,
+                    discordid: user.id,
                     submissions: 0,
                     dmFlag: false,
                     banned: false,
@@ -530,14 +502,14 @@ module.exports = {
             }
 
             const shared = submission.shared.split(";");
-            if (shared.includes(user))
+            if (shared.includes(user.id))
                 return interaction.editReply(
                     ":x: That user already has access to this level!"
                 );
 
             await db.levelsInVoting.update(
                 {
-                    shared: `${submission.shared}${user};`,
+                    shared: `${submission.shared}${user.id};`,
                 },
                 {
                     where: {
@@ -547,7 +519,7 @@ module.exports = {
             );
 
             return interaction.editReply(
-                `Shared _${submission.levelname}_ with ${member.user.username}!`
+                `Shared _${submission.levelname}_ with ${user.username}!`
             );
         }
     },

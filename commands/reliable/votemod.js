@@ -22,11 +22,10 @@ module.exports = {
             subcommand
                 .setName("ban")
                 .setDescription("Submission ban a user")
-                .addStringOption((option) =>
+                .addUserOption((option) =>
                     option
                         .setName("submitter")
                         .setDescription("The user to ban from submitting")
-                        .setAutocomplete(true)
                         .setRequired(true)
                 )
                 .addIntegerOption((option) =>
@@ -45,12 +44,11 @@ module.exports = {
                 .setDescription(
                     "Start a new voting (debug, for if this thread wasn't created by the bot)"
                 )
-                .addStringOption((option) =>
+                .addUserOption((option) =>
                     option
                         .setName("submitter")
                         .setDescription("The name of the user to insert")
                         .setRequired(true)
-                        .setAutocomplete(true)
                 )
         )
         .addSubcommand((subcommand) =>
@@ -63,34 +61,6 @@ module.exports = {
                 .setName("sync")
                 .setDescription("Manually update the data for submitted levels")
         ),
-    async autocomplete(interaction) {
-        const focused = interaction.options.getFocused(true);
-        const subcommand = interaction.options.getSubcommand();
-        if (
-            subcommand === "submitban" ||
-            subcommand === "setsubmissions" ||
-            subcommand === "insert"
-        ) {
-            const members = interaction.guild.members.cache;
-            const filtered = members
-                .filter((member) =>
-                    member.user.username
-                        .toLowerCase()
-                        .includes(focused.value.toLowerCase())
-                )
-                .map((member) => {
-                    return {
-                        name: member.user.username,
-                        value: member.id,
-                    };
-                });
-            return await interaction.respond(
-                filtered.slice(0, 25).map((user) => {
-                    return { name: user.name, value: user.value };
-                })
-            );
-        }
-    },
     async execute(interaction) {
         await interaction.deferReply({ ephemeral: true });
 
@@ -136,17 +106,17 @@ module.exports = {
 
             const text = await interaction.channel.name;
             const matchLevelName = text.match(/^(.*)\s\d+-\d+$/);
-            const user = await interaction.options.getString("submitter");
+            const user = await interaction.options.getUser("submitter");
             const matchYes = text.match(/(\d+)-\d+$/);
             const matchNo = text.match(/\d+-(\d+)$/);
 
             const submitter = await db.submitters.findOne({
-                where: { discordid: user },
+                where: { discordid: user.id },
             });
             if (!submitter) {
                 // create submitter
                 await db.submitters.create({
-                    discordid: user,
+                    discordid: user.id,
                     submissions: 0,
                     dmFlag: false,
                     banned: false,
@@ -155,7 +125,7 @@ module.exports = {
 
             await db.levelsInVoting.create({
                 levelname: matchLevelName[1],
-                submitter: user,
+                submitter: user.id,
                 discordid: interaction.channel.id,
                 yeses: matchYes[1],
                 nos: matchNo[1],
@@ -192,7 +162,7 @@ module.exports = {
             );
         } else if (interaction.options.getSubcommand() === "submitban") {
             const { db } = require("../../index.js");
-            const user = await interaction.options.getString("submitter");
+            const user = await interaction.options.getUser("submitter");
             const unban = await interaction.options.getInteger("unban");
             if (unban === 1) {
                 await db.submitters.update(
@@ -201,7 +171,7 @@ module.exports = {
                     },
                     {
                         where: {
-                            discordid: user,
+                            discordid: user.id,
                         },
                     }
                 );
@@ -215,7 +185,7 @@ module.exports = {
                 },
                 {
                     where: {
-                        discordid: user,
+                        discordid: user.id,
                     },
                 }
             );
@@ -223,7 +193,7 @@ module.exports = {
             const guild = await interaction.client.guilds.fetch(guildId);
 
             const levels = await db.levelsInVoting.findAll({
-                where: { submitter: user },
+                where: { submitter: user.id },
             });
 
             levels.forEach(async (level) => {
@@ -240,7 +210,7 @@ module.exports = {
             });
 
             await db.levelsInVoting.destroy({
-                where: { submitter: user },
+                where: { submitter: user.id },
             });
 
             return await interaction.editReply(

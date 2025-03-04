@@ -55,27 +55,6 @@ module.exports = {
                 .setName("reset")
                 .setDescription("Reset a level's votes to 0-0")
         ),
-    async autocomplete(interaction) {
-        const focusedOption = interaction.options.getFocused();
-        const members = interaction.guild.members.cache;
-        const filtered = members
-            .filter((member) =>
-                member.user.username
-                    .toLowerCase()
-                    .includes(focusedOption.toLowerCase())
-            )
-            .map((member) => {
-                return {
-                    name: member.user.username,
-                    value: member.id,
-                };
-            });
-        return await interaction.respond(
-            filtered.slice(0, 25).map((user) => {
-                return { name: user.name, value: user.value };
-            })
-        );
-    },
     async execute(interaction) {
         await interaction.deferReply({ ephemeral: true });
 
