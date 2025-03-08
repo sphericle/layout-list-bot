@@ -391,12 +391,6 @@ module.exports = {
             const rawStr = interaction.options.getString("raw");
             const userToPing = await interaction.options.getUser("discord");
 
-            if (!userToPing) {
-                return await interaction.editReply(
-                    ":x: The provided user is invalid, make sure you pick a suggested option!"
-                );
-            }
-
             const level = await cache.levels.findOne({
                 where: {
                     filename: [interaction.options.getString("levelname")],
