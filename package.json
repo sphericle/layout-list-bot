@@ -14,6 +14,7 @@
     "dependencies": {
         "@napi-rs/canvas": "^0.1.67",
         "@octokit/rest": "^21.1.0",
+        "axios": "^1.8.3",
         "chartjs-node-canvas": "^4.1.6",
         "discord.js": "^14.18.0",
         "dotenv": "^16.4.7",
@@ -22,6 +23,7 @@
         "log-timestamp": "^0.3.0",
         "log4js": "^6.9.1",
         "node-cron": "^3.0.3",
+        "node-fetch": "^3.3.2",
         "prettier": "^3.5.3",
         "sequelize": "^6.37.6",
         "simple-git": "^3.27.0",
