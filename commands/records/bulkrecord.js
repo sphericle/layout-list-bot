@@ -197,7 +197,7 @@ module.exports = {
             let levels = await db.bulkRecords.findAll({
                 where: {
                     levelname: Sequelize.where(
-                        Sequelize.fn("LOWER", Sequelize.col("name")),
+                        Sequelize.fn("LOWER", Sequelize.col("levelname")),
                         "LIKE",
                         "%" + focused.value.toLowerCase() + "%"
                     ),
@@ -308,9 +308,28 @@ module.exports = {
             return await interaction.editReply({ embeds: [embed], components: [row], })
 
         } else if (interaction.options.getSubcommand() === "delete") {
+            await interaction.deferReply({ ephemeral: true });
             const { db } = require('../../index.js')
 
+            const levelPath = interaction.options.getString("levelname")
 
+            await db.bulkRecords.destroy({
+                where: {
+                    path: levelPath
+                }
+            })
+
+            const embed = await buildEmbed(interaction.user.id)
+
+            // Create commit button
+            const commit = new ButtonBuilder()
+                .setCustomId("commitAddBulkRecords")
+                .setLabel("Commit changes")
+                .setStyle(ButtonStyle.Success);
+
+            const row = new ActionRowBuilder().addComponents(commit);
+
+            return await interaction.editReply({ embeds: [embed], components: [row], })
 
         } else if (interaction.options.getSubcommand() === "edit") {
             await interaction.deferReply({ ephemeral: true });
