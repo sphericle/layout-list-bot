@@ -3,15 +3,10 @@ const {
     EmbedBuilder,
     ButtonBuilder,
     ButtonStyle,
-    ActionRowBuilder
+    ActionRowBuilder,
+    AutoModerationRule
 } = require("discord.js");
 const isUrlHttp = require("is-url-http");
-const {
-    githubOwner,
-    githubRepo,
-    githubDataPath,
-    githubBranch,
-} = require("../../config.json");
 const logger = require("log4js").getLogger();
 const axios = require("axios")
 const pako = require("pako")
@@ -41,6 +36,14 @@ async function buildEmbed(moderatorID, page) {
             moderatorID: moderatorID,
         }
     })
+    if (records.length === 0) {
+        const errEmbed = new EmbedBuilder()
+        .setColor(0xFFFF00)
+        .setTitle(`No records!`)
+        .setDescription("You're not currently checking bulk records, use /bulkrecord add to start a session!");
+
+        return errEmbed;
+    }
 
     let embed = new EmbedBuilder()
         .setColor(0xFFFF00)
@@ -126,7 +129,7 @@ module.exports = {
         )
         .addSubcommand((subcommand) =>
             subcommand
-                .setName("edit")
+                .setName("editlevel")
                 .setDescription("Edit a record")
                 .addStringOption((option) =>
                     option
@@ -135,18 +138,27 @@ module.exports = {
                         .setRequired(true)
                         .setAutocomplete(true)
                 )
+                .addIntegerOption((option) =>
+                    option
+                        .setName("percent")
+                        .setDescription("The percent you got on the level")
+                        .setRequired(true)
+                )
+                .addIntegerOption((option) =>
+                    option
+                        .setName("enjoyment")
+                        .setDescription(
+                            "Your enjoyment rating on this level (1-10)"
+                        )
+                )
+        )
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName("edit")
+                .setDescription("Edit the main record data")
                 .addStringOption((option) =>
                     option
                         .setName("username")
-                        .setDescription(
-                            "The username of the person who submitted this record"
-                        )
-                        .setRequired(true)
-                        .setAutocomplete(true)
-                )
-                .addStringOption((option) =>
-                    option
-                        .setName("newuser")
                         .setDescription(
                             "The username you're submitting for (Be sure to select one of the available options.)"
                         )
@@ -175,6 +187,18 @@ module.exports = {
                             "The FPS you used to complete the level"
                         )
                 )
+        )
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName("addlevel")
+                .setDescription("Add a level to the records")
+                .addStringOption((option) =>
+                    option
+                        .setName("lvlname")
+                        .setDescription("The level this record is on")
+                        .setRequired(true)
+                        .setAutocomplete(true)
+                )
                 .addIntegerOption((option) =>
                     option
                         .setName("percent")
@@ -187,11 +211,23 @@ module.exports = {
                             "Your enjoyment rating on this level (1-10)"
                         )
                 )
+        )
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName("view")
+                .setDescription("Show all records you're currently checking")
+                .addIntegerOption((option) =>
+                    option
+                        .setName("page")
+                        .setDescription(
+                            "The page of levels"
+                        )
+                )
         ),
     async autocomplete(interaction) {
         const focused = await interaction.options.getFocused(true);
         const Sequelize = require("sequelize");
-        const { db } = require("../../index.js")
+        const { db, cache } = require("../../index.js")
 
         if (focused.name === "levelname") {
             let levels = await db.bulkRecords.findAll({
@@ -211,8 +247,40 @@ module.exports = {
                     value: level.path,
                 }))
             );
+        } else if (focused.name === "username") {
+            let users = await cache.users.findAll({
+                where: {
+                    name: Sequelize.where(
+                        Sequelize.fn("LOWER", Sequelize.col("name")),
+                        "LIKE",
+                        "%" + focused.value.toLowerCase() + "%"
+                    ),
+                },
+            });
+            return await interaction.respond(
+                users
+                    .slice(0, 25)
+                    .map((user) => ({ name: user.name, value: user.name }))
+            );
+        } else if (focused.name === "lvlname") {
+            let levels = await cache.levels.findAll({
+                where: {
+                    name: Sequelize.where(
+                        Sequelize.fn("LOWER", Sequelize.col("name")),
+                        "LIKE",
+                        "%" + focused.value.toLowerCase() + "%"
+                    ),
+                },
+            });
+
+            return await interaction.respond(
+                levels.slice(0, 25).map((level) => ({
+                    name: `#${level.position} - ${level.name}`,
+                    value: level.filename,
+                }))
+            );
         }
-    },
+      },
     async execute(interaction) {
         const { db } = require("../../index.js");
         if (interaction.options.getSubcommand() === "add") {
@@ -305,7 +373,7 @@ module.exports = {
 
             const row = new ActionRowBuilder().addComponents(commit);
 
-            return await interaction.editReply({ embeds: [embed], components: [row], })
+            return await interaction.editReply({ content: "", embeds: [embed], components: [row], })
 
         } else if (interaction.options.getSubcommand() === "delete") {
             await interaction.deferReply({ ephemeral: true });
@@ -329,204 +397,95 @@ module.exports = {
 
             const row = new ActionRowBuilder().addComponents(commit);
 
-            return await interaction.editReply({ embeds: [embed], components: [row], })
+            return await interaction.editReply({ content: "", embeds: [embed], components: [row], })
 
-        } else if (interaction.options.getSubcommand() === "edit") {
+        } else if (interaction.options.getSubcommand() === "editlevel") {
             await interaction.deferReply({ ephemeral: true });
-            const { octokit, cache } = require("../../index.js");
-            const levelname = interaction.options.getString("levelname");
-            const olduser = interaction.options.getString("username");
+            const { db } = require("../../index.js");
 
-            const level = await cache.levels.findOne({
-                where: { filename: levelname },
-            });
+            const levelPath = interaction.options.getString("levelname");
+            const percent = interaction.options.getInteger("percent")
+            const enjoyment = interaction.options.getInteger("enjoyment")
 
-            if (!level)
-                return await interaction.editReply(
-                    ":x: Couldn't find the level"
-                );
-            const filename = level.filename;
-
-            let fileResponse;
-            try {
-                fileResponse = await octokit.rest.repos.getContent({
-                    owner: githubOwner,
-                    repo: githubRepo,
-                    path: githubDataPath + `/${filename}.json`,
-                    branch: githubBranch,
-                });
-            } catch (fetchError) {
-                logger.info(`Couldn't fetch ${filename}.json: \n${fetchError}`);
-                return await interaction.editReply(
-                    `:x: Couldn't fetch ${filename}.json: \n${fetchError}`
-                );
-            }
-
-            let parsedData;
-            try {
-                parsedData = JSON.parse(
-                    Buffer.from(fileResponse.data.content, "base64").toString(
-                        "utf-8"
-                    )
-                );
-            } catch (parseError) {
-                logger.info(
-                    `Unable to parse data fetched from ${filename}:\n${parseError}`
-                );
-                return await interaction.editReply(
-                    `:x: Unable to parse data fetched from ${filename}:\n${parseError}`
-                );
-            }
-            if (!Array.isArray(parsedData.records)) {
-                logger.info(
-                    `The records field of the fetched ${filename}.json is not an array`
-                );
-                return await interaction.editReply(
-                    `:x: The records field of the fetched ${filename}.json is not an array`
-                );
-            }
-
-            const recordIndex = parsedData.records.findIndex(
-                (record) => record.user === olduser
+            await db.bulkRecords.update(
+                {
+                    ...(percent !== null && { percent }),
+                    ...(enjoyment !== null && { enjoyment }),
+                },
+                { where: { 
+                    moderatorID: interaction.user.id,
+                    path: levelPath
+                } }
             );
-            if (recordIndex === -1)
-                return await interaction.editReply(
-                    `:x: Couldn't find a record with the username \`${olduser}\``
-                );
 
-            const newuser = interaction.options.getString("newuser") || null;
-            const fps = interaction.options.getInteger("fps") || null;
-            const percent = interaction.options.getInteger("percent") || null;
-            const enjoyment =
-                interaction.options.getInteger("enjoyment") || null;
-            const video =
-                interaction.options.getString("completionlink") || null;
-            const device = interaction.options.getString("device") || null;
-
-            if (newuser !== null)
-                parsedData.records[recordIndex].user = newuser;
-            if (fps !== null) parsedData.records[recordIndex].hz = fps;
-            if (percent !== null)
-                parsedData.records[recordIndex].percent = percent;
-            if (enjoyment !== null)
-                parsedData.records[recordIndex].enjoyment = enjoyment;
-            if (video !== null) parsedData.records[recordIndex].link = video;
-            if (device !== null) {
-                if (device === "Mobile") {
-                    parsedData.records[recordIndex].mobile = true;
-                } else {
-                    delete parsedData.records[recordIndex].mobile;
-                }
-            }
-
-            await interaction.editReply("Committing...");
-
-            // not sure why it needs to be done this way but :shrug:
-            let changes = [];
-            changes.push({
-                path: githubDataPath + `/${filename}.json`,
-                content: JSON.stringify(parsedData, null, "\t"),
-            });
-
-            let commitSha;
-            try {
-                // Get the SHA of the latest commit from the branch
-                const { data: refData } = await octokit.git.getRef({
-                    owner: githubOwner,
-                    repo: githubRepo,
-                    ref: `heads/${githubBranch}`,
-                });
-                commitSha = refData.object.sha;
-            } catch (getRefError) {
-                logger.info(
-                    `Something went wrong while fetching the latest commit SHA:\n${getRefError}`
-                );
-                return await interaction.editReply(
-                    ":x: Something went wrong while commiting the records to github, please try again later (getRefError)"
-                );
-            }
-            let treeSha;
-            try {
-                // Get the commit using its SHA
-                const { data: commitData } = await octokit.git.getCommit({
-                    owner: githubOwner,
-                    repo: githubRepo,
-                    commit_sha: commitSha,
-                });
-                treeSha = commitData.tree.sha;
-            } catch (getCommitError) {
-                logger.info(
-                    `Something went wrong while fetching the latest commit:\n${getCommitError}`
-                );
-                return await interaction.editReply(
-                    ":x: Something went wrong while commiting the records to github, please try again later (getCommitError)"
-                );
-            }
-
-            let newTree;
-            try {
-                // Create a new tree with the changes
-                newTree = await octokit.git.createTree({
-                    owner: githubOwner,
-                    repo: githubRepo,
-                    base_tree: treeSha,
-                    tree: changes.map((change) => ({
-                        path: change.path,
-                        mode: "100644",
-                        type: "blob",
-                        content: change.content,
-                    })),
-                });
-            } catch (createTreeError) {
-                logger.info(
-                    `Something went wrong while creating a new tree:\n${createTreeError}`
-                );
-                return await interaction.editReply(
-                    ":x: Something went wrong while commiting the records to github, please try again later (createTreeError)"
-                );
-            }
-
-            let newCommit;
-            try {
-                // Create a new commit with this tree
-                newCommit = await octokit.git.createCommit({
-                    owner: githubOwner,
-                    repo: githubRepo,
-                    message: `Updated ${olduser}'s record on ${levelname} (${interaction.user.tag})`,
-                    tree: newTree.data.sha,
-                    parents: [commitSha],
-                });
-            } catch (createCommitError) {
-                logger.info(
-                    `Something went wrong while creating a new commit:\n${createCommitError}`
-                );
-                return await interaction.editReply(
-                    ":x: Something went wrong while commiting the records to github, please try again later (createCommitError)"
-                );
-            }
-
-            try {
-                // Update the branch to point to the new commit
-                await octokit.git.updateRef({
-                    owner: githubOwner,
-                    repo: githubRepo,
-                    ref: `heads/${githubBranch}`,
-                    sha: newCommit.data.sha,
-                });
-            } catch (updateRefError) {
-                logger.info(
-                    `Something went wrong while updating the branch :\n${updateRefError}`
-                );
-                return await interaction.editReply(
-                    ":x: Something went wrong while commiting the records to github, please try again later (updateRefError)"
-                );
-            }
-            logger.info(
-                `Successfully created commit on ${githubBranch} (record update): ${newCommit.data.sha}`
-            );
             return await interaction.editReply(
                 ":white_check_mark: This record has been updated!"
             );
+        } else if (interaction.options.getSubcommand() === "edit") {
+            await interaction.deferReply({ ephemeral: true });
+            const { db } = require("../../index.js");
+
+            const username = interaction.options.getString("username");
+            const device = interaction.options.getString("device")
+            const video = interaction.options.getString("completionlink")
+            const fps = interaction.options.getInteger("fps")
+
+            await db.bulkRecordSessions.update(
+                {
+                    ...(username !== null && { playerName: username }),
+                    ...(device !== null && { mobile: device === "Mobile" }),
+                    ...(video !== null && { video }),
+                    ...(fps !== null && { fps }),
+                },
+                { where: {
+                    moderatorID: interaction.user.id
+                } }
+            );
+
+            return await interaction.editReply(
+                ":white_check_mark: This record has been updated!"
+            );
+        } else if (interaction.options.getSubcommand() === "addlevel") {
+            await interaction.deferReply({ ephemeral: true });
+            const { db, cache } = require("../../index.js");
+
+            const levelPath = interaction.options.getString("lvlname");
+            const percent = interaction.options.getInteger("percent")
+            const enjoyment = interaction.options.getInteger("enjoyment")
+            
+            const dbLevel = await cache.levels.findOne({
+                where: {
+                    filename: levelPath
+                }
+            })
+
+            await db.bulkRecords.create({
+                moderatorID: interaction.user.id,
+                percent: percent !== null ? percent : 0,
+                enjoyment: enjoyment !== null ? enjoyment : 0,
+                path: dbLevel.filename,
+                levelname: dbLevel.name,
+            })
+
+            return await interaction.editReply(
+                ":white_check_mark: This record has been added!"
+            );
+        } else if (interaction.options.getSubcommand() === "view") {
+            await interaction.deferReply({ ephemeral: true });
+            
+            const page = interaction.options.getInteger("page") || 0
+
+            const embed = await buildEmbed(interaction.user.id, page)
+
+            // Create commit button
+            const commit = new ButtonBuilder()
+                .setCustomId("commitAddBulkRecords")
+                .setLabel("Commit changes")
+                .setStyle(ButtonStyle.Success);
+
+            const row = new ActionRowBuilder().addComponents(commit);
+
+            return await interaction.editReply({ content: "", embeds: [embed], components: [row], })
         }
     },
 };
