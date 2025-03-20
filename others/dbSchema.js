@@ -237,6 +237,27 @@ module.exports = {
             },
             messageId: Sequelize.STRING,
         });
+        
+        db.bulkRecordSessions = sequelize.define("bulkRecordSessions", {
+            sessionID: {
+                type: Sequelize.INTEGER,
+                unique: true,
+            },
+            moderatorID: Sequelize.STRING,
+            playerName: Sequelize.STRING,
+            video: Sequelize.STRING,
+            mobile: Sequelize.BOOLEAN,
+            fps: Sequelize.INTEGER,
+            note: Sequelize.STRING,
+            discordID: Sequelize.STRING,
+        });
+        
+        db.bulkRecords = sequelize.define("bulkRecords", {
+            sessionID: Sequelize.INTEGER,
+            enjoyment: Sequelize.INTEGER,
+            percent: Sequelize.INTEGER,
+            path: Sequelize.STRING,
+        });
         return db;
     },
 
