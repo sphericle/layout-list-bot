@@ -1,6 +1,9 @@
 const {
     SlashCommandBuilder,
     EmbedBuilder,
+    ButtonBuilder,
+    ButtonStyle,
+    ActionRowBuilder
 } = require("discord.js");
 const isUrlHttp = require("is-url-http");
 const {
@@ -32,8 +35,6 @@ async function buildEmbed(moderatorID, page) {
             moderatorID: moderatorID
         }
     })
-
-    logger.log(session)
 
     const records = await db.bulkRecords.findAll({
         where: {
@@ -122,15 +123,6 @@ module.exports = {
                         .setRequired(true)
                         .setAutocomplete(true)
                 )
-                .addStringOption((option) =>
-                    option
-                        .setName("username")
-                        .setDescription(
-                            "The username of the person who submitted this record"
-                        )
-                        .setRequired(true)
-                        .setAutocomplete(true)
-                )
         )
         .addSubcommand((subcommand) =>
             subcommand
@@ -196,6 +188,31 @@ module.exports = {
                         )
                 )
         ),
+    async autocomplete(interaction) {
+        const focused = await interaction.options.getFocused(true);
+        const Sequelize = require("sequelize");
+        const { db } = require("../../index.js")
+
+        if (focused.name === "levelname") {
+            let levels = await db.bulkRecords.findAll({
+                where: {
+                    levelname: Sequelize.where(
+                        Sequelize.fn("LOWER", Sequelize.col("name")),
+                        "LIKE",
+                        "%" + focused.value.toLowerCase() + "%"
+                    ),
+                    moderatorID: interaction.user.id
+                },
+            });
+
+            return await interaction.respond(
+                levels.slice(0, 25).map((level) => ({
+                    name: level.levelname,
+                    value: level.path,
+                }))
+            );
+        }
+    },
     async execute(interaction) {
         const { db } = require("../../index.js");
         if (interaction.options.getSubcommand() === "add") {
@@ -245,8 +262,20 @@ module.exports = {
             }
             const parsedJson = await JSON.parse(decompressData(responseBody))
 
+            await db.bulkRecordSessions.destroy({
+                where: {
+                    moderatorID: interaction.user.id
+                }
+            })
+
+            await db.bulkRecords.destroy({
+                where: {
+                    moderatorID: interaction.user.id
+                }
+            })
+
             // trust me this is a really cool way to do this
-            const dbSession = await db.bulkRecordSessions.create({
+            await db.bulkRecordSessions.create({
                 moderatorID: interaction.user.id,
                 playerName: parsedJson.name,
                 video: video,
@@ -268,236 +297,21 @@ module.exports = {
 
             const embed = await buildEmbed(interaction.user.id)
 
-            return await interaction.editReply({ embeds: [embed] })
+            // Create commit button
+            const commit = new ButtonBuilder()
+                .setCustomId("commitAddBulkRecords")
+                .setLabel("Commit changes")
+                .setStyle(ButtonStyle.Success);
+
+            const row = new ActionRowBuilder().addComponents(commit);
+
+            return await interaction.editReply({ embeds: [embed], components: [row], })
+
         } else if (interaction.options.getSubcommand() === "delete") {
-            await interaction.deferReply({ ephemeral: true });
-            const { cache, octokit } = require("../../index.js");
-            const level = await cache.levels.findOne({
-                where: { filename: interaction.options.getString("levelname") },
-            });
-            const username = interaction.options.getString("username");
+            const { db } = require('../../index.js')
 
-            if (!level)
-                return await interaction.editReply(
-                    ":x: Couldn't find the level"
-                );
-            const filename = level.filename;
 
-            let fileResponse;
-            try {
-                fileResponse = await octokit.rest.repos.getContent({
-                    owner: githubOwner,
-                    repo: githubRepo,
-                    path: githubDataPath + `/${filename}.json`,
-                    branch: githubBranch,
-                });
-            } catch (fetchError) {
-                logger.info(`Couldn't fetch ${filename}.json: \n${fetchError}`);
-                return await interaction.editReply(
-                    `:x: Couldn't fetch ${filename}.json: \n${fetchError}`
-                );
-            }
 
-            let parsedData;
-            try {
-                parsedData = JSON.parse(
-                    Buffer.from(fileResponse.data.content, "base64").toString(
-                        "utf-8"
-                    )
-                );
-            } catch (parseError) {
-                logger.info(
-                    `Unable to parse data fetched from ${filename}:\n${parseError}`
-                );
-                return await interaction.editReply(
-                    `:x: Unable to parse data fetched from ${filename}:\n${parseError}`
-                );
-            }
-            if (!Array.isArray(parsedData.records)) {
-                logger.info(
-                    `The records field of the fetched ${filename}.json is not an array`
-                );
-                return await interaction.editReply(
-                    `:x: The records field of the fetched ${filename}.json is not an array`
-                );
-            }
-
-            const recordIndex = parsedData.records.findIndex(
-                (record) => record.user === username
-            );
-            if (recordIndex === -1)
-                return await interaction.editReply(
-                    `:x: Couldn't find a record with the username \`${username}\``
-                );
-
-            parsedData.records.splice(recordIndex, 1);
-
-            await interaction.editReply("Committing...");
-
-            // not sure why it needs to be done this way but :shrug:
-            let changes = [];
-            changes.push({
-                path: githubDataPath + `/${filename}.json`,
-                content: JSON.stringify(parsedData, null, "\t"),
-            });
-
-            const changePath = githubDataPath + `/${filename}.json`;
-            const content = JSON.stringify(parsedData);
-
-            const debugStatus = await db.infos.findOne({
-                where: { name: "commitdebug" },
-            });
-            if (!debugStatus || !debugStatus.status) {
-                let commitSha;
-                try {
-                    // Get the SHA of the latest commit from the branch
-                    const { data: refData } = await octokit.git.getRef({
-                        owner: githubOwner,
-                        repo: githubRepo,
-                        ref: `heads/${githubBranch}`,
-                    });
-                    commitSha = refData.object.sha;
-                } catch (getRefError) {
-                    logger.info(
-                        `Something went wrong while fetching the latest commit SHA:\n${getRefError}`
-                    );
-                    await db.messageLocks.destroy({
-                        where: { discordid: interaction.message.id },
-                    });
-                    return await interaction.editReply(
-                        ":x: Something went wrong while commiting the records to github, please try again later (getRefError)"
-                    );
-                }
-                let treeSha;
-                try {
-                    // Get the commit using its SHA
-                    const { data: commitData } = await octokit.git.getCommit({
-                        owner: githubOwner,
-                        repo: githubRepo,
-                        commit_sha: commitSha,
-                    });
-                    treeSha = commitData.tree.sha;
-                } catch (getCommitError) {
-                    logger.info(
-                        `Something went wrong while fetching the latest commit:\n${getCommitError}`
-                    );
-                    await db.messageLocks.destroy({
-                        where: { discordid: interaction.message.id },
-                    });
-                    return await interaction.editReply(
-                        ":x: Something went wrong while commiting the records to github, please try again later (getCommitError)"
-                    );
-                }
-
-                let newTree;
-                try {
-                    // Create a new tree with the changes
-                    newTree = await octokit.git.createTree({
-                        owner: githubOwner,
-                        repo: githubRepo,
-                        base_tree: treeSha,
-                        tree: changes.map((change) => ({
-                            path: change.path,
-                            mode: "100644",
-                            type: "blob",
-                            content: change.content,
-                        })),
-                    });
-                } catch (createTreeError) {
-                    logger.info(
-                        `Something went wrong while creating a new tree:\n${createTreeError}`
-                    );
-                    await db.messageLocks.destroy({
-                        where: { discordid: interaction.message.id },
-                    });
-                    return await interaction.editReply(
-                        ":x: Something went wrong while commiting the records to github, please try again later (createTreeError)"
-                    );
-                }
-
-                let newCommit;
-                try {
-                    // Create a new commit with this tree
-                    newCommit = await octokit.git.createCommit({
-                        owner: githubOwner,
-                        repo: githubRepo,
-                        message: `Removed ${username}'s record from ${filename}.json (${interaction.user.tag})`,
-                        tree: newTree.data.sha,
-                        parents: [commitSha],
-                    });
-                } catch (createCommitError) {
-                    logger.info(
-                        `Something went wrong while creating a new commit:\n${createCommitError}`
-                    );
-                    await db.messageLocks.destroy({
-                        where: { discordid: interaction.message.id },
-                    });
-                    return await interaction.editReply(
-                        ":x: Something went wrong while commiting the records to github, please try again later (createCommitError)"
-                    );
-                }
-
-                try {
-                    // Update the branch to point to the new commit
-                    await octokit.git.updateRef({
-                        owner: githubOwner,
-                        repo: githubRepo,
-                        ref: `heads/${githubBranch}`,
-                        sha: newCommit.data.sha,
-                    });
-                } catch (updateRefError) {
-                    logger.info(
-                        `Something went wrong while updating the branch :\n${updateRefError}`
-                    );
-                    await db.messageLocks.destroy({
-                        where: { discordid: interaction.message.id },
-                    });
-                    return await interaction.editReply(
-                        ":x: Something went wrong while commiting the records to github, please try again later (updateRefError)"
-                    );
-                }
-                logger.info(
-                    `Successfully created commit on ${githubBranch} (record addition): ${newCommit.data.sha}`
-                );
-                await interaction.editReply("This record has been removed!");
-            } else {
-                // Get file SHA
-                let fileSha;
-                try {
-                    const response = await octokit.repos.getContent({
-                        owner: githubOwner,
-                        repo: githubRepo,
-                        path: changePath,
-                    });
-                    fileSha = response.data.sha;
-                } catch (error) {
-                    logger.info(`Error fetching ${changePath} SHA:\n${error}`);
-                    return await interaction.editReply(
-                        `:x: Couldn't fetch data from ${changePath}`
-                    );
-                }
-
-                try {
-                    await octokit.repos.createOrUpdateFileContents({
-                        owner: githubOwner,
-                        repo: githubRepo,
-                        path: changePath,
-                        message: `Updated ${changePath} (${interaction.user.tag})`,
-                        content: Buffer.from(content).toString("base64"),
-                        sha: fileSha,
-                    });
-                    logger.info(
-                        `Updated ${changePath} (${interaction.user.tag}`
-                    );
-                } catch (error) {
-                    logger.info(
-                        `Failed to update ${changePath} (${interaction.user.tag}):\n${error}`
-                    );
-                    await interaction.editReply(
-                        `:x: Couldn't update the file ${changePath}, skipping...`
-                    );
-                }
-            }
         } else if (interaction.options.getSubcommand() === "edit") {
             await interaction.deferReply({ ephemeral: true });
             const { octokit, cache } = require("../../index.js");
