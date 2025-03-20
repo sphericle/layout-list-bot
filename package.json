@@ -24,6 +24,7 @@
         "log4js": "^6.9.1",
         "node-cron": "^3.0.3",
         "node-fetch": "^3.3.2",
+        "pako": "^2.1.0",
         "prettier": "^3.5.3",
         "sequelize": "^6.37.6",
         "simple-git": "^3.27.0",

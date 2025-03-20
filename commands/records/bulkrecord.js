@@ -4,21 +4,56 @@ const {
 } = require("discord.js");
 const isUrlHttp = require("is-url-http");
 const {
-    archiveRecordsID,
-    priorityRoleID,
-    enableSeparateStaffServer,
-    enablePriorityRole,
-    staffGuildId,
-    guildId,
     githubOwner,
     githubRepo,
     githubDataPath,
     githubBranch,
 } = require("../../config.json");
 const logger = require("log4js").getLogger();
-const { octokit } = require("../../index.js");
 const axios = require("axios")
-const zlib = require("node:zlib")
+const pako = require("pako")
+
+// Decompressed data passed to the function using Gzip
+function decompressData(compressedData) {
+    const binaryString = atob(compressedData); // Decode base64
+    const charData = Uint8Array.from(binaryString, (char) =>
+        char.charCodeAt(0)
+    );
+    const decompressed = pako.ungzip(charData, { to: "string" });
+    return JSON.parse(decompressed);
+}
+
+async function buildEmbed(moderatorID, page) {
+    if (!page) page = 0;
+    const { db } = await require("../../index.js")
+
+    const session = await db.bulkRecordSessions.findOne({
+        where: {
+            moderatorID: moderatorID
+        }
+    })
+
+    logger.log(session)
+
+    const records = await db.bulkRecords.findAll({
+        where: {
+            moderatorID: moderatorID,
+        }
+    })
+
+    let embed = new EmbedBuilder()
+        .setColor(0xFFFF00)
+        .setTitle(`${session.playerName}'s records`)
+        .setDescription("You can add, remove, edit, and commit these records");
+    
+    for (const record of records.slice(page * 25, (page + 25) + 25)) {
+        embed.addFields({
+            name: record.levelname,
+            value: `${record.percent}% - ${record.enjoyment}/10`
+        })
+    }
+    return embed;
+}
 
 module.exports = {
     enabled: true,
@@ -166,561 +201,74 @@ module.exports = {
         if (interaction.options.getSubcommand() === "add") {
             await interaction.deferReply({ ephemeral: true });
 
-            // add record to list
-
-            // Check given level name
-            const { cache, db } = require("../../index.js");
-
-            const linkStr = interaction.options.getString("link");
+            const fileLink = interaction.options.getString("link");
             const device = interaction.options.getString("device");
-            const rawStr = interaction.options.getString("completionlink");
+            const video = interaction.options.getString("completionlink");
             const fps = interaction.options.getInteger("fps");
             const userToPing = interaction.options.getUser("discord");
             const note = interaction.options.getString("notes");
-            const percent = interaction.options.getInteger("percent") || 100;
-            const enjoyment = interaction.options.getInteger("enjoyment") || null;
-            const username = interaction.options.getString("username");
 
-            logger.log(linkStr)
+            // Check given URLs
+            await interaction.editReply("Checking if the URL is valid...");
+            if (/\s/g.test(fileLink) || !isUrlHttp(fileLink))
+                return await interaction.editReply(
+                    ":x: Couldn't add the record: The provided file link is not a valid URL"
+                );
+            if (video && (/\s/g.test(video) || !isUrlHttp(video)))
+                return await interaction.editReply(
+                    ":x: Couldn't add the record: The provided completion link is not a valid URL"
+                );
+
 
             // using axios so we can send the cookie lol
+            /* this is wrong .
             const date = new Date();
             date.setFullYear(date.getFullYear() - 1);
             date.setDate(date.getDate() + 66); // Add 66 days
             const cookieValue = date.toISOString().split('T')[0];
-            console.log(cookieValue)
+            */
             let responseBody;
             try {
-                const response = await axios.get(linkStr, {
+                const response = await axios.get(fileLink, {
                     headers: {
                         "Content-Type": "application/json",
-                        "Cookie": `verified=${cookieValue}`,
+                        "Cookie": `verified=2024-05-24`,
                     },
+                    responseType: "arraybuffer"
                 });
-                responseBody = await response.data;
+                responseBody = response.data;
             } catch (error) {
                 logger.error(`Error fetching the file from the provided link: ${error}`);
                 return await interaction.editReply(
                     ":x: Couldn't fetch the file from the provided link. Please ensure the link is correct and accessible."
                 );
             }
+            const parsedJson = await JSON.parse(decompressData(responseBody))
 
-            // parse response
+            // trust me this is a really cool way to do this
+            const dbSession = await db.bulkRecordSessions.create({
+                moderatorID: interaction.user.id,
+                playerName: parsedJson.name,
+                video: video,
+                mobile: device == "Mobile" ? true : false,
+                fps: fps,
+                note: note,
+                discordID: userToPing.id
+            })
 
-            let decompressedBody;
-            try {
-                decompressedBody = zlib.gunzipSync(Buffer.from(responseBody, "base64")).toString("utf-8");
-            } catch (error) {
-                logger.error(`Error decompressing the response body: ${error}`);
-                return await interaction.editReply(
-                    ":x: Couldn't decompress the response body. Please ensure the data is valid."
-                );
-            }
-
-            let parsedJson;
-            try {
-                parsedJson = JSON.parse(decompressedBody);
-            } catch (error) {
-                logger.error(`Error parsing JSON from decompressed body: ${error}`);
-                return await interaction.editReply(
-                    ":x: Couldn't parse the JSON from the decompressed body. Please ensure the data is valid."
-                );
-            }
-
-            logger.log(parsedJson)
-
-            const level = await cache.levels.findOne({
-                where: {
-                    filename: [interaction.options.getString("levelname")],
-                },
-            });
-            if (!level)
-                return await interaction.editReply(
-                    ":x: Couldn't find the level you're submitting for"
-                );
-            const filename = level.filename;
-            // Get cached user
-            let user;
-            try {
-                user = await cache.users.findOne({
-                    where: { name: username },
-                });
-                if (!user) {
-                    await interaction.editReply(
-                        "No user found, attempting to create a new one..."
-                    );
-                    user = await cache.users.create({
-                        name: username,
-                        user_id: Math.floor(
-                            1000000000 + Math.random() * 9000000000
-                        ),
-                    });
-
-                    logger.log(user);
-                }
-            } catch (error) {
-                logger.error(
-                    `Error automatically creating user on record submit: ${error}`
-                );
-                return await interaction.editReply(
-                    `:x: Error creating a new user: ${error} (show this to sphericle!)`
-                );
-            }
-
-            // Check given URLs
-            await interaction.editReply("Checking if the URL is valid...");
-            if (/\s/g.test(linkStr) || !isUrlHttp(linkStr))
-                return await interaction.editReply(
-                    ":x: Couldn't add the record: The provided completion link is not a valid URL"
-                );
-            if (rawStr && (/\s/g.test(rawStr) || !isUrlHttp(rawStr)))
-                return await interaction.editReply(
-                    ":x: Couldn't add the record: The provided raw footage link is not a valid URL"
-                );
-
-            // Check enjoyment bounds (1-10)
-            await interaction.editReply(
-                "Checking if the enjoyment is valid..."
-            );
-            if (enjoyment && (enjoyment < 1 || enjoyment > 10))
-                return await interaction.editReply(
-                    ":x: Couldn't add the record: Enjoyment rating must be between 1 and 10"
-                );
-
-            // Check percent bounds (0-100)
-            await interaction.editReply("Checking if the percent is valid...");
-            if (percent < 0 || percent > 100)
-                return await interaction.editReply(
-                    ":x: Couldn't add the record: Percent must be valid (1-100)"
-                );
-
-            let fileResponse;
-            try {
-                fileResponse = await octokit.rest.repos.getContent({
-                    owner: githubOwner,
-                    repo: githubRepo,
-                    path: githubDataPath + `/${filename}.json`,
-                    branch: githubBranch,
-                });
-            } catch (fetchError) {
-                logger.info(`Couldn't fetch ${filename}.json: \n${fetchError}`);
-                return await interaction.editReply(
-                    `:x: Couldn't fetch ${filename}.json: \n${fetchError}`
-                );
-            }
-
-            let parsedData;
-            try {
-                parsedData = JSON.parse(
-                    Buffer.from(fileResponse.data.content, "base64").toString(
-                        "utf-8"
-                    )
-                );
-            } catch (parseError) {
-                logger.info(
-                    `Unable to parse data fetched from ${filename}:\n${parseError}`
-                );
-                return await interaction.editReply(
-                    `:x: Unable to parse data fetched from ${filename}:\n${parseError}`
-                );
-            }
-            if (!Array.isArray(parsedData.records)) {
-                logger.info(
-                    `The records field of the fetched ${filename}.json is not an array`
-                );
-                return await interaction.editReply(
-                    `:x: The records field of the fetched ${filename}.json is not an array`
-                );
-            }
-
-            const githubCode =
-                `{\n\t\t"user": "${user.name}",\n\t\t"link": "${linkStr}",\n\t\t"percent": ${percent},\n\t\t"hz": ${fps}` +
-                (enjoyment !== null ? `,\n\t\t"enjoyment": ${enjoyment}` : "") +
-                (device == "Mobile" ? ',\n\t\t"mobile": true\n}\n' : "\n}");
-            const newRecord = JSON.parse(githubCode);
-
-            let existing = false;
-            let updated = false;
-            // If duplicate, don't add it to githubCodes
-            for (const fileRecord of parsedData.records) {
-                if (fileRecord.user === user.name) {
-                    logger.info(
-                        `Found existing record of ${filename} for ${user.name}`
-                    );
-                    if (fileRecord.percent < percent) {
-                        logger.info(
-                            "This record has a greater percent on this level, updating..."
-                        );
-                        fileRecord.percent = percent;
-                        fileRecord.enjoyment = enjoyment;
-                        fileRecord.link = linkStr;
-                        updated = true;
-                    } else {
-                        logger.info(
-                            `Canceled adding duplicated record of ${filename} for ${user.name}`
-                        );
-                        // TODO: this doesnt work
-                        // await db.acceptedRecords.destroy({ where: { id: record.dataValues['id'] } });
-                        existing = true;
-                    }
-                }
-            }
-
-            const shiftsLock = await db.infos.findOne({
-                where: { name: "shifts" },
-            });
-            if (!shiftsLock || shiftsLock.status)
-                return await interaction.editReply(
-                    ":x: The bot is currently assigning shifts, please wait a few minutes before checking records."
-                );
-
-            await interaction.editReply(`Writing code...`);
-
-            // Create embed to send in public channel
-            let publicEmbed = new EmbedBuilder()
-                .setColor(0x8fce00)
-                .setTitle(`:white_check_mark: ${level.name}`)
-                .addFields(
-                    { name: "Percent", value: `${percent}%`, inline: true },
-                    {
-                        name: "Record holder",
-                        value: `${user.name}`,
-                        inline: true,
-                    },
-                    {
-                        name: "Record added by",
-                        value: `${interaction.user}`,
-                        inline: true,
-                    },
-                    {
-                        name: "Device",
-                        value: `${device} (${fps} FPS)`,
-                        inline: true,
-                    },
-                    { name: "Link", value: `${linkStr}`, inline: true },
-                    {
-                        name: "Enjoyment",
-                        value: enjoyment ? `${enjoyment}/10` : "None",
-                        inline: true,
-                    }
-                )
-                .setTimestamp();
-
-            if (note) {
-                publicEmbed.addFields({
-                    name: "Note",
-                    value: `**_${note}_**`,
-                    inline: true,
-                });
-            }
-            logger.info(
-                `${interaction.user.tag} (${interaction.user.id}) accepted record of ${level.name} for ${user.name}`
-            );
-
-            await interaction.editReply("Adding record...");
-
-            // if the record does not already exist or existed but has been updated
-            if (existing === true && updated === false) {
-                return await interaction.editReply(
-                    `:x: This user already has a record on this level!`
-                );
-            }
-            // Accepting a record //
-
-            await interaction.editReply(`Writing to DB...`);
-            let record;
-            try {
-                const recordEntry = await db.acceptedRecords.create({
-                    username: user.name,
-                    submitter: interaction.user.id,
+            for (const level of parsedJson.levels) {
+                await db.bulkRecords.create({
+                    moderatorID: interaction.user.id,
+                    enjoyment: level.enjoyment,
+                    percent: level.percent,
+                    path: level.path,
                     levelname: level.name,
-                    filename: level.filename,
-                    device: device,
-                    fps: fps,
-                    enjoyment: enjoyment,
-                    percent: percent,
-                    completionlink: linkStr,
-                    raw: rawStr,
-                    ldm: null,
-                    modMenu: "none",
-                    additionalnotes: note,
-                    priority:
-                        enablePriorityRole &&
-                        interaction.member.roles.cache.has(priorityRoleID),
-                    moderator: interaction.user.id,
-                });
-                record = recordEntry.dataValues;
-            } catch (error) {
-                logger.error(
-                    `Error adding the record to the accepted table: ${error}`
-                );
-                return await interaction.editReply(
-                    ":x: Couldn't add the record to the database"
-                );
+                })
             }
 
-            await interaction.editReply("Committing...");
-            // Add new record to the level's file if this is a new record (not an updated one)
-            if (updated === false)
-                parsedData.records = parsedData.records.concat(newRecord);
+            const embed = await buildEmbed(interaction.user.id)
 
-            // not sure why it needs to be done this way but :shrug:
-            let changes = [];
-            changes.push({
-                path: githubDataPath + `/${filename}.json`,
-                content: JSON.stringify(parsedData, null, "\t"),
-            });
-
-            const changePath = githubDataPath + `/${filename}.json`;
-            const content = JSON.stringify(parsedData);
-
-            const debugStatus = await db.infos.findOne({
-                where: { name: "commitdebug" },
-            });
-            if (!debugStatus || !debugStatus.status) {
-                let commitSha;
-                try {
-                    // Get the SHA of the latest commit from the branch
-                    const { data: refData } = await octokit.git.getRef({
-                        owner: githubOwner,
-                        repo: githubRepo,
-                        ref: `heads/${githubBranch}`,
-                    });
-                    commitSha = refData.object.sha;
-                } catch (getRefError) {
-                    logger.info(
-                        `Something went wrong while fetching the latest commit SHA:\n${getRefError}`
-                    );
-                    await db.messageLocks.destroy({
-                        where: { discordid: interaction.message.id },
-                    });
-                    return await interaction.editReply(
-                        ":x: Something went wrong while commiting the records to github, please try again later (getRefError)"
-                    );
-                }
-                let treeSha;
-                try {
-                    // Get the commit using its SHA
-                    const { data: commitData } = await octokit.git.getCommit({
-                        owner: githubOwner,
-                        repo: githubRepo,
-                        commit_sha: commitSha,
-                    });
-                    treeSha = commitData.tree.sha;
-                } catch (getCommitError) {
-                    logger.info(
-                        `Something went wrong while fetching the latest commit:\n${getCommitError}`
-                    );
-                    await db.messageLocks.destroy({
-                        where: { discordid: interaction.message.id },
-                    });
-                    return await interaction.editReply(
-                        ":x: Something went wrong while commiting the records to github, please try again later (getCommitError)"
-                    );
-                }
-
-                let newTree;
-                try {
-                    // Create a new tree with the changes
-                    newTree = await octokit.git.createTree({
-                        owner: githubOwner,
-                        repo: githubRepo,
-                        base_tree: treeSha,
-                        tree: changes.map((change) => ({
-                            path: change.path,
-                            mode: "100644",
-                            type: "blob",
-                            content: change.content,
-                        })),
-                    });
-                } catch (createTreeError) {
-                    logger.info(
-                        `Something went wrong while creating a new tree:\n${createTreeError}`
-                    );
-                    await db.messageLocks.destroy({
-                        where: { discordid: interaction.message.id },
-                    });
-                    return await interaction.editReply(
-                        ":x: Something went wrong while commiting the records to github, please try again later (createTreeError)"
-                    );
-                }
-
-                let newCommit;
-                try {
-                    // Create a new commit with this tree
-                    newCommit = await octokit.git.createCommit({
-                        owner: githubOwner,
-                        repo: githubRepo,
-                        message: `Added ${record.username}'s record to ${record.levelname} (${interaction.user.tag})`,
-                        tree: newTree.data.sha,
-                        parents: [commitSha],
-                    });
-                } catch (createCommitError) {
-                    logger.info(
-                        `Something went wrong while creating a new commit:\n${createCommitError}`
-                    );
-                    await db.messageLocks.destroy({
-                        where: { discordid: interaction.message.id },
-                    });
-                    return await interaction.editReply(
-                        ":x: Something went wrong while commiting the records to github, please try again later (createCommitError)"
-                    );
-                }
-
-                try {
-                    // Update the branch to point to the new commit
-                    await octokit.git.updateRef({
-                        owner: githubOwner,
-                        repo: githubRepo,
-                        ref: `heads/${githubBranch}`,
-                        sha: newCommit.data.sha,
-                    });
-                } catch (updateRefError) {
-                    logger.info(
-                        `Something went wrong while updating the branch :\n${updateRefError}`
-                    );
-                    await db.messageLocks.destroy({
-                        where: { discordid: interaction.message.id },
-                    });
-                    return await interaction.editReply(
-                        ":x: Something went wrong while commiting the records to github, please try again later (updateRefError)"
-                    );
-                }
-                logger.info(
-                    `Successfully created commit on ${githubBranch} (record addition): ${newCommit.data.sha}`
-                );
-            } else {
-                // Get file SHA
-                let fileSha;
-                try {
-                    const response = await octokit.repos.getContent({
-                        owner: githubOwner,
-                        repo: githubRepo,
-                        path: changePath,
-                    });
-                    fileSha = response.data.sha;
-                } catch (error) {
-                    logger.info(`Error fetching ${changePath} SHA:\n${error}`);
-                    return await interaction.editReply(
-                        `:x: Couldn't fetch data from ${changePath}`
-                    );
-                }
-
-                try {
-                    await octokit.repos.createOrUpdateFileContents({
-                        owner: githubOwner,
-                        repo: githubRepo,
-                        path: changePath,
-                        message: `Updated ${changePath} (${interaction.user.tag})`,
-                        content: Buffer.from(content).toString("base64"),
-                        sha: fileSha,
-                    });
-                    logger.info(
-                        `Updated ${changePath} (${interaction.user.tag}`
-                    );
-                } catch (error) {
-                    logger.info(
-                        `Failed to update ${changePath} (${interaction.user.tag}):\n${error}`
-                    );
-                    await interaction.editReply(
-                        `:x: Couldn't update the file ${changePath}, skipping...`
-                    );
-                }
-
-                await interaction.message.delete();
-            }
-
-            // Send all messages simultaneously
-            const guild = await interaction.client.guilds.fetch(guildId);
-            const staffGuild = enableSeparateStaffServer
-                ? await interaction.client.guilds.fetch(staffGuildId)
-                : guild;
-
-            // staffGuild.channels.cache.get(acceptedRecordsID).send({ content: '', embeds: [acceptEmbed], components: [row] });
-            staffGuild.channels.cache.get(archiveRecordsID).send({
-                content: userToPing ? `<@${userToPing.id}>` : "",
-                embeds: [publicEmbed],
-            });
-
-            // Check if we need to send in dms as well
-            const settings = await db.staffSettings.findOne({
-                where: { moderator: interaction.user.id },
-            });
-            if (!settings) {
-                await db.staffSettings.create({
-                    moderator: interaction.user.id,
-                    sendAcceptedInDM: false,
-                });
-            } else if (settings.sendAcceptedInDM) {
-                try {
-                    const notRawGithubCode = {
-                        user: record.username,
-                        link: record.completionlink,
-                        percent: record.percent,
-                        hz: record.fps,
-                        ...(record.device === "Mobile" && { mobile: true }),
-                    };
-                    if (enjoyment) notRawGithubCode.enjoyment = enjoyment;
-
-                    const rawGithubCode = JSON.stringify(
-                        notRawGithubCode,
-                        null,
-                        "\t"
-                    );
-
-                    const dmMessage = `Accepted record of ${record.levelname} for ${record.username}\nGithub Code:\n\`\`\`${rawGithubCode}\`\`\``;
-                    await interaction.user.send({ content: dmMessage });
-                } catch {
-                    logger.info(
-                        `Failed to send in moderator ${interaction.user.id} dms, ignoring send in dms setting`
-                    );
-                }
-            }
-
-            // Update moderator data (create new entry if that moderator hasn't accepted/denied records before)
-            const modInfo = await db.staffStats.findOne({
-                where: { moderator: interaction.user.id },
-            });
-            if (!modInfo) {
-                await db.staffStats.create({
-                    moderator: interaction.user.id,
-                    nbRecords: 1,
-                    nbDenied: 0,
-                    nbAccepted: 1,
-                });
-            } else {
-                await modInfo.increment("nbRecords");
-                await modInfo.increment("nbAccepted");
-            }
-
-            if (!(await db.dailyStats.findOne({ where: { date: Date.now() } })))
-                db.dailyStats.create({
-                    date: Date.now(),
-                    nbRecordsAccepted: 1,
-                    nbRecordsPending: await db.pendingRecords.count(),
-                });
-            else
-                await db.dailyStats.update(
-                    {
-                        nbRecordsAccepted:
-                            (
-                                await db.dailyStats.findOne({
-                                    where: { date: Date.now() },
-                                })
-                            ).nbRecordsAccepted + 1,
-                    },
-                    { where: { date: Date.now() } }
-                );
-
-            logger.info(
-                `${interaction.user.tag} (${interaction.user.id}) submitted ${record.levelname} for ${record.username}`
-            );
-            return await interaction.editReply(
-                enablePriorityRole &&
-                    interaction.member.roles.cache.has(priorityRoleID)
-                    ? `:white_check_mark: The priority record for ${record.levelname} has been submitted successfully`
-                    : `:white_check_mark: The record for ${record.levelname} has been added successfully`
-            );
+            return await interaction.editReply({ embeds: [embed] })
         } else if (interaction.options.getSubcommand() === "delete") {
             await interaction.deferReply({ ephemeral: true });
             const { cache, octokit } = require("../../index.js");

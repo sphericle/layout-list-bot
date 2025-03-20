@@ -239,10 +239,6 @@ module.exports = {
         });
         
         db.bulkRecordSessions = sequelize.define("bulkRecordSessions", {
-            sessionID: {
-                type: Sequelize.INTEGER,
-                unique: true,
-            },
             moderatorID: Sequelize.STRING,
             playerName: Sequelize.STRING,
             video: Sequelize.STRING,
@@ -253,10 +249,11 @@ module.exports = {
         });
         
         db.bulkRecords = sequelize.define("bulkRecords", {
-            sessionID: Sequelize.INTEGER,
+            moderatorID: Sequelize.STRING,
             enjoyment: Sequelize.INTEGER,
             percent: Sequelize.INTEGER,
             path: Sequelize.STRING,
+            levelname: Sequelize.STRING,
         });
         return db;
     },
