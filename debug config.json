@@ -24,24 +24,24 @@
     "priorityRoleID": "0",
     "submissionLockRoleID": "0",
 
-    "pendingRecordsID": "1324848672147771533",
-    "priorityRecordsID": "1324848672147771533",
+    "pendingRecordsID": "1328535145455812660",
+    "priorityRecordsID": "1328535145455812660",
 
     "acceptedRecordsID": "0",
     "deniedRecordsID": "0",
-    "archiveRecordsID": "1324848672147771533",
-    "recordsID": "1324848672147771533",
+    "archiveRecordsID": "1328535145455812660",
+    "recordsID": "1328535145455812660",
 
-    "changelogID": "1324848672147771533",
+    "changelogID": "1328535145455812660",
     "changelogRoleID": "0",
 
-    "guildMemberAddID": "1324848672147771533",
+    "guildMemberAddID": "1328535145455812660",
 
     "shiftsReminderID": "1212119449994526801",
     "shiftsLogsID": "1219796853822849084",
     "recordsPerWeek": 60,
 
-    "submissionResultsID": "1324848672147771533",
+    "submissionResultsID": "1328535145455812660",
     "reliableThreadID": "1324848402500026428",
     "staffRole": "1320770731985866803",
     "submissionsChannelID": "1328535145455812660",

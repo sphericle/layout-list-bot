@@ -559,7 +559,7 @@ module.exports = {
                         value: `${device} (${fps} FPS)`,
                         inline: true,
                     },
-                    { name: "Link", value: `${linkStr}`, inline: true },
+                    { name: "Video", value: `[Link](${linkStr})`, inline: true },
                     {
                         name: "Enjoyment",
                         value: enjoyment ? `${enjoyment}/10` : "None",
@@ -1046,8 +1046,8 @@ module.exports = {
                         inline: true,
                     },
                     {
-                        name: "Link",
-                        value: `${oldRecord.completionlink}`,
+                        name: "Video",
+                        value: `[Link](${oldRecord.completionlink})`,
                         inline: true,
                     },
                     {
