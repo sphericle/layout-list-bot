@@ -2,8 +2,13 @@ const {
     githubDataPath,
     githubOwner,
     githubRepo,
-    githubBranch
+    githubBranch,
+    guildId,
+    enableSeparateStaffServer,
+    staffGuildId,
+    archiveRecordsID,
 } = require("../config.json")
+const { EmbedBuilder } = require("discord.js")
 const logger = require("log4js").getLogger()
 const fs = require("fs")
 const path = require("path")
@@ -178,6 +183,135 @@ module.exports = {
         logger.info(
             `Successfully created commit on ${githubBranch} (record addition): ${newCommit.data.sha}`
         );
+
+        // Send all messages simultaneously
+        const guild = await interaction.client.guilds.fetch(guildId);
+        const staffGuild = enableSeparateStaffServer
+            ? await interaction.client.guilds.fetch(staffGuildId)
+            : guild;
+
+        const recordsChannel = await staffGuild.channels.cache.get(archiveRecordsID)
+
+        // staffGuild.channels.cache.get(acceptedRecordsID).send({ content: '', embeds: [acceptEmbed], components: [row] });
+        if (session.discordID) {
+            await recordsChannel.send({
+                content: `<@${session.discordID}>`
+            });
+        }
+
+        // Check if we need to send in dms as well
+        const settings = await db.staffSettings.findOne({
+            where: { moderator: interaction.user.id },
+        });
+
+        // Update moderator data (create new entry if that moderator hasn't accepted/denied records before)
+        const modInfo = await db.staffStats.findOne({
+            where: { moderator: interaction.user.id },
+        });
+
+        if (!modInfo) {
+            await db.staffStats.create({
+                moderator: interaction.user.id,
+                nbRecords: records.length,
+                nbDenied: 0,
+                nbAccepted: records.length,
+            });
+        } else {
+            await modInfo.increment("nbRecords", { by: records.length });
+            await modInfo.increment("nbAccepted", { by: records.length });
+        }
+
+        if (!(await db.dailyStats.findOne({ where: { date: Date.now() } })))
+            db.dailyStats.create({
+                date: Date.now(),
+                nbRecordsAccepted: records.length,
+                nbRecordsPending: await db.pendingRecords.count(),
+            });
+        else
+            await db.dailyStats.update(
+                {
+                    nbRecordsAccepted:
+                        (
+                            await db.dailyStats.findOne({
+                                where: { date: Date.now() },
+                            })
+                        ).nbRecordsAccepted + records.length,
+                },
+                { where: { date: Date.now() } }
+            );
+      
+        const recordEmbeds = []
+
+        for (const record of records) {
+            // Create embed to send in public channel
+            let publicEmbed = new EmbedBuilder()
+                .setColor(0x8fce00)
+                .setTitle(`:white_check_mark: ${record.levelname}`)
+                .addFields(
+                    { name: "Percent", value: `${record.percent}%`, inline: true },
+                    {
+                        name: "Record holder",
+                        value: `${session.playerName}`,
+                        inline: true,
+                    },
+                    {
+                        name: "Record added by",
+                        value: `${interaction.user}`,
+                        inline: true,
+                    },
+                    {
+                        name: "Device",
+                        value: `${record.mobile ? "Mobile" : "PC"} (${session.fps} FPS)`,
+                        inline: true,
+                    },
+                    { name: "Link", value: `${session.video}`, inline: true },
+                    {
+                        name: "Enjoyment",
+                        value: record.enjoyment ? `${record.enjoyment}/10` : "None",
+                        inline: true,
+                    }
+                )
+
+            recordEmbeds.push(publicEmbed);
+
+            if (!settings) {
+                await db.staffSettings.create({
+                    moderator: interaction.user.id,
+                    sendAcceptedInDM: false,
+                });
+            } else if (settings.sendAcceptedInDM) {
+                try {
+                    const notRawGithubCode = {
+                        user: session.playerName,
+                        link: session.video,
+                        percent: record.percent,
+                        hz: session.fps,
+                        mobile: session.mobile ? true : false,
+                    };
+                    if (record.enjoyment) notRawGithubCode.enjoyment = record.enjoyment;
+    
+                    const rawGithubCode = JSON.stringify(
+                        notRawGithubCode,
+                        null,
+                        "\t"
+                    );
+    
+                    const dmMessage = `Accepted record of ${record.levelname} for ${session.playername}\nGithub Code:\n\`\`\`${rawGithubCode}\`\`\``;
+                    await interaction.user.send({ content: dmMessage });
+                } catch {
+                    logger.info(
+                        `Failed to send in moderator ${interaction.user.id} dms, ignoring send in dms setting`
+                    );
+                }
+            }        
+        }
+        
+        if (recordEmbeds.length > 0) {
+            for (let i = 0; i < recordEmbeds.length; i += 10) {
+                const embedBatch = recordEmbeds.slice(i, i + 10);
+                await recordsChannel.send({ embeds: embedBatch });
+            }
+        }
 
         await interaction.editReply(":white_check_mark: Added records!")
 
