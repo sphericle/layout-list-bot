@@ -4,7 +4,6 @@ const {
     ButtonBuilder,
     ButtonStyle,
     ActionRowBuilder,
-    AutoModerationRule
 } = require("discord.js");
 const isUrlHttp = require("is-url-http");
 const logger = require("log4js").getLogger();
@@ -40,7 +39,7 @@ async function buildEmbed(moderatorID, page) {
         const errEmbed = new EmbedBuilder()
         .setColor(0xFFFF00)
         .setTitle(`No records!`)
-        .setDescription("You're not currently checking bulk records, use /bulkrecord add to start a session!");
+        .setDescription(`You're not currently checking bulk records, start a session with /bulkrecord add`);
 
         return errEmbed;
     }
@@ -48,7 +47,7 @@ async function buildEmbed(moderatorID, page) {
     let embed = new EmbedBuilder()
         .setColor(0xFFFF00)
         .setTitle(`${session.playerName}'s records`)
-        .setDescription("You can add, remove, edit, and commit these records");
+        .setDescription(`${session.fps} FPS (${session.mobile ? "Mobile" : "PC"}) | [Video](${session.video})${session.discordID ? " | <@" + session.discordID + ">" : ""}`);
     
     for (const record of records.slice(page * 25, (page + 25) + 25)) {
         embed.addFields({
@@ -349,8 +348,8 @@ module.exports = {
                 video: video,
                 mobile: device == "Mobile" ? true : false,
                 fps: fps,
-                note: note,
-                discordID: userToPing.id
+                note: note || null,
+                discordID: userToPing?.id || null
             })
 
             for (const level of parsedJson.levels) {
