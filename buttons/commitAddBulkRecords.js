@@ -264,7 +264,7 @@ module.exports = {
                         value: `${record.mobile ? "Mobile" : "PC"} (${session.fps} FPS)`,
                         inline: true,
                     },
-                    { name: "Link", value: `${session.video}`, inline: true },
+                    { name: "Video", value: `[Link](${session.video})`, inline: true },
                     {
                         name: "Enjoyment",
                         value: record.enjoyment ? `${record.enjoyment}/10` : "None",
