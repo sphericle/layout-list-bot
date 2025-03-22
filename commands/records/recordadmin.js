@@ -91,7 +91,7 @@ module.exports = {
 
             const modId = interaction.options.getUser("moderator").id;
 
-            const modInfo = await db.staffStats.findOne({
+            const modInfo = await db.staffs.findOne({
                 attribute: ["nbRecords", "nbAccepted", "nbDenied", "updatedAt"],
                 where: { moderator: modId },
             });

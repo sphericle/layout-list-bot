@@ -212,7 +212,7 @@ module.exports = {
         }
 
         const levelname = (
-            await cache.legacy.findOne({ where: { filename: level.filename } })
+            await cache.legacy_levels.findOne({ where: { filename: level.filename } })
         )?.name;
         try {
             const above = list[level.position]
@@ -259,7 +259,7 @@ module.exports = {
             await db.levelsToLegacy.destroy({
                 where: { discordid: level.discordid },
             });
-            await cache.legacy.destroy({ where: { filename: level.filename } });
+            await cache.legacy_levels.destroy({ where: { filename: level.filename } });
             await cache.levels.create({
                 name: levelname,
                 filename: level.filename,

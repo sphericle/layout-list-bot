@@ -25,7 +25,7 @@ module.exports = {
         if (uncheckedAssignedRecords.length != 0) {
             for (const modRecords of uncheckedAssignedRecords) {
                 const modId = modRecords.dataValues["assigned"];
-                const staff = await db.staffSettings.findOne({
+                const staff = await db.settings.findOne({
                     where: { moderator: modId },
                 });
                 try {

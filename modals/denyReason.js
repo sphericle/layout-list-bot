@@ -181,11 +181,11 @@ module.exports = {
         });
 
         // Update moderator data
-        const modInfo = await db.staffStats.findOne({
+        const modInfo = await db.staffs.findOne({
             where: { moderator: interaction.user.id },
         });
         if (!modInfo) {
-            await db.staffStats.create({
+            await db.staffs.create({
                 moderator: interaction.user.id,
                 nbRecords: 1,
                 nbDenied: 1,
