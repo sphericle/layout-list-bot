@@ -805,11 +805,11 @@ module.exports = {
             });
 
             // Check if we need to send in dms as well
-            const settings = await db.staffSettings.findOne({
+            const settings = await db.settings.findOne({
                 where: { moderator: interaction.user.id },
             });
             if (!settings) {
-                await db.staffSettings.create({
+                await db.settings.create({
                     moderator: interaction.user.id,
                     sendAcceptedInDM: false,
                 });
@@ -840,11 +840,11 @@ module.exports = {
             }
 
             // Update moderator data (create new entry if that moderator hasn't accepted/denied records before)
-            const modInfo = await db.staffStats.findOne({
+            const modInfo = await db.staffs.findOne({
                 where: { moderator: interaction.user.id },
             });
             if (!modInfo) {
-                await db.staffStats.create({
+                await db.staffs.create({
                     moderator: interaction.user.id,
                     nbRecords: 1,
                     nbDenied: 0,
@@ -1358,11 +1358,11 @@ module.exports = {
                 .send({ embeds: [publicEmbed] });
 
             // Check if we need to send in dms as well
-            const settings = await db.staffSettings.findOne({
+            const settings = await db.settings.findOne({
                 where: { moderator: interaction.user.id },
             });
             if (!settings) {
-                await db.staffSettings.create({
+                await db.settings.create({
                     moderator: interaction.user.id,
                     sendAcceptedInDM: false,
                 });
@@ -1395,11 +1395,11 @@ module.exports = {
             }
 
             // Update moderator data (create new entry if that moderator hasn't accepted/denied records before)
-            const modInfo = await db.staffStats.findOne({
+            const modInfo = await db.staffs.findOne({
                 where: { moderator: interaction.user.id },
             });
             if (!modInfo) {
-                await db.staffStats.create({
+                await db.staffs.create({
                     moderator: interaction.user.id,
                     nbRecords: 1,
                     nbDenied: 0,
@@ -1443,7 +1443,7 @@ module.exports = {
 
             const modId = interaction.user.id;
 
-            const modInfo = await db.staffStats.findOne({
+            const modInfo = await db.staffs.findOne({
                 attribute: ["nbRecords", "nbAccepted", "nbDenied", "updatedAt"],
                 where: { moderator: modId },
             });
@@ -1593,9 +1593,9 @@ module.exports = {
             // Display staff records leaderboard //
 
             // Get number of staff
-            const nbTotal = await db.staffStats.count();
+            const nbTotal = await db.staffs.count();
             // Get sqlite data, ordered by descending number of records, limited to top 20 for now (maybe add a page system later)
-            const modInfos = await db.staffStats.findAll({
+            const modInfos = await db.staffs.findAll({
                 limit: 30,
                 order: [["nbRecords", "DESC"]],
                 attributes: [
@@ -1686,7 +1686,7 @@ module.exports = {
             const { db } = require("../../index.js");
 
             // Update sqlite db
-            const update = await db.staffSettings.update(
+            const update = await db.settings.update(
                 {
                     sendAcceptedInDM:
                         interaction.options.getString("status") === "enabled",
@@ -1695,7 +1695,7 @@ module.exports = {
             );
 
             if (!update) {
-                const create = await db.staffSettings.create({
+                const create = await db.settings.create({
                     moderator: interaction.user.id,
                     sendAcceptedInDM:
                         interaction.options.getString("status") === "enabled",
@@ -1717,7 +1717,7 @@ module.exports = {
             const { db } = require("../../index.js");
 
             // Update sqlite db
-            const update = await db.staffSettings.update(
+            const update = await db.settings.update(
                 {
                     shiftReminder:
                         interaction.options.getString("status") === "enabled",
@@ -1726,7 +1726,7 @@ module.exports = {
             );
 
             if (!update) {
-                const create = await db.staffSettings.create({
+                const create = await db.settings.create({
                     moderator: interaction.user.id,
                     shiftReminder:
                         interaction.options.getString("status") === "enabled",

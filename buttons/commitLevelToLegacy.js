@@ -241,7 +241,7 @@ module.exports = {
                 where: { discordid: level.discordid },
             });
             await cache.levels.destroy({ where: { filename: level.filename } });
-            await cache.legacy.create({
+            await cache.legacy_levels.create({
                 name: levelname,
                 filename: level.filename,
                 position: list.length + 1,

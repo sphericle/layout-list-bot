@@ -349,7 +349,7 @@ module.exports = {
             return await interaction.respond(
                 (
                     await (subcommand === "fromlegacy"
-                        ? cache.legacy
+                        ? cache.legacy_levels
                         : cache.levels
                     ).findAll({ where: {} })
                 )

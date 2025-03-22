@@ -347,7 +347,7 @@ module.exports = {
                 files: [membersAttachment],
             });
         } else if (interaction.options.getSubcommand() === "exportdb") {
-            const { db } = require("../../index.js");
+            const { db, sequelize } = require("../../index.js");
 
             const exportDir = path.join(__dirname, "../../data/exports/");
             if (!fs.existsSync(exportDir)) {
@@ -358,202 +358,66 @@ module.exports = {
                 `database_export_${Date.now()}.xlsx`
             );
 
-            try {
-                const workbook = new ExcelJS.Workbook();
-                const pendingSheet = workbook.addWorksheet("Pending Records");
-                const acceptedSheet = workbook.addWorksheet("Accepted Records");
-                const deniedSheet = workbook.addWorksheet("Denied Records");
-                const dailyStatsSheet = workbook.addWorksheet("Daily Stats");
-                const submitters = workbook.addWorksheet("Submitters");
-                const levelsInVoting =
-                    workbook.addWorksheet("Levels In Voting");
-                const skippers = workbook.addWorksheet("Skip counts");
-                const levelStats = workbook.addWorksheet("Submission stats");
+            const tables = Object.values(await sequelize.getQueryInterface().showAllTables())
 
-                // Add columns to the sheets
-                pendingSheet.columns = [
-                    { header: "Username", key: "username", width: 25 },
-                    { header: "Level Name", key: "levelname", width: 30 },
-                    { header: "Device", key: "device", width: 20 },
-                    { header: "Created At", key: "createdAt", width: 25 },
-                ];
+            const dbMap = {}
 
-                acceptedSheet.columns = [
-                    { header: "Username", key: "username", width: 25 },
-                    { header: "Level Name", key: "levelname", width: 30 },
-                    { header: "Device", key: "device", width: 20 },
-                    { header: "Created At", key: "createdAt", width: 25 },
-                ];
-
-                deniedSheet.columns = [
-                    { header: "Username", key: "username", width: 25 },
-                    { header: "Level Name", key: "levelname", width: 30 },
-                    { header: "Device", key: "device", width: 20 },
-                    { header: "Created At", key: "createdAt", width: 25 },
-                ];
-
-                submitters.columns = [
-                    { header: "discordid", key: "discordid", width: 25 },
-                    { header: "submissions", key: "submissions", width: 30 },
-                    { header: "dmFlag", key: "dmFlag", width: 20 },
-                    { header: "banned", key: "banned", width: 20 },
-                ];
-
-                levelsInVoting.columns = [
-                    { header: "levelname", key: "levelname", width: 25 },
-                    { header: "submitter", key: "submitter", width: 30 },
-                    { header: "discordid", key: "discordid", width: 20 },
-                    { header: "yeses", key: "yeses", width: 20 },
-                    { header: "nos", key: "nos", width: 20 },
-                    { header: "shared", key: "shared", width: 20 },
-                ];
-                skippers.columns = [
-                    { header: "user", key: "user", width: 25 },
-                    { header: "count", key: "count", width: 25 },
-                ];
-
-                levelStats.columns = [
-                    { header: "submissions", key: "submissions", width: 25 },
-                    { header: "accepts", key: "accepts", width: 25 },
-                    { header: "denies", key: "denies", width: 25 },
-                ];
-
-                dailyStatsSheet.columns = [
-                    { header: "Date", key: "date", width: 15 },
-                    {
-                        header: "Records Submitted",
-                        key: "nbRecordsSubmitted",
-                        width: 25,
-                    },
-                    {
-                        header: "Records Pending",
-                        key: "nbRecordsPending",
-                        width: 25,
-                    },
-                    {
-                        header: "Records Accepted",
-                        key: "nbRecordsAccepted",
-                        width: 25,
-                    },
-                    {
-                        header: "Records Denied",
-                        key: "nbRecordsDenied",
-                        width: 25,
-                    },
-                    {
-                        header: "Members Joined",
-                        key: "nbMembersJoined",
-                        width: 20,
-                    },
-                    { header: "Members Left", key: "nbMembersLeft", width: 20 },
-                ];
-
-                const pendingRecords = await db.pendingRecords.findAll({
-                    attributes: [
-                        "username",
-                        "levelname",
-                        "device",
-                        "createdAt",
-                    ],
-                });
-                const acceptedRecords = await db.acceptedRecords.findAll({
-                    attributes: [
-                        "username",
-                        "levelname",
-                        "device",
-                        "createdAt",
-                    ],
-                });
-                const deniedRecords = await db.deniedRecords.findAll({
-                    attributes: [
-                        "username",
-                        "levelname",
-                        "device",
-                        "createdAt",
-                    ],
-                });
-                const dailyStats = await db.dailyStats.findAll({
-                    attributes: [
-                        "date",
-                        "nbRecordsSubmitted",
-                        "nbRecordsPending",
-                        "nbRecordsAccepted",
-                        "nbRecordsDenied",
-                        "nbMembersJoined",
-                        "nbMembersLeft",
-                    ],
-                });
-
-                const submittersData = await db.submitters.findAll({
-                    attributes: [
-                        "discordid",
-                        "submissions",
-                        "dmFlag",
-                        "banned",
-                    ],
-                });
-
-                const levelsInVotingData = await db.levelsInVoting.findAll({
-                    attributes: [
-                        "levelname",
-                        "submitter",
-                        "discordid",
-                        "yeses",
-                        "nos",
-                        "shared",
-                        "paused",
-                    ],
-                });
-
-                const skippersData = await db.skippers.findAll({
-                    attributes: ["user", "count"],
-                });
-
-                const levelStatsData = await db.levelStats.findAll({
-                    attributes: ["submissions", "accepts", "denies"],
-                });
-
-                pendingRecords.forEach((record) =>
-                    pendingSheet.addRow(record.toJSON())
-                );
-                acceptedRecords.forEach((record) =>
-                    acceptedSheet.addRow(record.toJSON())
-                );
-                deniedRecords.forEach((record) =>
-                    deniedSheet.addRow(record.toJSON())
-                );
-                dailyStats.forEach((stat) =>
-                    dailyStatsSheet.addRow(stat.toJSON())
-                );
-                submittersData.forEach((stat) =>
-                    submitters.addRow(stat.toJSON())
-                );
-                levelsInVotingData.forEach((stat) =>
-                    levelsInVoting.addRow(stat.toJSON())
-                );
-                skippersData.forEach((stat) => skippers.addRow(stat.toJSON()));
-                levelStatsData.forEach((stat) =>
-                    levelStats.addRow(stat.toJSON())
-                );
-
-                await workbook.xlsx.writeFile(filePath);
-
-                const fileAttachment = new AttachmentBuilder(filePath, {
-                    name: "database_export.xlsx",
-                });
-                await interaction.editReply({
-                    content: ":white_check_mark: Exported data successfully:",
-                    files: [fileAttachment],
-                });
-
-                fs.unlinkSync(filePath);
-            } catch (error) {
-                logger.error(error);
-                await interaction.editReply({
-                    content:
-                        ":x: An error occurred while exporting the database.",
-                });
+            for (const table of tables) {
+                const columns = await sequelize.getQueryInterface().describeTable(table);
+                dbMap[table] = Object.keys(columns);
             }
+
+            let workbook;
+
+            try {
+                workbook = new ExcelJS.Workbook();
+
+                for (let [k, v] of Object.entries(dbMap)) {
+                    const worksheet = await workbook.addWorksheet(k)
+                    worksheet.columns = []
+                    for (const row of v) {
+                        if (!row.endsWith("At"))
+                            worksheet.columns.push({
+                                header: row,
+                                key: row,
+                                width: 30,
+                                equivalentTo: () => false,
+                            })
+                    }
+                    
+                    if (!db[k]) {
+                        // LOLLLLLL
+                        if (k.endsWith("ies")) {
+                            k = k.slice(0, -3);
+                            k = k.concat("y")
+                        } else if (k.toLowerCase().endsWith('s')) {
+                            k = k.slice(0, -1)
+                        }
+                    }
+                    
+                    const tableData = await db[k].findAll();
+                    await tableData.forEach((record) => 
+                        worksheet.addRow(record.toJSON())
+                    )
+
+                }
+            } catch (e) {
+                logger.error(e)
+                return;
+            }
+
+            await workbook.xlsx.writeFile(filePath);
+
+            const fileAttachment = new AttachmentBuilder(filePath, {
+                name: "database_export.xlsx",
+            });
+            await interaction.editReply({
+                content: ":white_check_mark: Exported data successfully:",
+                files: [fileAttachment],
+            });
+
+            fs.unlinkSync(filePath);
+        
         } else if (interaction.options.getSubcommand() === "exportcache") {
             const { cache } = require("../../index.js");
 

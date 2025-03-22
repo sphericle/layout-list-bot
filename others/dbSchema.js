@@ -117,7 +117,7 @@ module.exports = {
             userdiscordid: Sequelize.STRING,
         });
 
-        db.staffStats = sequelize.define("staffs", {
+        db.staffs = sequelize.define("staffs", {
             moderator: Sequelize.STRING,
             nbRecords: Sequelize.INTEGER,
             nbAccepted: Sequelize.INTEGER,
@@ -154,7 +154,7 @@ module.exports = {
             nbMembersLeft: { type: Sequelize.NUMBER, defaultValue: 0 },
         });
 
-        db.staffSettings = sequelize.define("settings", {
+        db.settings = sequelize.define("settings", {
             moderator: Sequelize.STRING,
             sendAcceptedInDM: {
                 type: Sequelize.BOOLEAN,
@@ -277,7 +277,7 @@ module.exports = {
             filename: Sequelize.STRING,
         });
 
-        cache.legacy = sequelize_cache.define("legacy_levels", {
+        cache.legacy_levels = sequelize_cache.define("legacy_levels", {
             name: Sequelize.STRING,
             position: Sequelize.INTEGER,
             filename: Sequelize.STRING,
