@@ -559,7 +559,11 @@ module.exports = {
                         value: `${device} (${fps} FPS)`,
                         inline: true,
                     },
-                    { name: "Video", value: `[Link](${linkStr})`, inline: true },
+                    {
+                        name: "Video",
+                        value: `[Link](${linkStr})`,
+                        inline: true,
+                    },
                     {
                         name: "Enjoyment",
                         value: enjoyment ? `${enjoyment}/10` : "None",
