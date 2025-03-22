@@ -380,13 +380,20 @@ module.exports = {
                     const worksheet = await workbook.addWorksheet(k);
                     worksheet.columns = [];
                     for (const row of v) {
-                        if (!row.endsWith("At"))
-                            worksheet.columns.push({
-                                header: row,
-                                key: row,
-                                width: 30,
-                                equivalentTo: () => false,
-                            });
+                        if (row.endsWith("At"))
+                            continue;
+
+                        const columnsToAdd = {
+                            header: row,
+                            key: row,
+                            width: 30,
+                            equivalentTo: () => false,
+                        }
+
+                        worksheet.columns = [
+                            ...worksheet.columns,
+                            columnsToAdd
+                        ]
                     }
 
                     if (!db[k]) {
