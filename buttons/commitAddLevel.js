@@ -79,24 +79,23 @@ module.exports = {
             );
         }
 
-         // Check if file already exists
-         try {
+        // Check if file already exists
+        try {
             await octokit.rest.repos.getContent({
                 owner: githubOwner,
                 repo: githubRepo,
                 path: githubDataPath + `/${mainFilename}.json`,
                 branch: githubBranch,
             });
-            let creator = JSON.parse(level.githubCode).creators[0]
-            creator = creator
+            let creator = JSON.parse(level.githubCode).creators[0];
+            (creator = creator
                 .normalize("NFD")
                 .replace(/[^a-zA-Z0-9 ]/g, "")
                 .replace(/ /g, "_")
-                .toLowerCase(),
-            mainFilename = level.filename + `_${creator}`
-            
+                .toLowerCase()),
+                (mainFilename = level.filename + `_${creator}`);
         } catch (e) {
-            e // lol!
+            e; // lol!
         }
 
         // filter out all levels that are not dividers
@@ -120,7 +119,7 @@ module.exports = {
             above: noDiv[level.position] || null,
             below: noDiv[level.position - 2] || null,
         });
-        
+
         const changes = [
             {
                 path: githubDataPath + "/_list.json",
@@ -236,13 +235,13 @@ module.exports = {
             // never added to the noDiv array
             const above = noDiv[level.position]
                 ? await cache.levels.findOne({
-                        where: { filename: noDiv[level.position - 1] },
-                    })
+                      where: { filename: noDiv[level.position - 1] },
+                  })
                 : null;
             const below = noDiv[level.position - 2]
                 ? await cache.levels.findOne({
-                        where: { filename: noDiv[level.position - 2] },
-                    })
+                      where: { filename: noDiv[level.position - 2] },
+                  })
                 : null;
 
             if (enableChangelogMessage) {
@@ -269,9 +268,7 @@ module.exports = {
                     .setDescription(message)
                     .setTimestamp();
 
-                const guild = await interaction.client.guilds.fetch(
-                    guildId
-                );
+                const guild = await interaction.client.guilds.fetch(guildId);
                 const staffGuild = enableSeparateStaffServer
                     ? await interaction.client.guilds.fetch(staffGuildId)
                     : guild;
@@ -315,6 +312,5 @@ module.exports = {
         return await interaction.editReply(
             `:white_check_mark: Successfully created file: **${mainFilename}.json** (${newCommit.data.html_url})`
         );
-        
     },
 };

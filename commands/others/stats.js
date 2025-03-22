@@ -358,12 +358,16 @@ module.exports = {
                 `database_export_${Date.now()}.xlsx`
             );
 
-            const tables = Object.values(await sequelize.getQueryInterface().showAllTables())
+            const tables = Object.values(
+                await sequelize.getQueryInterface().showAllTables()
+            );
 
-            const dbMap = {}
+            const dbMap = {};
 
             for (const table of tables) {
-                const columns = await sequelize.getQueryInterface().describeTable(table);
+                const columns = await sequelize
+                    .getQueryInterface()
+                    .describeTable(table);
                 dbMap[table] = Object.keys(columns);
             }
 
@@ -373,8 +377,8 @@ module.exports = {
                 workbook = new ExcelJS.Workbook();
 
                 for (let [k, v] of Object.entries(dbMap)) {
-                    const worksheet = await workbook.addWorksheet(k)
-                    worksheet.columns = []
+                    const worksheet = await workbook.addWorksheet(k);
+                    worksheet.columns = [];
                     for (const row of v) {
                         if (!row.endsWith("At"))
                             worksheet.columns.push({
@@ -382,27 +386,26 @@ module.exports = {
                                 key: row,
                                 width: 30,
                                 equivalentTo: () => false,
-                            })
+                            });
                     }
-                    
+
                     if (!db[k]) {
                         // LOLLLLLL
                         if (k.endsWith("ies")) {
                             k = k.slice(0, -3);
-                            k = k.concat("y")
-                        } else if (k.toLowerCase().endsWith('s')) {
-                            k = k.slice(0, -1)
+                            k = k.concat("y");
+                        } else if (k.toLowerCase().endsWith("s")) {
+                            k = k.slice(0, -1);
                         }
                     }
-                    
-                    const tableData = await db[k].findAll();
-                    await tableData.forEach((record) => 
-                        worksheet.addRow(record.toJSON())
-                    )
 
+                    const tableData = await db[k].findAll();
+                    await tableData.forEach((record) =>
+                        worksheet.addRow(record.toJSON())
+                    );
                 }
             } catch (e) {
-                logger.error(e)
+                logger.error(e);
                 return;
             }
 
@@ -417,7 +420,6 @@ module.exports = {
             });
 
             fs.unlinkSync(filePath);
-        
         } else if (interaction.options.getSubcommand() === "exportcache") {
             const { cache } = require("../../index.js");
 
