@@ -199,17 +199,17 @@ module.exports = {
         }
 
         // Check if we need to send in dms as well
-        const settings = await db.staffSettings.findOne({
+        const settings = await db.settings.findOne({
             where: { moderator: interaction.user.id },
         });
 
         // Update moderator data (create new entry if that moderator hasn't accepted/denied records before)
-        const modInfo = await db.staffStats.findOne({
+        const modInfo = await db.staffs.findOne({
             where: { moderator: interaction.user.id },
         });
 
         if (!modInfo) {
-            await db.staffStats.create({
+            await db.staffs.create({
                 moderator: interaction.user.id,
                 nbRecords: records.length,
                 nbDenied: 0,
@@ -274,7 +274,7 @@ module.exports = {
             recordEmbeds.push(publicEmbed);
 
             if (!settings) {
-                await db.staffSettings.create({
+                await db.settings.create({
                     moderator: interaction.user.id,
                     sendAcceptedInDM: false,
                 });
