@@ -58,6 +58,27 @@ async function buildEmbed(moderatorID, page) {
     return embed;
 }
 
+/**
+ * Updates a date string in format "YYYYMMDD" to the current date at runtime
+ * @param {string} dateString - The date string to update, in format "YYYYMMDD"
+ * @returns {string} - Current date in the same format "YYYYMMDD"
+ */
+function getCurrentDate(offset) {
+    if (!offset) offset = 0
+    // Get current date and add offset days
+    const now = new Date();
+    now.setDate(now.getDate() + offset);
+    
+    // Format to YYYYMMDD
+    const year = now.getFullYear();
+    // getMonth() is zero-based, so add 1 and pad with leading zero if needed
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    
+    // Combine into the same format
+    return `${year}${month}${day}`;
+}
+
 module.exports = {
     enabled: true,
     data: new SlashCommandBuilder()
@@ -285,7 +306,7 @@ module.exports = {
         if (interaction.options.getSubcommand() === "add") {
             await interaction.deferReply({ ephemeral: true });
 
-            const fileLink = interaction.options.getString("link");
+            let fileLink = interaction.options.getString("link");
             const device = interaction.options.getString("device");
             const video = interaction.options.getString("completionlink");
             const fps = interaction.options.getInteger("fps");
@@ -303,6 +324,14 @@ module.exports = {
                     ":x: Couldn't add the record: The provided completion link is not a valid URL"
                 );
 
+            const baseIdRegex = /filebin\.net\/([a-z0-9]+)_\d{8}/;
+            const baseIdMatch = fileLink.match(baseIdRegex);
+            const binID = baseIdMatch[1];
+
+            const numberRegex = /filebin\.net\/[a-z0-9]+_\d{8}\/(\d+)/;
+            const numberMatch = fileLink.match(numberRegex);
+            const binFileName = numberMatch[1];
+            let toOffset = 0
 
             // using axios so we can send the cookie lol
             /* this is wrong .
@@ -311,21 +340,32 @@ module.exports = {
             date.setDate(date.getDate() + 66); // Add 66 days
             const cookieValue = date.toISOString().split('T')[0];
             */
+
+            let i = 0
             let responseBody;
-            try {
-                const response = await axios.get(fileLink, {
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Cookie": `verified=2024-05-24`,
-                    },
-                    responseType: "arraybuffer"
-                });
-                responseBody = response.data;
-            } catch (error) {
-                logger.error(`Error fetching the file from the provided link: ${error}`);
-                return await interaction.editReply(
-                    ":x: Couldn't fetch the file from the provided link. Please ensure the link is correct and accessible."
-                );
+            while (!responseBody && i <= 3) {
+                let date = getCurrentDate(toOffset)
+                try {
+                    const modifiedLink = `https://filebin.net/${binID}_${date}/${binFileName}`;
+                    const response = await axios.get(modifiedLink, {
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Cookie": `verified=2024-05-24`,
+                        },
+                        responseType: "arraybuffer"
+                    });
+                    if (response.status === 200)
+                        responseBody = response.data;
+                } catch (error) {
+                    logger.error(`Error fetching the file from all modified links: ${error}`);
+                    if (toOffset === 0) {
+                        toOffset -= 1
+                    } else {
+                        toOffset *= -1
+                    }
+                    ++i
+
+                }
             }
             const parsedJson = await JSON.parse(decompressData(responseBody))
 
