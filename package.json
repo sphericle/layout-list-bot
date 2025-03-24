@@ -12,7 +12,7 @@
     "author": "Minebox260",
     "license": "ISC",
     "dependencies": {
-        "@napi-rs/canvas": "^0.1.68",
+        "@napi-rs/canvas": "^0.1.67",
         "@octokit/rest": "^21.1.0",
         "axios": "^1.8.3",
         "chartjs-node-canvas": "^4.1.6",
@@ -32,6 +32,7 @@
     },
     "devDependencies": {
         "@eslint/js": "^9.21.0",
+        "eslint": "^9.22.0",
         "globals": "^16.0.0"
     }
 }
