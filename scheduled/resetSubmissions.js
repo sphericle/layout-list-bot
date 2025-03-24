@@ -1,7 +1,7 @@
 const logger = require("log4js").getLogger();
 module.exports = {
     name: "resetSubmissions",
-    cron: "0 5 0 * * *",
+    cron: "0 4 1 * *",
     enabled: true,
     async execute() {
         const { db } = require("../index.js");
