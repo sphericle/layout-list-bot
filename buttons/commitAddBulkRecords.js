@@ -17,7 +17,6 @@ module.exports = {
     customId: "commitAddBulkRecords",
     ephemeral: true,
     async execute(interaction) {
-        // https://filebin.net/ttfthfqf64cxkthb3je55/509227
         const { db, octokit } = require("../index.js")
 
         const session = await db.bulkRecordSessions.findOne({
@@ -145,7 +144,7 @@ module.exports = {
             newCommit = await octokit.git.createCommit({
                 owner: githubOwner,
                 repo: githubRepo,
-                message: `Bulk-add ${session.playerName}'s records`,
+                message: `Bulk-add ${session.playerName}'s records (${interaction.user.tag})`,
                 tree: newTree.data.sha,
                 parents: [commitSha],
             });
