@@ -40,7 +40,7 @@ module.exports = {
             subcommand
                 .setName("add")
                 .setDescription(
-                    "Add a record directly to the site without submitting it"
+                    "Add a record to the site"
                 )
                 .addStringOption((option) =>
                     option

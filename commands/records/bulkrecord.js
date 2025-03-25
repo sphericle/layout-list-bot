@@ -98,7 +98,7 @@ module.exports = {
             subcommand
                 .setName("add")
                 .setDescription(
-                    "Add a record directly to the site without submitting it"
+                    "Start checking a bulk record submission"
                 )
                 .addStringOption((option) =>
                     option
