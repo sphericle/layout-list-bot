@@ -7,8 +7,8 @@ const {
 } = require("discord.js");
 const isUrlHttp = require("is-url-http");
 const logger = require("log4js").getLogger();
-const axios = require("axios")
-const pako = require("pako")
+const axios = require("axios");
+const pako = require("pako");
 
 // Decompressed data passed to the function using Gzip
 function decompressData(compressedData) {
@@ -22,38 +22,46 @@ function decompressData(compressedData) {
 
 async function buildEmbed(moderatorID, page) {
     if (!page) page = 0;
-    const { db } = await require("../../index.js")
+    const { db } = await require("../../index.js");
 
     const session = await db.bulkRecordSessions.findOne({
         where: {
-            moderatorID: moderatorID
-        }
-    })
+            moderatorID: moderatorID,
+        },
+    });
 
     const records = await db.bulkRecords.findAll({
         where: {
             moderatorID: moderatorID,
-        }
-    })
+        },
+    });
     if (records.length === 0) {
         const errEmbed = new EmbedBuilder()
-        .setColor(0xFFFF00)
-        .setTitle(`No records!`)
-        .setDescription(`You're not currently checking bulk records, start a session with /bulkrecord add`);
+            .setColor(0xffff00)
+            .setTitle(`No records!`)
+            .setDescription(
+                `You're not currently checking bulk records, start a session with /bulkrecord add`
+            );
 
         return errEmbed;
     }
 
     let embed = new EmbedBuilder()
-        .setColor(0xFFFF00)
+        .setColor(0xffff00)
         .setTitle(`${session.playerName}'s records`)
-        .setDescription(`${session.fps} FPS (${session.mobile ? "Mobile" : "PC"}) | [Video](${session.video})${session.discordID ? " | <@" + session.discordID + ">" : ""}`);
-    
-    for (const record of records.slice(page * 25, (page + 25) + 25)) {
+        .setDescription(
+            `${session.fps} FPS (${
+                session.mobile ? "Mobile" : "PC"
+            }) | [Video](${session.video})${
+                session.discordID ? " | <@" + session.discordID + ">" : ""
+            }`
+        );
+
+    for (const record of records.slice(page * 25, page + 25 + 25)) {
         embed.addFields({
             name: record.levelname,
-            value: `${record.percent}% - ${record.enjoyment}/10`
-        })
+            value: `${record.percent}% - ${record.enjoyment}/10`,
+        });
     }
     return embed;
 }
@@ -64,17 +72,17 @@ async function buildEmbed(moderatorID, page) {
  * @returns {string} - Current date in the same format "YYYYMMDD"
  */
 function getCurrentDate(offset) {
-    if (!offset) offset = 0
+    if (!offset) offset = 0;
     // Get current date and add offset days
     const now = new Date();
     now.setDate(now.getDate() + offset);
-    
+
     // Format to YYYYMMDD
     const year = now.getFullYear();
     // getMonth() is zero-based, so add 1 and pad with leading zero if needed
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+
     // Combine into the same format
     return `${year}${month}${day}`;
 }
@@ -83,14 +91,16 @@ module.exports = {
     enabled: true,
     data: new SlashCommandBuilder()
         .setName("bulkrecord")
-        .setDescription("Commands for adding records submitted with the Grind page")
+        .setDescription(
+            "Commands for adding records submitted with the Grind page"
+        )
         .addSubcommand((subcommand) =>
             subcommand
                 .setName("add")
                 .setDescription(
                     "Add a record directly to the site without submitting it"
                 )
-                .addStringOption((option) => 
+                .addStringOption((option) =>
                     option
                         .setName("link")
                         .setDescription("The link to the submitted save file")
@@ -237,17 +247,13 @@ module.exports = {
                 .setName("view")
                 .setDescription("Show all records you're currently checking")
                 .addIntegerOption((option) =>
-                    option
-                        .setName("page")
-                        .setDescription(
-                            "The page of levels"
-                        )
+                    option.setName("page").setDescription("The page of levels")
                 )
         ),
     async autocomplete(interaction) {
         const focused = await interaction.options.getFocused(true);
         const Sequelize = require("sequelize");
-        const { db, cache } = require("../../index.js")
+        const { db, cache } = require("../../index.js");
 
         if (focused.name === "levelname") {
             let levels = await db.bulkRecords.findAll({
@@ -257,7 +263,7 @@ module.exports = {
                         "LIKE",
                         "%" + focused.value.toLowerCase() + "%"
                     ),
-                    moderatorID: interaction.user.id
+                    moderatorID: interaction.user.id,
                 },
             });
 
@@ -300,7 +306,7 @@ module.exports = {
                 }))
             );
         }
-      },
+    },
     async execute(interaction) {
         const { db } = require("../../index.js");
         if (interaction.options.getSubcommand() === "add") {
@@ -331,7 +337,7 @@ module.exports = {
             const numberRegex = /filebin\.net\/[a-z0-9]+_\d{8}\/(\d+)/;
             const numberMatch = fileLink.match(numberRegex);
             const binFileName = numberMatch[1];
-            let toOffset = 0
+            let toOffset = 0;
 
             // using axios so we can send the cookie lol
             /* this is wrong .
@@ -341,45 +347,45 @@ module.exports = {
             const cookieValue = date.toISOString().split('T')[0];
             */
 
-            let i = 0
+            let i = 0;
             let responseBody;
             while (!responseBody && i <= 3) {
-                let date = getCurrentDate(toOffset)
+                let date = getCurrentDate(toOffset);
                 try {
                     const modifiedLink = `https://filebin.net/${binID}_${date}/${binFileName}`;
                     const response = await axios.get(modifiedLink, {
                         headers: {
                             "Content-Type": "application/json",
-                            "Cookie": `verified=2024-05-24`,
+                            Cookie: `verified=2024-05-24`,
                         },
-                        responseType: "arraybuffer"
+                        responseType: "arraybuffer",
                     });
-                    if (response.status === 200)
-                        responseBody = response.data;
+                    if (response.status === 200) responseBody = response.data;
                 } catch (error) {
-                    logger.error(`Error fetching the file from all modified links: ${error}`);
+                    logger.error(
+                        `Error fetching the file from all modified links: ${error}`
+                    );
                     if (toOffset === 0) {
-                        toOffset -= 1
+                        toOffset -= 1;
                     } else {
-                        toOffset *= -1
+                        toOffset *= -1;
                     }
-                    ++i
-
+                    ++i;
                 }
             }
-            const parsedJson = await JSON.parse(decompressData(responseBody))
+            const parsedJson = await JSON.parse(decompressData(responseBody));
 
             await db.bulkRecordSessions.destroy({
                 where: {
-                    moderatorID: interaction.user.id
-                }
-            })
+                    moderatorID: interaction.user.id,
+                },
+            });
 
             await db.bulkRecords.destroy({
                 where: {
-                    moderatorID: interaction.user.id
-                }
-            })
+                    moderatorID: interaction.user.id,
+                },
+            });
 
             // trust me this is a really cool way to do this
             await db.bulkRecordSessions.create({
@@ -389,8 +395,8 @@ module.exports = {
                 mobile: device == "Mobile" ? true : false,
                 fps: fps,
                 note: note || null,
-                discordID: userToPing?.id || null
-            })
+                discordID: userToPing?.id || null,
+            });
 
             for (const level of parsedJson.levels) {
                 await db.bulkRecords.create({
@@ -399,10 +405,10 @@ module.exports = {
                     percent: level.percent,
                     path: level.path,
                     levelname: level.name,
-                })
+                });
             }
 
-            const embed = await buildEmbed(interaction.user.id)
+            const embed = await buildEmbed(interaction.user.id);
 
             // Create commit button
             const commit = new ButtonBuilder()
@@ -412,21 +418,24 @@ module.exports = {
 
             const row = new ActionRowBuilder().addComponents(commit);
 
-            return await interaction.editReply({ content: "", embeds: [embed], components: [row], })
-
+            return await interaction.editReply({
+                content: "",
+                embeds: [embed],
+                components: [row],
+            });
         } else if (interaction.options.getSubcommand() === "delete") {
             await interaction.deferReply({ ephemeral: true });
-            const { db } = require('../../index.js')
+            const { db } = require("../../index.js");
 
-            const levelPath = interaction.options.getString("levelname")
+            const levelPath = interaction.options.getString("levelname");
 
             await db.bulkRecords.destroy({
                 where: {
-                    path: levelPath
-                }
-            })
+                    path: levelPath,
+                },
+            });
 
-            const embed = await buildEmbed(interaction.user.id)
+            const embed = await buildEmbed(interaction.user.id);
 
             // Create commit button
             const commit = new ButtonBuilder()
@@ -436,25 +445,30 @@ module.exports = {
 
             const row = new ActionRowBuilder().addComponents(commit);
 
-            return await interaction.editReply({ content: "", embeds: [embed], components: [row], })
-
+            return await interaction.editReply({
+                content: "",
+                embeds: [embed],
+                components: [row],
+            });
         } else if (interaction.options.getSubcommand() === "editlevel") {
             await interaction.deferReply({ ephemeral: true });
             const { db } = require("../../index.js");
 
             const levelPath = interaction.options.getString("levelname");
-            const percent = interaction.options.getInteger("percent")
-            const enjoyment = interaction.options.getInteger("enjoyment")
+            const percent = interaction.options.getInteger("percent");
+            const enjoyment = interaction.options.getInteger("enjoyment");
 
             await db.bulkRecords.update(
                 {
                     ...(percent !== null && { percent }),
                     ...(enjoyment !== null && { enjoyment }),
                 },
-                { where: { 
-                    moderatorID: interaction.user.id,
-                    path: levelPath
-                } }
+                {
+                    where: {
+                        moderatorID: interaction.user.id,
+                        path: levelPath,
+                    },
+                }
             );
 
             return await interaction.editReply(
@@ -465,9 +479,9 @@ module.exports = {
             const { db } = require("../../index.js");
 
             const username = interaction.options.getString("username");
-            const device = interaction.options.getString("device")
-            const video = interaction.options.getString("completionlink")
-            const fps = interaction.options.getInteger("fps")
+            const device = interaction.options.getString("device");
+            const video = interaction.options.getString("completionlink");
+            const fps = interaction.options.getInteger("fps");
 
             await db.bulkRecordSessions.update(
                 {
@@ -476,9 +490,11 @@ module.exports = {
                     ...(video !== null && { video }),
                     ...(fps !== null && { fps }),
                 },
-                { where: {
-                    moderatorID: interaction.user.id
-                } }
+                {
+                    where: {
+                        moderatorID: interaction.user.id,
+                    },
+                }
             );
 
             return await interaction.editReply(
@@ -489,14 +505,14 @@ module.exports = {
             const { db, cache } = require("../../index.js");
 
             const levelPath = interaction.options.getString("lvlname");
-            const percent = interaction.options.getInteger("percent")
-            const enjoyment = interaction.options.getInteger("enjoyment")
-            
+            const percent = interaction.options.getInteger("percent");
+            const enjoyment = interaction.options.getInteger("enjoyment");
+
             const dbLevel = await cache.levels.findOne({
                 where: {
-                    filename: levelPath
-                }
-            })
+                    filename: levelPath,
+                },
+            });
 
             await db.bulkRecords.create({
                 moderatorID: interaction.user.id,
@@ -504,17 +520,17 @@ module.exports = {
                 enjoyment: enjoyment !== null ? enjoyment : 0,
                 path: dbLevel.filename,
                 levelname: dbLevel.name,
-            })
+            });
 
             return await interaction.editReply(
                 ":white_check_mark: This record has been added!"
             );
         } else if (interaction.options.getSubcommand() === "view") {
             await interaction.deferReply({ ephemeral: true });
-            
-            const page = interaction.options.getInteger("page") || 0
 
-            const embed = await buildEmbed(interaction.user.id, page)
+            const page = interaction.options.getInteger("page") || 0;
+
+            const embed = await buildEmbed(interaction.user.id, page);
 
             // Create commit button
             const commit = new ButtonBuilder()
@@ -524,7 +540,11 @@ module.exports = {
 
             const row = new ActionRowBuilder().addComponents(commit);
 
-            return await interaction.editReply({ content: "", embeds: [embed], components: [row], })
+            return await interaction.editReply({
+                content: "",
+                embeds: [embed],
+                components: [row],
+            });
         }
     },
 };

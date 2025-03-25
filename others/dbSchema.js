@@ -237,7 +237,7 @@ module.exports = {
             },
             messageId: Sequelize.STRING,
         });
-        
+
         db.bulkRecordSessions = sequelize.define("bulkRecordSessions", {
             moderatorID: Sequelize.STRING,
             playerName: Sequelize.STRING,
@@ -247,7 +247,7 @@ module.exports = {
             note: Sequelize.STRING,
             discordID: Sequelize.STRING,
         });
-        
+
         db.bulkRecords = sequelize.define("bulkRecords", {
             moderatorID: Sequelize.STRING,
             enjoyment: Sequelize.INTEGER,

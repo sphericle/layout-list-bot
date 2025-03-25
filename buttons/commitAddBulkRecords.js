@@ -1,4 +1,4 @@
-const { 
+const {
     githubDataPath,
     githubOwner,
     githubRepo,
@@ -7,31 +7,31 @@ const {
     enableSeparateStaffServer,
     staffGuildId,
     archiveRecordsID,
-} = require("../config.json")
-const { EmbedBuilder } = require("discord.js")
-const logger = require("log4js").getLogger()
-const fs = require("fs")
-const path = require("path")
+} = require("../config.json");
+const { EmbedBuilder } = require("discord.js");
+const logger = require("log4js").getLogger();
+const fs = require("fs");
+const path = require("path");
 
 module.exports = {
     customId: "commitAddBulkRecords",
     ephemeral: true,
     async execute(interaction) {
-        const { db, octokit } = require("../index.js")
+        const { db, octokit } = require("../index.js");
 
         const session = await db.bulkRecordSessions.findOne({
             where: {
-                moderatorID: interaction.user.id
-            }
-        })
+                moderatorID: interaction.user.id,
+            },
+        });
 
         const records = await db.bulkRecords.findAll({
             where: {
-                moderatorID: interaction.user.id
-            }
-        })
+                moderatorID: interaction.user.id,
+            },
+        });
 
-        const changes = []
+        const changes = [];
 
         const localRepoPath = path.resolve(__dirname, `../data/repo/`);
 
@@ -53,17 +53,16 @@ module.exports = {
             }
 
             let recordToAdd = {
-                "user": session.playerName,
-                "link": session.video,
-                "percent": record.percent,
-                "hz": session.fps,
-                "mobile": session.mobile,
-            }
+                user: session.playerName,
+                link: session.video,
+                percent: record.percent,
+                hz: session.fps,
+                mobile: session.mobile,
+            };
 
-            if (record.enjoyment)
-                recordToAdd.enjoyment = record.enjoyment
+            if (record.enjoyment) recordToAdd.enjoyment = record.enjoyment;
 
-            parsedData.records.push(recordToAdd)
+            parsedData.records.push(recordToAdd);
 
             changes.push({
                 path: `${githubDataPath}/${record.path}.json`,
@@ -189,12 +188,14 @@ module.exports = {
             ? await interaction.client.guilds.fetch(staffGuildId)
             : guild;
 
-        const recordsChannel = await staffGuild.channels.cache.get(archiveRecordsID)
+        const recordsChannel = await staffGuild.channels.cache.get(
+            archiveRecordsID
+        );
 
         // staffGuild.channels.cache.get(acceptedRecordsID).send({ content: '', embeds: [acceptEmbed], components: [row] });
         if (session.discordID) {
             await recordsChannel.send({
-                content: `<@${session.discordID}>`
+                content: `<@${session.discordID}>`,
             });
         }
 
@@ -238,8 +239,8 @@ module.exports = {
                 },
                 { where: { date: Date.now() } }
             );
-      
-        const recordEmbeds = []
+
+        const recordEmbeds = [];
 
         for (const record of records) {
             // Create embed to send in public channel
@@ -247,7 +248,11 @@ module.exports = {
                 .setColor(0x8fce00)
                 .setTitle(`:white_check_mark: ${record.levelname}`)
                 .addFields(
-                    { name: "Percent", value: `${record.percent}%`, inline: true },
+                    {
+                        name: "Percent",
+                        value: `${record.percent}%`,
+                        inline: true,
+                    },
                     {
                         name: "Record holder",
                         value: `${session.playerName}`,
@@ -260,16 +265,24 @@ module.exports = {
                     },
                     {
                         name: "Device",
-                        value: `${record.mobile ? "Mobile" : "PC"} (${session.fps} FPS)`,
+                        value: `${record.mobile ? "Mobile" : "PC"} (${
+                            session.fps
+                        } FPS)`,
                         inline: true,
                     },
-                    { name: "Video", value: `[Link](${session.video})`, inline: true },
+                    {
+                        name: "Video",
+                        value: `[Link](${session.video})`,
+                        inline: true,
+                    },
                     {
                         name: "Enjoyment",
-                        value: record.enjoyment ? `${record.enjoyment}/10` : "None",
+                        value: record.enjoyment
+                            ? `${record.enjoyment}/10`
+                            : "None",
                         inline: true,
                     }
-                )
+                );
 
             recordEmbeds.push(publicEmbed);
 
@@ -287,14 +300,15 @@ module.exports = {
                         hz: session.fps,
                         mobile: session.mobile ? true : false,
                     };
-                    if (record.enjoyment) notRawGithubCode.enjoyment = record.enjoyment;
-    
+                    if (record.enjoyment)
+                        notRawGithubCode.enjoyment = record.enjoyment;
+
                     const rawGithubCode = JSON.stringify(
                         notRawGithubCode,
                         null,
                         "\t"
                     );
-    
+
                     const dmMessage = `Accepted record of ${record.levelname} for ${session.playername}\nGithub Code:\n\`\`\`${rawGithubCode}\`\`\``;
                     await interaction.user.send({ content: dmMessage });
                 } catch {
@@ -302,9 +316,9 @@ module.exports = {
                         `Failed to send in moderator ${interaction.user.id} dms, ignoring send in dms setting`
                     );
                 }
-            }        
+            }
         }
-        
+
         if (recordEmbeds.length > 0) {
             for (let i = 0; i < recordEmbeds.length; i += 10) {
                 const embedBatch = recordEmbeds.slice(i, i + 10);
@@ -312,18 +326,18 @@ module.exports = {
             }
         }
 
-        await interaction.editReply(":white_check_mark: Added records!")
+        await interaction.editReply(":white_check_mark: Added records!");
 
         await db.bulkRecordSessions.destroy({
             where: {
-                moderatorID: interaction.user.id
-            }
-        })
+                moderatorID: interaction.user.id,
+            },
+        });
         await db.bulkRecords.destroy({
             where: {
-                moderatorID: interaction.user.id
-            }
-        })
+                moderatorID: interaction.user.id,
+            },
+        });
         return;
-    }
-}
+    },
+};
