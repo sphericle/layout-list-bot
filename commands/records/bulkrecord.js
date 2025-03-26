@@ -97,9 +97,7 @@ module.exports = {
         .addSubcommand((subcommand) =>
             subcommand
                 .setName("add")
-                .setDescription(
-                    "Start checking a bulk record submission"
-                )
+                .setDescription("Start checking a bulk record submission")
                 .addStringOption((option) =>
                     option
                         .setName("link")

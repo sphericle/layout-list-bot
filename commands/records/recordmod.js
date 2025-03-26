@@ -39,9 +39,7 @@ module.exports = {
         .addSubcommand((subcommand) =>
             subcommand
                 .setName("add")
-                .setDescription(
-                    "Add a record to the site"
-                )
+                .setDescription("Add a record to the site")
                 .addStringOption((option) =>
                     option
                         .setName("username")
