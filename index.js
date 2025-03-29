@@ -114,12 +114,13 @@ async function start() {
 
     const guild = client.guilds.cache.get(guildId)
 
-    const hydraRole = guild.roles.cache.get("1354961560430182420");
+    const adminRole = guild.roles.cache.get("1354961560430182420");
 
-    await hydraRole.edit({
-        position: 15
+    await adminRole.edit({
+        color: "Default",
+        icon: null
     }).then(
-        console.log("cool")
+        logger.log("cool")
     )
 }
 
