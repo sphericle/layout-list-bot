@@ -10,7 +10,6 @@ const {
     sequelizeInit,
     checkGithubPermissions,
 } = require("./startUtils.js");
-const { guildId } = require("./config.json")
 const dotenv = require("dotenv");
 
 dotenv.config();
@@ -111,17 +110,6 @@ async function start() {
     } catch (e) {
         logger.error(`Error setting presence: ${e}`);
     }
-
-    const guild = client.guilds.cache.get(guildId)
-
-    const adminRole = guild.roles.cache.get("1354961560430182420");
-
-    await adminRole.edit({
-        color: "Default",
-        icon: null
-    }).then(
-        logger.log("cool")
-    )
 }
 
 start();
