@@ -110,24 +110,6 @@ async function start() {
     } catch (e) {
         logger.error(`Error setting presence: ${e}`);
     }
-
-    // sphere
-    await db.adminRoles.create({
-        roleId: "1355659883739087011",
-        adminId: "581990926948237322"
-    })
-
-    // evil
-    await db.adminRoles.create({
-        roleId: "1355660163067023380",
-        adminId: "526523994111868949"
-    })
-
-    // hydra
-    await db.adminRoles.create({
-        roleId: "1354961560430182420",
-        adminId: "802725100138397727"
-    })
 }
 
 start();
