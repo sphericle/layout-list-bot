@@ -1464,13 +1464,15 @@ module.exports = {
                 },
             ];
 
-            const packsWithLevel = packs.filter((pack) => 
+            const packsWithLevel = packs.filter((pack) =>
                 pack.levels?.includes(filename)
-            )
+            );
 
             if (packsWithLevel.length > 0) {
                 for (const pack of packsWithLevel) {
-                    pack.levels = pack.levels.filter(level => level !== levelToDelete.filename);
+                    pack.levels = pack.levels.filter(
+                        (level) => level !== levelToDelete.filename
+                    );
                 }
                 changes.push({
                     path: githubDataPath + "/_packs.json",
