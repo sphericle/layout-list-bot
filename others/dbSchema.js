@@ -258,7 +258,10 @@ module.exports = {
         
         db.adminRoles = sequelize.define("adminRoles", {
             roleId: Sequelize.STRING,
-            adminId: Sequelize.STRING,
+            adminId: {
+                type: Sequelize.STRING,
+                unique: true
+            },
         });
 
         return db;
