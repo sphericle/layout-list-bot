@@ -1431,13 +1431,24 @@ module.exports = {
 
             list.splice(index, 1);
 
+            let packs;
             try {
-                cache.levels.destroy({
-                    where: { filename: levelToDelete.filename },
-                });
+                packs = JSON.parse(
+                    Buffer.from(
+                        (
+                            await octokit.rest.repos.getContent({
+                                owner: githubOwner,
+                                repo: githubRepo,
+                                path: githubDataPath + `/_packs.json`,
+                                branch: githubBranch,
+                            })
+                        ).data.content,
+                        "base64"
+                    ).toString("utf-8")
+                );
             } catch (e) {
                 return await interaction.editReply(
-                    `:x: Error removing level from database: ${e}`
+                    `:x: Failed to fetch _packs.json: ${e}`
                 );
             }
 
@@ -1452,6 +1463,30 @@ module.exports = {
                     content: JSON.stringify(parsedData, null, "\t"),
                 },
             ];
+
+            const packsWithLevel = packs.filter((pack) => 
+                pack.levels?.includes(filename)
+            )
+
+            if (packsWithLevel.length > 0) {
+                for (const pack of packsWithLevel) {
+                    pack.levels = pack.levels.filter(level => level !== levelToDelete.filename);
+                }
+                changes.push({
+                    path: githubDataPath + "/_packs.json",
+                    content: JSON.stringify(packs, null, "\t"),
+                });
+            }
+
+            try {
+                cache.levels.destroy({
+                    where: { filename: levelToDelete.filename },
+                });
+            } catch (e) {
+                return await interaction.editReply(
+                    `:x: Error removing level from database: ${e}`
+                );
+            }
 
             const toDelete = githubDataPath + `/${filename}.json`;
 
