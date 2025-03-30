@@ -255,6 +255,12 @@ module.exports = {
             path: Sequelize.STRING,
             levelname: Sequelize.STRING,
         });
+        
+        db.adminRoles = sequelize.define("adminRoles", {
+            roleId: Sequelize.STRING,
+            adminId: Sequelize.STRING,
+        });
+
         return db;
     },
 
