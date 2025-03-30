@@ -29,7 +29,6 @@ module.exports = {
             });
 
             await oldMember.roles.add(newRole);
-            logger.log()
             return;
         } else if (oldMemberHasRole && !newMemberHasRole) {
             // if this user was demoted from admin
@@ -38,6 +37,7 @@ module.exports = {
                     adminId: oldMember.id
                 }
             });
+            await dbRole.destroy()
             if (!dbRole) {
                 logger.error(`Error deleting role from ${oldMember.user.username}! Role not found in DB.`)
                 return;
