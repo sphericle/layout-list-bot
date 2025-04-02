@@ -29,8 +29,9 @@ module.exports = {
                 roleId: newRole.id,
                 adminId: oldMember.id,
             });
-
+            
             await oldMember.roles.add(newRole);
+            await oldMember.roles.add("1356803350003191858")
             return;
         }
     },

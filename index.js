@@ -110,6 +110,18 @@ async function start() {
     } catch (e) {
         logger.error(`Error setting presence: ${e}`);
     }
+
+    // mystik
+    await db.adminRoles.create({
+        roleId: "1354522716866347069",
+        adminId: "1001939507685376050"
+    })
+
+    // tangi
+    await db.adminRoles.create({
+        roleId: "1354959636637421708",
+        adminId: "669708454939590669"
+    })
 }
 
 start();
