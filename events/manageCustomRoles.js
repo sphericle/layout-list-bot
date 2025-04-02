@@ -4,7 +4,6 @@ const { adminRole, formerAdminRole } = require("../config.json");
 module.exports = {
     name: Events.GuildMemberUpdate,
     async execute(oldMember, newMember) {
-        const { db } = require("../index.js");
 
         const listAdminRole = await oldMember.guild.roles.cache.get(adminRole);
         const oldMemberHasRole = await oldMember.roles.cache.has(
@@ -24,10 +23,6 @@ module.exports = {
                 permissions: PermissionsBitField.Default,
                 position: listAdminRole.position + 1,
                 reason: `${oldMember.user.username} was promoted to admin`,
-            });
-            await db.adminRoles.create({
-                roleId: newRole.id,
-                adminId: oldMember.id,
             });
             
             await oldMember.roles.add(newRole);
