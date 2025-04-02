@@ -1,5 +1,5 @@
 const { Events, PermissionsBitField } = require("discord.js");
-const { adminRole } = require("../config.json");
+const { adminRole, formerAdminRole } = require("../config.json");
 
 module.exports = {
     name: Events.GuildMemberUpdate,
@@ -31,7 +31,7 @@ module.exports = {
             });
             
             await oldMember.roles.add(newRole);
-            await oldMember.roles.add("1356803350003191858")
+            await oldMember.roles.add(formerAdminRole)
             return;
         }
     },
