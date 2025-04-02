@@ -110,12 +110,6 @@ async function start() {
     } catch (e) {
         logger.error(`Error setting presence: ${e}`);
     }
-
-    // dark
-    await db.adminRoles.create({
-        roleId: "1277503519645106298",
-        adminId: "788169821672964118"
-    })
 }
 
 start();
