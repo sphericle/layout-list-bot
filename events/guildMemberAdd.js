@@ -53,7 +53,7 @@ module.exports = {
         const context = canvas.getContext("2d");
         context.fillStyle = "#1372ed30";
         context.roundRect(10, 15, canvas.width - 20, canvas.height - 30, 20);
-        context.fill()
+        context.fill();
 
         context.font = "28px Arial";
         context.fillStyle = "#d0d0d0";

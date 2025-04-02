@@ -1,5 +1,5 @@
 const { Events, PermissionsBitField } = require("discord.js");
-const { adminRole } = require("../config.json")
+const { adminRole } = require("../config.json");
 
 module.exports = {
     name: Events.GuildMemberUpdate,
@@ -7,9 +7,13 @@ module.exports = {
         const { db } = require("../index.js");
 
         const listAdminRole = await oldMember.guild.roles.cache.get(adminRole);
-        const oldMemberHasRole = await oldMember.roles.cache.has(listAdminRole.id);
-        const newMemberHasRole = await newMember.roles.cache.has(listAdminRole.id);
-        
+        const oldMemberHasRole = await oldMember.roles.cache.has(
+            listAdminRole.id
+        );
+        const newMemberHasRole = await newMember.roles.cache.has(
+            listAdminRole.id
+        );
+
         // if this user just got admin
         if (!oldMemberHasRole && newMemberHasRole) {
             const newRole = await oldMember.guild.roles.create({
@@ -19,7 +23,7 @@ module.exports = {
                 mentionable: false,
                 permissions: PermissionsBitField.Default,
                 position: listAdminRole.position + 1,
-                reason: `${oldMember.user.username} was promoted to admin`
+                reason: `${oldMember.user.username} was promoted to admin`,
             });
             await db.adminRoles.create({
                 roleId: newRole.id,
