@@ -60,7 +60,7 @@ module.exports = {
             try {
                 dbRole = await db.adminRoles.findOne({
                     where: {
-                        adminid: interaction.user.id,
+                        adminId: interaction.user.id,
                     },
                 });
             } catch (e) {
@@ -120,7 +120,7 @@ module.exports = {
             let listAdminRole;
             try {
                 const theListAdminRole = await interaction.member.roles.cache.get(
-                    listAdminRole
+                    adminRole
                 );
                 const oldAdminRole = await interaction.member.roles.cache.get(
                     formerAdminRole
@@ -149,10 +149,11 @@ module.exports = {
                 reason: `${interaction.user.username} created their custom role`,
                 ...(icon ? { icon } : {}),
             });
+            
 
             try {
                 await db.adminRoles.create({
-                    adminid: interaction.user.id,
+                    adminId: interaction.user.id,
                     roleId: role.id,
                 });
             } catch (e) {
@@ -161,7 +162,7 @@ module.exports = {
                 );
             }
             try {
-                await interaction.member.roles.cache.add(role.id);
+                await interaction.member.roles.add(role.id);
             } catch (e) {
                 logger.error(
                     `Failed to add ${interaction.user.id}'s custom role: ${e}`
