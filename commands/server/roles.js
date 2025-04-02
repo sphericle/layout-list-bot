@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, PermissionsBitField } = require("discord.js");
-const { adminRole } = require("../../config.json");
+const { adminRole, formerAdminRole } = require("../../config.json");
 const logger = require("log4js").getLogger();
 
 module.exports = {
@@ -105,20 +105,37 @@ module.exports = {
 
             const { db } = require("../../index.js");
 
+            const existingRole = await db.adminRoles.findOne({
+                where: {
+                    adminId: interaction.user.id
+                }
+            })
+
+            if (existingRole) {
+                return await interaction.editReply(`:x: You already have a custom role! <@&${existingRole.id}>`)
+            }
+
+            // look for the list admin/former admin role on the user 
+            // so we can place the role below the right one
             let listAdminRole;
             try {
-                listAdminRole = await interaction.guild.roles.cache.get(
-                    adminRole
+                const theListAdminRole = await interaction.member.roles.cache.get(
+                    listAdminRole
                 );
-                if (!listAdminRole) {
-                    logger.warn(`No list admin role found! ID: ${adminRole}`);
+                const oldAdminRole = await interaction.member.roles.cache.get(
+                    formerAdminRole
+                )
+                if (theListAdminRole) listAdminRole = theListAdminRole
+                else if (oldAdminRole) listAdminRole = oldAdminRole;
+                else {
+                    return await interaction.editReply(":x: Could not find list or former admin role!")
                 }
             } catch (e) {
                 logger.error(
-                    `Error fetching list admin role (${adminRole}): ${e}`
+                    `Error fetching list admin role (${adminRole}, ${formerAdminRole}): ${e}`
                 );
                 return await interaction.editReply(
-                    "Error creating custom role: could not find admin role!"
+                    "Error creating custom role: could not find admin role(s)!"
                 );
             }
 
