@@ -6,8 +6,6 @@ const {
     ActionRowBuilder,
 } = require("discord.js");
 const isUrlHttp = require("is-url-http");
-const logger = require("log4js").getLogger();
-const axios = require("axios");
 const pako = require("pako");
 
 // Decompressed data passed to the function using Gzip
@@ -66,29 +64,9 @@ async function buildEmbed(moderatorID, page) {
     return embed;
 }
 
-/**
- * Updates a date string in format "YYYYMMDD" to the current date at runtime
- * @param {string} dateString - The date string to update, in format "YYYYMMDD"
- * @returns {string} - Current date in the same format "YYYYMMDD"
- */
-function getCurrentDate(offset) {
-    if (!offset) offset = 0;
-    // Get current date and add offset days
-    const now = new Date();
-    now.setDate(now.getDate() + offset);
-
-    // Format to YYYYMMDD
-    const year = now.getFullYear();
-    // getMonth() is zero-based, so add 1 and pad with leading zero if needed
-    const month = String(now.getMonth() + 1).padStart(2, "0");
-    const day = String(now.getDate()).padStart(2, "0");
-
-    // Combine into the same format
-    return `${year}${month}${day}`;
-}
-
 module.exports = {
     enabled: true,
+    decompressData,
     data: new SlashCommandBuilder()
         .setName("bulkrecord")
         .setDescription(
@@ -100,8 +78,8 @@ module.exports = {
                 .setDescription("Start checking a bulk record submission")
                 .addStringOption((option) =>
                     option
-                        .setName("link")
-                        .setDescription("The link to the submitted save file")
+                        .setName("code")
+                        .setDescription("The text copied from the website")
                         .setRequired(true)
                 )
                 .addStringOption((option) =>
@@ -310,7 +288,7 @@ module.exports = {
         if (interaction.options.getSubcommand() === "add") {
             await interaction.deferReply({ ephemeral: true });
 
-            let fileLink = interaction.options.getString("link");
+            const fileData = interaction.options.getString("code");
             const device = interaction.options.getString("device");
             const video = interaction.options.getString("completionlink");
             const fps = interaction.options.getInteger("fps");
@@ -319,59 +297,12 @@ module.exports = {
 
             // Check given URLs
             await interaction.editReply("Checking if the URL is valid...");
-            if (/\s/g.test(fileLink) || !isUrlHttp(fileLink))
-                return await interaction.editReply(
-                    ":x: Couldn't add the record: The provided file link is not a valid URL"
-                );
             if (video && (/\s/g.test(video) || !isUrlHttp(video)))
                 return await interaction.editReply(
                     ":x: Couldn't add the record: The provided completion link is not a valid URL"
                 );
 
-            const baseIdRegex = /filebin\.net\/([a-z0-9]+)_\d{8}/;
-            const baseIdMatch = fileLink.match(baseIdRegex);
-            const binID = baseIdMatch[1];
-
-            const numberRegex = /filebin\.net\/[a-z0-9]+_\d{8}\/(\d+)/;
-            const numberMatch = fileLink.match(numberRegex);
-            const binFileName = numberMatch[1];
-            let toOffset = 0;
-
-            // using axios so we can send the cookie lol
-            /* this is wrong .
-            const date = new Date();
-            date.setFullYear(date.getFullYear() - 1);
-            date.setDate(date.getDate() + 66); // Add 66 days
-            const cookieValue = date.toISOString().split('T')[0];
-            */
-
-            let i = 0;
-            let responseBody;
-            while (!responseBody && i <= 3) {
-                let date = getCurrentDate(toOffset);
-                try {
-                    const modifiedLink = `https://filebin.net/${binID}_${date}/${binFileName}`;
-                    const response = await axios.get(modifiedLink, {
-                        headers: {
-                            "Content-Type": "application/json",
-                            Cookie: `verified=2024-05-24`,
-                        },
-                        responseType: "arraybuffer",
-                    });
-                    if (response.status === 200) responseBody = response.data;
-                } catch (error) {
-                    logger.error(
-                        `Error fetching the file from all modified links: ${error}`
-                    );
-                    if (toOffset === 0) {
-                        toOffset -= 1;
-                    } else {
-                        toOffset *= -1;
-                    }
-                    ++i;
-                }
-            }
-            const parsedJson = await JSON.parse(decompressData(responseBody));
+            const parsedJson = await JSON.parse(decompressData(fileData));
 
             await db.bulkRecordSessions.destroy({
                 where: {

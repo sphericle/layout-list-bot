@@ -14,7 +14,6 @@
     "dependencies": {
         "@napi-rs/canvas": "^0.1.67",
         "@octokit/rest": "20.1.2",
-        "axios": "^1.8.4",
         "chartjs-node-canvas": "^4.1.6",
         "discord.js": "^14.18.0",
         "dotenv": "^16.4.7",
