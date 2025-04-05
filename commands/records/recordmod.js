@@ -2525,7 +2525,7 @@ module.exports = {
                 }
             }
         } else if (interaction.options.getSubcommand() === "ban") {
-            await interaction.deferReply();
+            await interaction.deferReply({ephemeral: true});
             const path = require("path");
             const fs = require("fs");
 
