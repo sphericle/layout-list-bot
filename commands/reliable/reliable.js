@@ -302,8 +302,7 @@ module.exports = {
             let pingMessage = "";
             for (const user of shared) {
                 // if this aint jdk
-                if (user !== "516317038231158793")
-                    pingMessage += `<@${user}> `;
+                if (user !== "516317038231158793") pingMessage += `<@${user}> `;
             }
 
             // add links to message
