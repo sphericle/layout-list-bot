@@ -300,11 +300,7 @@ module.exports = {
             const shared = submission.shared.split(";");
             shared.pop();
             let pingMessage = "";
-            for (const user of shared) {
-                // if this aint jdk
-                if (user !== "516317038231158793") pingMessage += `<@${user}> `;
-            }
-
+            for (const user of shared) pingMessage += `<@${user}> `;
             // add links to message
             const rawImgs = interaction.options.getString("images");
             let attachments = [];
