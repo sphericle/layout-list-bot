@@ -16,7 +16,7 @@
         "@octokit/rest": "20.1.2",
         "chartjs-node-canvas": "^5.0.0",
         "discord.js": "^14.18.0",
-        "dotenv": "^16.4.7",
+        "dotenv": "^16.5.0",
         "exceljs": "^4.4.0",
         "is-url-http": "^2.3.8",
         "log-timestamp": "^0.3.0",
