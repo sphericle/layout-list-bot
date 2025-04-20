@@ -55,7 +55,7 @@ async function buildEmbed(moderatorID, page) {
             }`
         );
 
-    for (const record of records.slice(page * 25, page + 25 + 25)) {
+    for (const record of records.slice(page * 25, page * 25 + 25)) {
         embed.addFields({
             name: record.levelname,
             value: `${record.percent}% - ${record.enjoyment}/10`,
