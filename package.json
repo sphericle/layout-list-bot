@@ -21,7 +21,7 @@
         "is-url-http": "^2.3.8",
         "log-timestamp": "^0.3.0",
         "log4js": "^6.9.1",
-        "node-cron": "^3.0.3",
+        "node-cron": "^4.0.7",
         "node-fetch": "^3.3.2",
         "pako": "^2.1.0",
         "prettier": "^3.5.3",
