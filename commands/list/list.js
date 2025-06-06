@@ -299,22 +299,7 @@ module.exports = {
                     .slice(0, 25)
                     .map((user) => ({ name: user.name, value: user.name }))
             );
-        else if (subcommand === "hide") {
-            let levels = await cache.levels.findAll({
-                where: {
-                    name: Sequelize.where(
-                        Sequelize.fn("LOWER", Sequelize.col("name")),
-                        "LIKE",
-                        "%" + focused.value.toLowerCase() + "%"
-                    ),
-                },
-            });
-            return await interaction.respond(
-                levels
-                    .slice(0, 25)
-                    .map((level) => ({ name: level.name, value: level.name }))
-            );
-        } else if (subcommand === "restore") {
+        else if (subcommand === "restore") {
             let levels = await cache.archived.findAll({
                 where: {
                     name: Sequelize.where(
@@ -360,7 +345,7 @@ module.exports = {
                     )
                     .slice(0, 25)
                     .map((level) => ({
-                        name: level.name,
+                        name: `#${level.position} - ${level.name}`,
                         value: level.filename,
                     }))
             );

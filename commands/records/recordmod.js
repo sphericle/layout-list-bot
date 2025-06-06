@@ -2138,7 +2138,7 @@ module.exports = {
             }
 
             const recordIndex = parsedData.records.findIndex(
-                (record) => record.user === olduser
+                (record) => record.user.toLowerCase() === olduser.toLowerCase()
             );
             if (recordIndex === -1)
                 return await interaction.editReply(
