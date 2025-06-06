@@ -60,7 +60,9 @@ module.exports = {
                 mobile: session.mobile,
             };
 
-            if (record.enjoyment) recordToAdd.enjoyment = record.enjoyment;
+            if (
+                record.enjoyment !== null && record.enjoyment !== undefined
+            ) recordToAdd.enjoyment = record.enjoyment;
 
             parsedData.records.push(recordToAdd);
 
@@ -277,7 +279,7 @@ module.exports = {
                     },
                     {
                         name: "Enjoyment",
-                        value: record.enjoyment
+                        value: (record.enjoyment !== undefined && record.enjoyment !== null)
                             ? `${record.enjoyment}/10`
                             : "None",
                         inline: true,
