@@ -110,17 +110,19 @@ module.exports = {
             const matchYes = text.match(/(\d+)-\d+$/);
             const matchNo = text.match(/\d+-(\d+)$/);
 
-            const submitter = await db.submitters.findOne({
+
+            let submitter;
+            submitter = await db.submitters.findOne({
                 where: { discordid: user.id },
             });
             if (!submitter) {
                 // create submitter
-                await db.submitters.create({
+                submitter = await db.submitters.create({
                     discordid: user.id,
                     submissions: 0,
                     dmFlag: false,
                     banned: false,
-                });
+                }).dataValues;
             }
 
             await db.levelsInVoting.create({
@@ -129,7 +131,7 @@ module.exports = {
                 discordid: interaction.channel.id,
                 yeses: matchYes[1],
                 nos: matchNo[1],
-                shared: `${submitter};`,
+                shared: `${submitter.discordid};`,
                 paused: false,
             });
             interaction.editReply(":white_check_mark: Vote inserted!");
