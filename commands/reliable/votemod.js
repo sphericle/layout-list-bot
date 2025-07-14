@@ -110,7 +110,6 @@ module.exports = {
             const matchYes = text.match(/(\d+)-\d+$/);
             const matchNo = text.match(/\d+-(\d+)$/);
 
-
             let submitter;
             submitter = await db.submitters.findOne({
                 where: { discordid: user.id },
