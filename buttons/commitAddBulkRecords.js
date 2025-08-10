@@ -12,12 +12,15 @@ const { EmbedBuilder } = require("discord.js");
 const logger = require("log4js").getLogger();
 const fs = require("fs");
 const path = require("path");
+const { cloneOrPullRepo } = require("../others/gitUtils.js");
 
 module.exports = {
     customId: "commitAddBulkRecords",
     ephemeral: true,
     async execute(interaction) {
         const { db, octokit } = require("../index.js");
+
+        await cloneOrPullRepo();
 
         const session = await db.bulkRecordSessions.findOne({
             where: {
