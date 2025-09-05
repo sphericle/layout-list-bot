@@ -1042,6 +1042,8 @@ module.exports = {
                 githubDataPath,
                 githubBranch,
             } = require("../../config.json");
+            const { cloneOrPullRepo } = require("../../others/gitUtils.js");
+            await cloneOrPullRepo();
 
             const olduser = interaction.options.getString("username");
             const newuser = interaction.options.getString("newusername");

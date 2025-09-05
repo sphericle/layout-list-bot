@@ -24,6 +24,7 @@ module.exports = {
         }
     },
     async parseLevels(useLegacy) {
+        await this.cloneOrPullRepo();
         const levels = [];
         const localRepoPath = path.resolve(__dirname, `../data/repo/`);
         const listFilename = useLegacy
@@ -73,6 +74,7 @@ module.exports = {
     },
 
     async parseUsers(useLegacy) {
+        await this.cloneOrPullRepo();
         const { cache } = require("../index.js");
         const userset = new Set();
         const localRepoPath = path.resolve(__dirname, `../data/repo/`);

@@ -2528,6 +2528,8 @@ module.exports = {
             await interaction.deferReply();
             const path = require("path");
             const fs = require("fs");
+            const { cloneOrPullRepo } = require("../../others/gitUtils.js");
+            await cloneOrPullRepo();
 
             const username = interaction.options.getString("username");
 

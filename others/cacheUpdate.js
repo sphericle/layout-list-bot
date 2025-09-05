@@ -33,6 +33,8 @@ module.exports = {
         const localRepoPath = path.resolve(__dirname, "../data/repo/");
         const packs = [];
 
+        await cloneOrPullRepo();
+
         let parsedData;
         try {
             parsedData = JSON.parse(
