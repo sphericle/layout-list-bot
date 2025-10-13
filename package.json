@@ -15,7 +15,7 @@
         "@napi-rs/canvas": "^0.1.80",
         "@octokit/rest": "20.1.2",
         "chartjs-node-canvas": "^5.0.0",
-        "discord.js": "^14.22.1",
+        "discord.js": "^14.23.2",
         "dotenv": "^17.2.2",
         "exceljs": "^4.4.0",
         "is-url-http": "^2.3.11",
