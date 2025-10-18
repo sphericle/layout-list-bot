@@ -63,6 +63,9 @@ module.exports = {
 
             // Execute command
             try {
+                logger.log(
+                    `User ${interaction.user.username} (${interaction.user.id}) executed /${interaction.commandName} ${interaction.options._subcommand || ""}${interaction.options._hoistedOptions.length > 0 ? ` \nOptions: ${JSON.stringify(interaction.options._hoistedOptions)}` : ""}`
+                )
                 await command.execute(interaction);
             } catch (error) {
                 logger.error(`Error executing ${interaction.commandName}`);

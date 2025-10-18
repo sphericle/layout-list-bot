@@ -2,29 +2,31 @@ const fs = require("fs");
 const path = require("path");
 const logger = require("log4js").getLogger();
 
-module.exports = {
-    async cloneOrPullRepo() {
-        const { git } = require("../index");
-        try {
-            const { repoUrl } = require("../config.json");
-            const localRepoPath = path.resolve(__dirname, `../data/repo/`);
+async function cloneOrPullRepo() {
+    const { git } = require("../index");
+    try {
+        const { repoUrl } = require("../config.json");
+        const localRepoPath = path.resolve(__dirname, `../data/repo/`);
 
-            if (!fs.existsSync(localRepoPath)) {
-                logger.info(
-                    "Git - " +
-                        "Cloning the repository for the first time, this may take a while..."
-                );
-                await git.clone(repoUrl, localRepoPath);
-            } else {
-                await git.cwd(localRepoPath).pull();
-            }
-        } catch (error) {
-            logger.error("Git - " + `Error updating the repository:\n${error}`);
-            return -1;
+        if (!fs.existsSync(localRepoPath)) {
+            logger.info(
+                "Git - " +
+                    "Cloning the repository for the first time, this may take a while..."
+            );
+            await git.clone(repoUrl, localRepoPath);
+        } else {
+            await git.cwd(localRepoPath).pull();
         }
-    },
+    } catch (error) {
+        logger.error("Git - " + `Error updating the repository:\n${error}`);
+        return -1;
+    }
+}
+
+module.exports = {
+    cloneOrPullRepo,
     async parseLevels(useLegacy) {
-        await this.cloneOrPullRepo();
+        await cloneOrPullRepo();
         const levels = [];
         const localRepoPath = path.resolve(__dirname, `../data/repo/`);
         const listFilename = useLegacy
@@ -74,7 +76,6 @@ module.exports = {
     },
 
     async parseUsers(useLegacy) {
-        await this.cloneOrPullRepo();
         const { cache } = require("../index.js");
         const userset = new Set();
         const localRepoPath = path.resolve(__dirname, `../data/repo/`);

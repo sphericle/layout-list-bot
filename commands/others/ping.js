@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, MessageFlags } = require("discord.js");
 
 module.exports = {
-    enabled: true,
+    enabled: false,
     data: new SlashCommandBuilder()
         .setName("botping")
         .setDescription("Bot ping measurements"),
