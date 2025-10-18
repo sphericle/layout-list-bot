@@ -3,6 +3,7 @@ const path = require("node:path");
 const { Collection } = require("discord.js");
 const cron = require("node-cron");
 const { githubOwner, githubRepo } = require("./config.json");
+const { updateArchivedLevels } = require("./others/cacheUpdate");
 const logger = require("log4js").getLogger();
 
 module.exports = {
@@ -133,7 +134,8 @@ module.exports = {
             if (
                 table !== "updateLevels" &&
                 table !== "updateUsers" &&
-                table !== "updatePacks"
+                table !== "updatePacks" && 
+                table !== "updateArchived"
             )
                 await cache[table].sync({ alter: true });
         }

@@ -1,6 +1,6 @@
 {
     "name": "aredl-bot",
-    "version": "3.10.20",
+    "version": "3.11.1",
     "description": "Discord bot for managing the All Rated Extreme Demons List",
     "main": "index.js",
     "scripts": {

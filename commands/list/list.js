@@ -1398,6 +1398,7 @@ module.exports = {
                         "utf-8"
                     )
                 );
+                parsedData["position"] = levelToDelete.position;
             } catch (parseError) {
                 logger.info(
                     `Unable to parse data fetched from ${filename}:\n${parseError}`
