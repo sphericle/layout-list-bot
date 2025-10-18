@@ -8,7 +8,9 @@ module.exports = {
             "Command to check whether a GD level has been delisted automatically"
         )
         .addStringOption((option) =>
-            option.setName("id").setDescription("The level ID to check")
+            option.setName("id")
+                .setDescription("The level ID to check")
+                .setRequired(true)
         ),
     async execute(interaction) {
         const lvlId = interaction.options.getString("id");

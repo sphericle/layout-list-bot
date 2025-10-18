@@ -69,9 +69,9 @@ module.exports = {
                     }) executed /${interaction.commandName} ${
                         interaction.options._subcommand || ""
                     }${
-                        interaction.options._hoistedOptions.length > 0
+                        interaction.options.data.length > 0
                             ? ` \nOptions: ${JSON.stringify(
-                                  interaction.options._hoistedOptions
+                                  interaction.options.data
                               )}`
                             : ""
                     }`

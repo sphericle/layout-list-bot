@@ -105,7 +105,7 @@ async function start() {
                     type: ActivityType.Playing,
                 },
             ],
-            status: "online",
+            status: "online", 
         });
     } catch (e) {
         logger.error(`Error setting presence: ${e}`);

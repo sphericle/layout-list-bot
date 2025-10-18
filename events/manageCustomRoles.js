@@ -12,7 +12,7 @@ module.exports = {
             listAdminRole.id
         );
 
-        // if this user just got admin
+        // if this user just got leader
         if (!oldMemberHasRole && newMemberHasRole) {
             const newRole = await oldMember.guild.roles.create({
                 name: oldMember.user.displayName,
@@ -21,7 +21,7 @@ module.exports = {
                 mentionable: false,
                 permissions: PermissionsBitField.Default,
                 position: listAdminRole.position + 1,
-                reason: `${oldMember.user.username} was promoted to admin`,
+                reason: `${oldMember.user.username} was promoted to leader`,
             });
 
             await oldMember.roles.add(newRole);
