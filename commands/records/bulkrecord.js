@@ -300,14 +300,21 @@ module.exports = {
             const note = interaction.options.getString("notes");
 
             // Check given URLs
-            await interaction.editReply("Checking if the URL is valid...");
+            await interaction.editReply("Opening record...");
             if (video && (/\s/g.test(video) || !isUrlHttp(video)))
                 return await interaction.editReply(
                     ":x: Couldn't add the record: The provided completion link is not a valid URL"
                 );
 
-            const parsedJson = await JSON.parse(decompressData(fileData));
-
+            let parsedJson;
+            try {
+                parsedJson = await JSON.parse(decompressData(fileData));
+            } catch (e) {
+                logger.error(`Failed to parse grind page data: ${e}`)
+                logger.error(fileData)
+                return await interaction.editReply(":x: Could not parse the grind page data")
+            }
+            
             await db.bulkRecordSessions.destroy({
                 where: {
                     moderatorID: interaction.user.id,

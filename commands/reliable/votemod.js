@@ -249,7 +249,7 @@ module.exports = {
                 embeds: [modInfoEmbed],
             });
         } else if (interaction.options.getSubcommand() === "sync") {
-            await updateLevels.execute(true);
+            await updateLevels.execute();
             return await interaction.editReply(":white_check_mark:");
         }
     },
