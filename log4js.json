@@ -15,6 +15,110 @@
             "compress": true,
             "keepFileExt": true
         },
+        "errorfile": {
+            "type": "file",
+            "filename": "logs/error.log",
+            "maxLogSize": 204800,
+            "backups": 1,
+            "compress": false
+        },
+        "errorarchive": {
+            "type": "dateFile",
+            "filename": "logs/archive/error",
+            "pattern": "-yyyy-MM-dd.log",
+            "compress": true,
+            "keepFileExt": true
+        },
+        "warnfile": {
+            "type": "file",
+            "filename": "logs/warn.log",
+            "maxLogSize": 204800,
+            "backups": 1,
+            "compress": false
+        },
+        "warnarchive": {
+            "type": "dateFile",
+            "filename": "logs/archive/warn",
+            "pattern": "-yyyy-MM-dd.log",
+            "compress": true,
+            "keepFileExt": true
+        },
+        "infofile": {
+            "type": "file",
+            "filename": "logs/info.log",
+            "maxLogSize": 204800,
+            "backups": 1,
+            "compress": false
+        },
+        "infoarchive": {
+            "type": "dateFile",
+            "filename": "logs/archive/info",
+            "pattern": "-yyyy-MM-dd.log",
+            "compress": true,
+            "keepFileExt": true
+        },
+        "debugfile": {
+            "type": "file",
+            "filename": "logs/debug.log",
+            "maxLogSize": 204800,
+            "backups": 1,
+            "compress": false
+        },
+        "debugarchive": {
+            "type": "dateFile",
+            "filename": "logs/archive/debug",
+            "pattern": "-yyyy-MM-dd.log",
+            "compress": true,
+            "keepFileExt": true
+        },
+        "errorFilter": {
+            "type": "logLevelFilter",
+            "appender": "errorfile",
+            "level": "error",
+            "maxLevel": "error"
+        },
+        "errorArchiveFilter": {
+            "type": "logLevelFilter",
+            "appender": "errorarchive",
+            "level": "error",
+            "maxLevel": "error"
+        },
+        "warnFilter": {
+            "type": "logLevelFilter",
+            "appender": "warnfile",
+            "level": "warn",
+            "maxLevel": "warn"
+        },
+        "warnArchiveFilter": {
+            "type": "logLevelFilter",
+            "appender": "warnarchive",
+            "level": "warn",
+            "maxLevel": "warn"
+        },
+        "infoFilter": {
+            "type": "logLevelFilter",
+            "appender": "infofile",
+            "level": "info",
+            "maxLevel": "info"
+        },
+        "infoArchiveFilter": {
+            "type": "logLevelFilter",
+            "appender": "infoarchive",
+            "level": "info",
+            "maxLevel": "info"
+        },
+        "debugFilter": {
+            "type": "logLevelFilter",
+            "appender": "debugfile",
+            "level": "debug",
+            "maxLevel": "debug"
+        },
+        "debugArchiveFilter": {
+            "type": "logLevelFilter",
+            "appender": "debugarchive",
+            "level": "debug",
+            "maxLevel": "debug"
+        },
         "sqlfile": {
             "type": "file",
             "filename": "logs/sql.log",
@@ -32,12 +136,33 @@
     },
     "categories": {
         "default": {
-            "appenders": ["console", "logfile", "logarchive"],
+            "appenders": [
+                "console",
+                "logfile",
+                "logarchive",
+                "errorFilter",
+                "errorArchiveFilter",
+                "warnFilter",
+                "warnArchiveFilter",
+                "infoFilter",
+                "infoArchiveFilter",
+                "debugFilter",
+                "debugArchiveFilter"
+            ],
             "level": "debug"
         },
-        "sql": { "appenders": ["sqlfile", "sqlarchive"], "level": "debug" },
+        "sql": { 
+            "appenders": ["sqlfile", "sqlarchive"], 
+            "level": "debug" 
+        },
         "error": {
-            "appenders": ["console", "logfile", "logarchive"],
+            "appenders": [
+                "console",
+                "logfile",
+                "logarchive",
+                "errorFilter",
+                "errorArchiveFilter"
+            ],
             "level": "error"
         }
     }
