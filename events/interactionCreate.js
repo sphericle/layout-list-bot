@@ -68,7 +68,7 @@ module.exports = {
                     `User ${interaction.user.username} (${
                         interaction.user.id
                     }) executed /${interaction.commandName} ${
-                        interaction.options.getSubcommand() || ""
+                        interaction.options.getSubcommand(false) || ""
                     }${
                         optionsToLog.length > 0
                             ? ` \nOptions: ${JSON.stringify(
