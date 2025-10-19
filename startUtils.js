@@ -134,7 +134,7 @@ module.exports = {
             if (
                 table !== "updateLevels" &&
                 table !== "updateUsers" &&
-                table !== "updatePacks" && 
+                table !== "updatePacks" &&
                 table !== "updateArchived"
             )
                 await cache[table].sync({ alter: true });

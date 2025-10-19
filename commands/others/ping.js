@@ -12,7 +12,10 @@ module.exports = {
             flags: MessageFlags.Ephemeral,
         });
         interaction.editReply(
-            `Pong! ${sent.resource.message.createdTimestamp - interaction.createdTimestamp}ms`
+            `Pong! ${
+                sent.resource.message.createdTimestamp -
+                interaction.createdTimestamp
+            }ms`
         );
     },
 };

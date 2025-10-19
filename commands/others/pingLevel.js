@@ -8,7 +8,8 @@ module.exports = {
             "Command to check whether a GD level has been delisted automatically"
         )
         .addStringOption((option) =>
-            option.setName("id")
+            option
+                .setName("id")
                 .setDescription("The level ID to check")
                 .setRequired(true)
         ),

@@ -1,7 +1,7 @@
 const logger = require("log4js").getLogger();
 const { cloneOrPullRepo, parseLevels } = require("./gitUtils.js");
 const path = require("path");
-const fs = require('fs');
+const fs = require("fs");
 module.exports = {
     async updateCachedLevels() {
         const { cache } = require("../index.js");
@@ -103,5 +103,5 @@ module.exports = {
             );
         }
         return;
-    }
+    },
 };

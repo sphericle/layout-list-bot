@@ -4,11 +4,9 @@ module.exports = {
     enabled: true,
     data: new SlashCommandBuilder()
         .setName("updatedata")
-        .setDescription(
-            "Updates the cache data from the list"
-        ),
+        .setDescription("Updates the cache data from the list"),
     async execute(interaction) {
-        await interaction.deferReply({ ephemeral: true })
+        await interaction.deferReply({ ephemeral: true });
         const { cache } = require("../../index.js");
         await cache.updateLevels();
         await cache.updatePacks();

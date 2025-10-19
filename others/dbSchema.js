@@ -263,7 +263,7 @@ module.exports = {
         const {
             updateCachedLevels,
             updateCachedPacks,
-            updateArchivedLevels
+            updateArchivedLevels,
         } = require("./cacheUpdate.js");
         const { parseUsers } = require("../others/gitUtils.js");
         cache.levels = sequelize_cache.define("levels", {
@@ -276,7 +276,7 @@ module.exports = {
             name: Sequelize.STRING,
             position: {
                 type: Sequelize.INTEGER,
-                required: false
+                required: false,
             },
             filename: Sequelize.STRING,
         });
