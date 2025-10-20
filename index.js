@@ -12,7 +12,7 @@ const {
 } = require("./startUtils.js");
 const dotenv = require("dotenv");
 
-dotenv.config({quiet: true});
+dotenv.config({ quiet: true });
 
 // Logger
 log4js.configure("./log4js.json");

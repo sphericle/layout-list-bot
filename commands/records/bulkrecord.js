@@ -310,11 +310,13 @@ module.exports = {
             try {
                 parsedJson = await JSON.parse(decompressData(fileData));
             } catch (e) {
-                logger.error(`Failed to parse grind page data: ${e}`)
-                logger.error(fileData)
-                return await interaction.editReply(":x: Could not parse the grind page data")
+                logger.error(`Failed to parse grind page data: ${e}`);
+                logger.error(fileData);
+                return await interaction.editReply(
+                    ":x: Could not parse the grind page data"
+                );
             }
-            
+
             await db.bulkRecordSessions.destroy({
                 where: {
                     moderatorID: interaction.user.id,

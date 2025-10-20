@@ -58,12 +58,14 @@ module.exports = {
             timestamps.set(interaction.user.id, now);
             setTimeout(
                 () => timestamps.delete(interaction.user.id),
-                cooldownAmount,
+                cooldownAmount
             );
 
             // Execute command
             try {
-                const optionsToLog = interaction.options.data.filter((op) => op.type !== 1);
+                const optionsToLog = interaction.options.data.filter(
+                    (op) => op.type !== 1
+                );
                 logger.log(
                     `User ${interaction.user.username} (${
                         interaction.user.id
@@ -71,9 +73,7 @@ module.exports = {
                         interaction.options.getSubcommand(false) || ""
                     }${
                         optionsToLog.length > 0
-                            ? ` \nOptions: ${JSON.stringify(
-                                  optionsToLog
-                              )}`
+                            ? ` \nOptions: ${JSON.stringify(optionsToLog)}`
                             : ""
                     }`
                 );

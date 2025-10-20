@@ -151,9 +151,9 @@
             ],
             "level": "debug"
         },
-        "sql": { 
-            "appenders": ["sqlfile", "sqlarchive"], 
-            "level": "debug" 
+        "sql": {
+            "appenders": ["sqlfile", "sqlarchive"],
+            "level": "debug"
         },
         "error": {
             "appenders": [
