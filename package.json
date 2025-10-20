@@ -18,7 +18,7 @@
         "discord.js": "^14.23.2",
         "dotenv": "^17.2.3",
         "exceljs": "^4.4.0",
-        "is-url-http": "^2.3.11",
+        "is-url-http": "^2.3.12",
         "log-timestamp": "^0.3.0",
         "log4js": "^6.9.1",
         "node-cron": "^4.2.1",
