@@ -343,7 +343,7 @@ module.exports = {
                 `${submission.levelname} (${
                     command === "accept" ? "ACCEPTED" : "REJECTED"
                 })`,
-                `Accepted by ${interaction.user.username}`
+                `${command === "accept" ? "Accepted" : "Rejected"} by ${interaction.user.username}`
             ); // Set the channel name to the same thing but with the added yes
 
             await message.delete();
