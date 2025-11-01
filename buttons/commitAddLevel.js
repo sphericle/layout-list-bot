@@ -279,6 +279,8 @@ module.exports = {
                         embeds: [publicEmbed],
                     });
                 await announcementMsg.crosspost();
+                await announcementMsg.react("👍");
+                await announcementMsg.react("👎");
             }
         } catch (changelogErr) {
             logger.info(
