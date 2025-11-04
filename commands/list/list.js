@@ -168,11 +168,6 @@ module.exports = {
                 )
                 .addIntegerOption((option) =>
                     option
-                        .setName("position")
-                        .setDescription("The position to place the level at")
-                )
-                .addIntegerOption((option) =>
-                    option
                         .setName("difficulty")
                         .addChoices(
                             { name: "Beginner", value: 0 },
@@ -526,8 +521,7 @@ module.exports = {
             }
             return;
         } else if (interaction.options.getSubcommand() === "edit") {
-            const { db, cache } = require("../../index.js");
-            const { octokit } = require("../../index.js");
+            const { db, cache, octokit } = require("../../index.js");
             const level = interaction.options.getString("level") || null;
             const levelname =
                 interaction.options.getString("levelname") || null;
@@ -836,19 +830,14 @@ module.exports = {
             const noDiv = list.filter((level) => !level.startsWith("_"));
             const currentPosition = list.indexOf(levelfile);
             const lowered = currentPosition < position;
-            // not rly sure why this says index bc
-            // it reutrns an entry from the noDiv array LOL
             const indexBelow = noDiv[position - 1];
-            logger.log(`indexBelow: ` + indexBelow);
 
             const levelBelow = await cache.levels.findOne({
                 where: { filename: indexBelow },
             });
-            logger.log(`Below: ${levelBelow.filename}`);
             const levelAbove = await cache.levels.findOne({
                 where: { position: levelBelow.position - 1 },
             });
-            logger.log(`Above: ${levelAbove.filename}`);
 
             if (currentPosition == -1)
                 return await interaction.editReply(

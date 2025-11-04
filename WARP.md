@@ -19,15 +19,13 @@ This file provides guidance to WARP (warp.dev) when working with code in this re
 
 ## Architecture Overview
 
-This is a **Discord bot for managing the All Rated Extreme Demons List** - a fork of the AREDL bot that manages record submissions and list maintenance through Discord interactions.
+This is a **Discord bot for managing the Layout List** - a fork of the AREDL bot that manages list maintenance through Discord interactions.
 
 ### Key Components
 
 **Entry Points:**
 
 -   `bot.js` - Command registration and deployment to Discord
--   `index.js` - Main application entry point with database initialization
--   `startUtils.js` - Initialization utilities for client, database, and scheduled tasks
 
 **Core Structure:**
 

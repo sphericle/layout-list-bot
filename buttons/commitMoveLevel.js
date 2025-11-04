@@ -4,9 +4,7 @@ const {
     githubDataPath,
     githubBranch,
     changelogID,
-    enableSeparateStaffServer,
     guildId,
-    staffGuildId,
 } = require("../config.json");
 const { EmbedBuilder } = require("discord.js");
 const logger = require("log4js").getLogger();
@@ -61,7 +59,8 @@ module.exports = {
 
         const noDiv = list.filter((level) => !level.startsWith("_"));
 
-        const currentPosition = list.indexOf(level.filename) + 1;
+        const currentPosition = noDiv.indexOf(level.filename) + 1;
+        const realCurrentPosition = list.indexOf(level.filename) + 1;
         if (currentPosition == 0)
             return await interaction.editReply(
                 ":x: The given level is not on the list"
@@ -76,7 +75,7 @@ module.exports = {
               )
             : [];
 
-        if (level.position < 1 || level.position > list.length + 1) {
+        if (level.position < 1 || level.position > noDiv.length + 1) {
             return await interaction.editReply(
                 ":x: The given position is incorrect"
             );
@@ -85,8 +84,9 @@ module.exports = {
         const lowered = currentPosition < level.position;
 
         // get the level below the level we want to place
-        // +2 because 1 is index offset and 1 is to get the above level
+        // +2 because 1 is index offset and 1 is to get the level underneath
         const levelBelow = noDiv[level.position - 1];
+        const levelAbove = noDiv[level.position - 2];
 
         // find the index of that level in the real list
         const realBelow = list.indexOf(levelBelow);
@@ -95,8 +95,7 @@ module.exports = {
         list.splice(realBelow, 0, level.filename);
 
         // -1 bc indexes
-        // insert joke about language with indexing at 1 like maybe they were onto something
-        list.splice(lowered ? currentPosition - 1 : currentPosition, 1);
+        list.splice(lowered ? realCurrentPosition - 1 : realCurrentPosition, 1);
 
         changelogList.push({
             date: Math.floor(new Date().getTime() / 1000),
@@ -104,8 +103,8 @@ module.exports = {
             name: level.filename,
             to_rank: level.position,
             from_rank: currentPosition,
-            above: list[level.position] || null,
-            below: list[level.position - 2] || null,
+            above: levelBelow,
+            below: levelAbove,
         });
 
         const changes = [
@@ -219,14 +218,14 @@ module.exports = {
         }
 
         try {
-            const above = noDiv[level.position]
+            const above = levelAbove
                 ? await cache.levels.findOne({
-                      where: { filename: noDiv[level.position] },
+                      where: { filename: levelAbove },
                   })
                 : null;
-            const below = noDiv[level.position - 2]
+            const below = levelBelow
                 ? await cache.levels.findOne({
-                      where: { filename: noDiv[level.position - 2] },
+                      where: { filename: levelBelow },
                   })
                 : null;
             const levelname = (
@@ -240,15 +239,15 @@ module.exports = {
                     levelname: levelname,
                     old_position: currentPosition,
                     new_position: level.position,
-                    level_above: above?.name || null,
-                    level_below: below?.name || null,
+                    level_above: below?.name || null,
+                    level_below: above?.name || null,
                     action: lowered ? "lowered" : "raised",
                 });
 
-                let message = `${levelname} has been moved from #${currentPosition} to #${level.position}, `;
-                if (above) message += `above ${above?.name}`;
+                let message = `**${levelname}** has been ${lowered ? "lowered" : "raised"} from #${currentPosition} to #${level.position}, `;
+                if (above) message += `above **${below?.name}**`;
                 if (above && below) message += ` and `;
-                if (below) message += `below ${below?.name}`;
+                if (below) message += `below **${above?.name}**`;
                 message += ".";
 
                 // Create embed to send in public channel
@@ -259,11 +258,8 @@ module.exports = {
                     .setTimestamp();
 
                 const guild = await interaction.client.guilds.fetch(guildId);
-                const staffGuild = enableSeparateStaffServer
-                    ? await interaction.client.guilds.fetch(staffGuildId)
-                    : guild;
 
-                staffGuild.channels.cache.get(changelogID).send({
+                guild.channels.cache.get(changelogID).send({
                     embeds: [publicEmbed],
                 });
             }
@@ -289,6 +285,11 @@ module.exports = {
                 `Successfully created commit on ${githubBranch}: ${newCommit.data.sha}, but an error occured while cleanin up:\n${cleanupErr}`
             );
         }
+
+        await cache.levels.update(
+            { position: level.position },
+            { where: { filename: level.filename } }
+        );
 
         return await interaction.editReply(
             `:white_check_mark: Successfully moved **${level.filename}.json** (${newCommit.data.html_url})`
