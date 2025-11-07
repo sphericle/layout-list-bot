@@ -264,7 +264,7 @@ module.exports = {
                 // Create embed to send in public channel
                 const publicEmbed = new EmbedBuilder()
                     .setColor(0x8fce00)
-                    .setTitle(`:white_check_mark: ${levelData.name}`) // TODO: maybe make this a random funny message
+                    .setTitle(`:white_check_mark: ${levelData.name}`)
                     .setDescription(message)
                     .setTimestamp();
 

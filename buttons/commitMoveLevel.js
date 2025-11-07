@@ -252,16 +252,19 @@ module.exports = {
 
                 // Create embed to send in public channel
                 const publicEmbed = new EmbedBuilder()
-                    .setColor(0x8fce00)
-                    .setTitle(`:white_check_mark: ${levelname}`) // TODO: maybe make this a random funny message
+                    .setColor(0x00d3ff)
+                    .setTitle(`:arrow_${lowered ? "down" : "up"}: ${levelname}`)
                     .setDescription(message)
                     .setTimestamp();
 
                 const guild = await interaction.client.guilds.fetch(guildId);
 
-                guild.channels.cache.get(changelogID).send({
+                const announcementMsg = guild.channels.cache.get(changelogID).send({
                     embeds: [publicEmbed],
                 });
+                await announcementMsg.crosspost();
+                await announcementMsg.react("👍");
+                await announcementMsg.react("👎");
             }
         } catch (changelogErr) {
             logger.info(
