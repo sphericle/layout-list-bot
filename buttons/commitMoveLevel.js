@@ -259,7 +259,9 @@ module.exports = {
 
                 const guild = await interaction.client.guilds.fetch(guildId);
 
-                const announcementMsg = guild.channels.cache.get(changelogID).send({
+                const channel = guild.channels.cache.get(changelogID);
+
+                const announcementMsg = await channel.send({
                     embeds: [publicEmbed],
                 });
                 await announcementMsg.crosspost();
@@ -267,7 +269,7 @@ module.exports = {
                 await announcementMsg.react("👎");
             }
         } catch (changelogErr) {
-            logger.info(
+            logger.error(
                 `An error occured while creating a changelog entry:\n${changelogErr}`
             );
             return await interaction.editReply(
